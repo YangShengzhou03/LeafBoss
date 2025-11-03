@@ -44,6 +44,11 @@
             登录
           </el-button>
         </el-form-item>
+        
+        <div class="register-link">
+          <span>还没有账号？</span>
+          <el-link type="primary" @click="goToRegister">立即注册</el-link>
+        </div>
       </el-form>
     </div>
   </div>
@@ -98,6 +103,10 @@ const handleLogin = async () => {
     loading.value = false
   }
 }
+
+const goToRegister = () => {
+  router.push('/register')
+}
 </script>
 
 <style scoped>
@@ -136,5 +145,15 @@ const handleLogin = async () => {
 
 .login-form-content {
   margin-top: 20px;
+}
+
+.register-link {
+  text-align: center;
+  margin-top: 20px;
+  color: #666;
+}
+
+.register-link span {
+  margin-right: 8px;
 }
 </style>

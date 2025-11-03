@@ -70,3 +70,29 @@ export const activateCard = (id: number) => {
 export const rechargeCard = (id: number) => {
   return service.post(`/cards/${id}/recharge`)
 }
+
+// 导入卡
+export const importCards = (file: File) => {
+  const formData = new FormData()
+  formData.append('file', file)
+  return service.post('/cards/import', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  })
+}
+
+// 下载导入模板
+export const downloadTemplate = () => {
+  return service.get('/cards/import/template', {
+    responseType: 'blob'
+  })
+}
+
+// 导出卡数据
+export const exportCards = (params: CardQueryParams) => {
+  return service.get('/cards/export', {
+    params,
+    responseType: 'blob'
+  })
+}
