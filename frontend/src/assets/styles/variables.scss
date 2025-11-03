@@ -1,0 +1,104 @@
+// 颜色变量
+$--color-primary: #409EFF;
+$--color-success: #67C23A;
+$--color-warning: #E6A23C;
+$--color-danger: #F56C6C;
+$--color-info: #909399;
+
+// 中性色
+$--color-white: #FFFFFF;
+$--color-black: #000000;
+$--color-text-primary: #303133;
+$--color-text-regular: #606266;
+$--color-text-secondary: #909399;
+$--color-text-placeholder: #C0C4CC;
+
+// 背景色
+$--background-color-base: #F5F7FA;
+$--background-color-light: #F2F6FC;
+
+// 边框色
+$--border-color-base: #DCDFE6;
+$--border-color-light: #E4E7ED;
+$--border-color-lighter: #EBEEF5;
+$--border-color-extra-light: #F2F6FC;
+
+// 字体大小
+$--font-size-extra-small: 12px;
+$--font-size-small: 13px;
+$--font-size-base: 14px;
+$--font-size-medium: 16px;
+$--font-size-large: 18px;
+$--font-size-extra-large: 20px;
+
+// 字体粗细
+$--font-weight-primary: 500;
+$--font-weight-secondary: 400;
+
+// 边框圆角
+$--border-radius-base: 4px;
+$--border-radius-small: 2px;
+$--border-radius-round: 20px;
+$--border-radius-circle: 100%;
+
+// 阴影
+$--box-shadow-base: 0 2px 4px rgba(0, 0, 0, .12), 0 0 6px rgba(0, 0, 0, .04);
+$--box-shadow-light: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+
+// 间距
+$--spacing-xs: 5px;
+$--spacing-sm: 10px;
+$--spacing-base: 15px;
+$--spacing-lg: 20px;
+$--spacing-xl: 30px;
+
+// 布局
+$--header-height: 60px;
+$--sidebar-width: 200px;
+$--sidebar-width-collapsed: 64px;
+
+// 响应式断点
+$--breakpoint-xs: 480px;
+$--breakpoint-sm: 768px;
+$--breakpoint-md: 992px;
+$--breakpoint-lg: 1200px;
+$--breakpoint-xl: 1920px;
+
+// 动画
+$--transition-duration: .3s;
+$--transition-function: ease-in-out;
+
+// 卡片样式
+$--card-padding: 20px;
+$--card-border-radius: 4px;
+$--card-background: #FFFFFF;
+
+// 表格样式
+$--table-header-background: #F5F7FA;
+$--table-border-color: #EBEEF5;
+$--table-hover-background: #F5F7FA;
+
+// 按钮样式
+$--button-border-radius: 4px;
+$--button-padding-vertical: 12px;
+$--button-padding-horizontal: 20px;
+
+// 表单样式
+$--input-height: 40px;
+$--input-border-radius: 4px;
+$--input-padding-horizontal: 15px;
+
+// 菜单样式
+$--menu-background-color: #304156;
+$--menu-text-color: #BFBFBF;
+$--menu-active-text-color: #409EFF;
+
+// 标签页样式
+$--tabs-header-height: 40px;
+$--tabs-active-color: #409EFF;
+
+// 消息提示样式
+$--message-success-background: #F0F9EB;
+$--message-warning-background: #FDF6EC;
+$--message-error-background: #FEF0F0;
+$--message-info-background: #F4F4F5;

@@ -95,6 +95,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import * as echarts from 'echarts'
+import { CreditCard, Clock, Finished, Close } from '@element-plus/icons-vue'
 
 // 统计数据
 const stats = ref({

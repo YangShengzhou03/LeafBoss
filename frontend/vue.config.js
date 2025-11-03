@@ -39,13 +39,5 @@ module.exports = defineConfig({
       }
     }
   },
-  // 确保Vue 3兼容性
-  chainWebpack: config => {
-    config.plugin('vue').tap(args => {
-      args[0].compilerOptions = {
-        isCustomElement: tag => tag.startsWith('el-')
-      }
-      return args
-    })
-  }
+
 })

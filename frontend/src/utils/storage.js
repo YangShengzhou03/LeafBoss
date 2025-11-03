@@ -1,6 +1,6 @@
 // 本地存储工具函数
 
-import { STORAGE_KEYS } from '@/constants'
+import { STORAGE_KEYS } from '@/constants/index.ts'
 
 /**
  * 安全的本地存储操作
@@ -9,7 +9,7 @@ export class StorageUtil {
   /**
    * 设置存储项
    */
-  static set(key: string, value: any): void {
+  static set(key, value) {
     try {
       const serializedValue = JSON.stringify(value)
       localStorage.setItem(key, serializedValue)
@@ -21,7 +21,7 @@ export class StorageUtil {
   /**
    * 获取存储项
    */
-  static get<T = any>(key: string, defaultValue?: T): T | null {
+  static get(key, defaultValue) {
     try {
       const item = localStorage.getItem(key)
       if (item === null) return defaultValue || null
@@ -36,7 +36,7 @@ export class StorageUtil {
   /**
    * 移除存储项
    */
-  static remove(key: string): void {
+  static remove(key) {
     try {
       localStorage.removeItem(key)
     } catch (error) {
@@ -47,7 +47,7 @@ export class StorageUtil {
   /**
    * 清空所有存储项
    */
-  static clear(): void {
+  static clear() {
     try {
       localStorage.clear()
     } catch (error) {
@@ -58,7 +58,7 @@ export class StorageUtil {
   /**
    * 获取存储项数量
    */
-  static get length(): number {
+  static get length() {
     try {
       return localStorage.length
     } catch (error) {
@@ -70,7 +70,7 @@ export class StorageUtil {
   /**
    * 检查存储项是否存在
    */
-  static has(key: string): boolean {
+  static has(key) {
     try {
       return localStorage.getItem(key) !== null
     } catch (error) {
@@ -82,7 +82,7 @@ export class StorageUtil {
   /**
    * 获取所有存储键名
    */
-  static keys(): string[] {
+  static keys() {
     try {
       return Object.keys(localStorage)
     } catch (error) {
@@ -97,60 +97,60 @@ export class StorageUtil {
  */
 export const AppStorage = {
   // Token操作
-  getToken(): string | null {
-    return StorageUtil.get<string>(STORAGE_KEYS.TOKEN)
+  getToken() {
+    return StorageUtil.get(STORAGE_KEYS.TOKEN)
   },
 
-  setToken(token: string): void {
+  setToken(token) {
     StorageUtil.set(STORAGE_KEYS.TOKEN, token)
   },
 
-  removeToken(): void {
+  removeToken() {
     StorageUtil.remove(STORAGE_KEYS.TOKEN)
   },
 
   // 用户信息操作
-  getUserInfo<T = any>(): T | null {
-    return StorageUtil.get<T>(STORAGE_KEYS.USER_INFO)
+  getUserInfo() {
+    return StorageUtil.get(STORAGE_KEYS.USER_INFO)
   },
 
-  setUserInfo<T = any>(userInfo: T): void {
+  setUserInfo(userInfo) {
     StorageUtil.set(STORAGE_KEYS.USER_INFO, userInfo)
   },
 
-  removeUserInfo(): void {
+  removeUserInfo() {
     StorageUtil.remove(STORAGE_KEYS.USER_INFO)
   },
 
   // 侧边栏状态
-  getSidebarStatus(): boolean {
-    return StorageUtil.get<boolean>(STORAGE_KEYS.SIDEBAR_STATUS, true)
+  getSidebarStatus() {
+    return StorageUtil.get(STORAGE_KEYS.SIDEBAR_STATUS, true)
   },
 
-  setSidebarStatus(opened: boolean): void {
+  setSidebarStatus(opened) {
     StorageUtil.set(STORAGE_KEYS.SIDEBAR_STATUS, opened)
   },
 
   // 主题设置
-  getTheme(): string | null {
-    return StorageUtil.get<string>(STORAGE_KEYS.THEME)
+  getTheme() {
+    return StorageUtil.get(STORAGE_KEYS.THEME)
   },
 
-  setTheme(theme: string): void {
+  setTheme(theme) {
     StorageUtil.set(STORAGE_KEYS.THEME, theme)
   },
 
   // 语言设置
-  getLanguage(): string | null {
-    return StorageUtil.get<string>(STORAGE_KEYS.LANGUAGE)
+  getLanguage() {
+    return StorageUtil.get(STORAGE_KEYS.LANGUAGE)
   },
 
-  setLanguage(language: string): void {
+  setLanguage(language) {
     StorageUtil.set(STORAGE_KEYS.LANGUAGE, language)
   },
 
   // 清空所有应用相关存储
-  clearAppData(): void {
+  clearAppData() {
     const keys = Object.values(STORAGE_KEYS)
     keys.forEach(key => StorageUtil.remove(key))
   },
@@ -160,7 +160,7 @@ export const AppStorage = {
  * 会话存储工具（临时存储）
  */
 export class SessionStorageUtil {
-  static set(key: string, value: any): void {
+  static set(key, value) {
     try {
       const serializedValue = JSON.stringify(value)
       sessionStorage.setItem(key, serializedValue)
@@ -169,7 +169,7 @@ export class SessionStorageUtil {
     }
   }
 
-  static get<T = any>(key: string, defaultValue?: T): T | null {
+  static get(key, defaultValue) {
     try {
       const item = sessionStorage.getItem(key)
       if (item === null) return defaultValue || null
@@ -181,7 +181,7 @@ export class SessionStorageUtil {
     }
   }
 
-  static remove(key: string): void {
+  static remove(key) {
     try {
       sessionStorage.removeItem(key)
     } catch (error) {
@@ -189,7 +189,7 @@ export class SessionStorageUtil {
     }
   }
 
-  static clear(): void {
+  static clear() {
     try {
       sessionStorage.clear()
     } catch (error) {
@@ -202,7 +202,7 @@ export class SessionStorageUtil {
  * Cookie操作工具
  */
 export class CookieUtil {
-  static set(name: string, value: string, days?: number): void {
+  static set(name, value, days) {
     let expires = ''
     if (days) {
       const date = new Date()
@@ -212,7 +212,7 @@ export class CookieUtil {
     document.cookie = name + '=' + (value || '') + expires + '; path=/' + '; SameSite=Lax'
   }
 
-  static get(name: string): string | null {
+  static get(name) {
     const nameEQ = name + '='
     const ca = document.cookie.split(';')
     for (let i = 0; i < ca.length; i++) {
@@ -223,7 +223,7 @@ export class CookieUtil {
     return null
   }
 
-  static remove(name: string): void {
+  static remove(name) {
     document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/' + '; SameSite=Lax'
   }
 }
