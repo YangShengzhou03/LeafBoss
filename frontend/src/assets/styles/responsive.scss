@@ -1,0 +1,242 @@
+// 响应式断点变量
+$breakpoints: (
+  xs: 480px,
+  sm: 576px,
+  md: 768px,
+  lg: 992px,
+  xl: 1200px,
+  xxl: 1600px
+);
+
+// 媒体查询混入
+@mixin respond-to($breakpoint) {
+  @if map-has-key($breakpoints, $breakpoint) {
+    @media (max-width: map-get($breakpoints, $breakpoint)) {
+      @content;
+    }
+  } @else {
+    @warn "Breakpoint #{$breakpoint} is not defined in $breakpoints map.";
+  }
+}
+
+@mixin respond-above($breakpoint) {
+  @if map-has-key($breakpoints, $breakpoint) {
+    @media (min-width: map-get($breakpoints, $breakpoint) + 1px) {
+      @content;
+    }
+  } @else {
+    @warn "Breakpoint #{$breakpoint} is not defined in $breakpoints map.";
+  }
+}
+
+// 移动端优先的响应式混入
+@mixin mobile-first($breakpoint) {
+  @if map-has-key($breakpoints, $breakpoint) {
+    @media (min-width: map-get($breakpoints, $breakpoint)) {
+      @content;
+    }
+  } @else {
+    @warn "Breakpoint #{$breakpoint} is not defined in $breakpoints map.";
+  }
+}
+
+// 响应式容器
+.responsive-container {
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 16px;
+
+  @include respond-to(xs) {
+    padding: 0 8px;
+  }
+
+  @include respond-above(sm) {
+    max-width: 540px;
+  }
+
+  @include respond-above(md) {
+    max-width: 720px;
+  }
+
+  @include respond-above(lg) {
+    max-width: 960px;
+  }
+
+  @include respond-above(xl) {
+    max-width: 1140px;
+  }
+
+  @include respond-above(xxl) {
+    max-width: 1320px;
+  }
+}
+
+// 响应式网格系统
+.responsive-grid {
+  display: grid;
+  gap: 16px;
+
+  @include respond-to(xs) {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  @include respond-above(sm) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include respond-above(md) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  @include respond-above(lg) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  @include respond-above(xl) {
+    grid-template-columns: repeat(6, 1fr);
+  }
+}
+
+// 响应式字体大小
+.responsive-text {
+  font-size: 14px;
+
+  @include respond-to(xs) {
+    font-size: 12px;
+  }
+
+  @include respond-above(md) {
+    font-size: 16px;
+  }
+
+  @include respond-above(lg) {
+    font-size: 18px;
+  }
+}
+
+// 响应式间距工具类
+@for $i from 1 through 10 {
+  .p-#{$i} {
+    padding: #{$i * 4}px;
+  }
+  
+  .m-#{$i} {
+    margin: #{$i * 4}px;
+  }
+
+  @include respond-to(xs) {
+    .p-#{$i} {
+      padding: #{$i * 2}px;
+    }
+    
+    .m-#{$i} {
+      margin: #{$i * 2}px;
+    }
+  }
+}
+
+// 隐藏/显示工具类
+.hidden-xs {
+  @include respond-to(xs) {
+    display: none !important;
+  }
+}
+
+.hidden-sm {
+  @include respond-to(sm) {
+    display: none !important;
+  }
+}
+
+.hidden-md {
+  @include respond-to(md) {
+    display: none !important;
+  }
+}
+
+.visible-xs {
+  display: none !important;
+  
+  @include respond-to(xs) {
+    display: block !important;
+  }
+}
+
+.visible-sm {
+  display: none !important;
+  
+  @include respond-to(sm) {
+    display: block !important;
+  }
+}
+
+.visible-md {
+  display: none !important;
+  
+  @include respond-to(md) {
+    display: block !important;
+  }
+}
+
+// 响应式图片
+.responsive-image {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+// 触摸设备优化
+.touch-optimized {
+  @media (hover: none) and (pointer: coarse) {
+    // 触摸设备优化样式
+    min-height: 44px; // 最小触摸目标尺寸
+    min-width: 44px;
+    
+    // 增加触摸反馈
+    &:active {
+      opacity: 0.7;
+      transform: scale(0.98);
+    }
+  }
+}
+
+// 暗色模式支持
+@media (prefers-color-scheme: dark) {
+  .dark-mode-support {
+    background-color: #1a1a1a;
+    color: #ffffff;
+  }
+}
+
+// 高对比度模式支持
+@media (prefers-contrast: high) {
+  .high-contrast-support {
+    border-width: 2px;
+    font-weight: 600;
+  }
+}
+
+// 减少动画支持
+@media (prefers-reduced-motion: reduce) {
+  .reduced-motion-support {
+    animation: none;
+    transition: none;
+  }
+}
+
+// 打印样式
+@media print {
+  .print-hidden {
+    display: none !important;
+  }
+  
+  .print-visible {
+    display: block !important;
+  }
+  
+  body {
+    background: white !important;
+    color: black !important;
+  }
+}
