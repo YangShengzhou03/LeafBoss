@@ -110,6 +110,7 @@
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useDebounceFn } from '@vueuse/core'
+import { generateCardsBatch, validateCardFormat, cardStatusManager, cardCacheManager } from '@/utils/cardUtils'
 
 // 响应式数据
 const loading = ref(false)
@@ -252,26 +253,13 @@ const handleAddCards = async () => {
   }
 }
 
-// 卡密生成算法
+// 使用优化后的卡密生成算法
 const generateCards = (specType, quantity) => {
-  const cards = []
-  const timestamp = new Date().toISOString().slice(0, 10).replace(/-/g, '')
-  
-  for (let i = 1; i <= quantity; i++) {
-    const cardId = `CARD-${timestamp}-${String(i).padStart(3, '0')}`
-    cards.push({
-      id: cardId,
-      specType: specType,
-      responseNumber: 0,
-      status: 'unused',
-      createdAt: new Date().toLocaleString('zh-CN'),
-      categoryName: '软件服务',
-      goodsName: '办公软件',
-      specName: specType === 'month' ? '月卡' : specType === 'quarter' ? '季卡' : '年卡'
-    })
-  }
-  
-  return cards
+  return generateCardsBatch(specType, quantity, {
+    prefix: 'CARD',
+    categoryName: '软件服务',
+    goodsName: '办公软件'
+  })
 }
 
 // 内存泄漏防护
