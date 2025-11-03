@@ -17,7 +17,7 @@
       >
         <el-menu-item index="/dashboard">
           <el-icon><DataBoard /></el-icon>
-          <span>仪表板</span>
+          <span>仪表盘</span>
         </el-menu-item>
         <el-sub-menu index="/product">
           <template #title>
@@ -28,22 +28,28 @@
             <el-icon><Goods /></el-icon>
             <span>商品管理</span>
           </el-menu-item>
-          <el-menu-item index="/product/categories">
-            <el-icon><Folder /></el-icon>
-            <span>商品分类</span>
-          </el-menu-item>
           <el-menu-item index="/product/specifications">
             <el-icon><List /></el-icon>
             <span>规格管理</span>
           </el-menu-item>
         </el-sub-menu>
-        <el-menu-item index="/cards">
-          <el-icon><CreditCard /></el-icon>
-          <span>卡密管理</span>
-        </el-menu-item>
-        <el-menu-item index="/validation">
-          <el-icon><Search /></el-icon>
-          <span>卡密验证</span>
+        <el-sub-menu index="/cards">
+          <template #title>
+            <el-icon><CreditCard /></el-icon>
+            <span>卡密管理</span>
+          </template>
+          <el-menu-item index="/cards/list">
+            <el-icon><List /></el-icon>
+            <span>卡密列表</span>
+          </el-menu-item>
+          <el-menu-item index="/cards/validation">
+            <el-icon><Search /></el-icon>
+            <span>卡密验证</span>
+          </el-menu-item>
+        </el-sub-menu>
+        <el-menu-item index="/users">
+          <el-icon><User /></el-icon>
+          <span>用户管理</span>
         </el-menu-item>
       </el-menu>
     </el-aside>

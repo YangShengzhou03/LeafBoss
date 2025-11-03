@@ -9,7 +9,7 @@ const routes = [
     path: '/dashboard',
     name: 'Dashboard',
     component: () => import('@/views/Dashboard.vue'),
-    meta: { title: '仪表板' }
+    meta: { title: '仪表盘' }
   },
   {
     path: '/product',
@@ -35,15 +35,25 @@ const routes = [
   },
   {
     path: '/cards',
-    name: 'Cards',
-    component: () => import('@/views/Cards.vue'),
-    meta: { title: '卡密管理' }
+    redirect: '/cards/list'
   },
   {
-    path: '/validation',
-    name: 'Validation',
+    path: '/cards/list',
+    name: 'CardsList',
+    component: () => import('@/views/Cards.vue'),
+    meta: { title: '卡密列表' }
+  },
+  {
+    path: '/cards/validation',
+    name: 'CardsValidation',
     component: () => import('@/views/Validation.vue'),
     meta: { title: '卡密验证' }
+  },
+  {
+    path: '/users',
+    name: 'Users',
+    component: () => import('@/views/Users.vue'),
+    meta: { title: '用户管理' }
   }
 ]
 
