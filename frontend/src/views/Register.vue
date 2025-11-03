@@ -48,6 +48,15 @@
             :prefix-icon="Lock"
             show-password
           />
+          <div class="password-strength">
+            <div 
+              class="strength-bar"
+              :class="checkPasswordStrength(registerForm.password)"
+            ></div>
+            <span class="strength-text">
+              {{ getPasswordStrengthText(registerForm.password) }}
+            </span>
+          </div>
         </el-form-item>
         
         <el-form-item prop="confirmPassword">
@@ -89,6 +98,8 @@ import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
 import { User, Lock, Message, UserFilled } from '@element-plus/icons-vue'
+import { safeAuthApi } from '@/services/auth'
+import { Validator } from '@/utils/validate'
 
 const router = useRouter()
 const registerFormRef = ref<FormInstance>()
@@ -102,36 +113,73 @@ const registerForm = reactive({
   confirmPassword: ''
 })
 
-const validateConfirmPassword = (rule: any, value: string, callback: any) => {
-  if (value === '') {
-    callback(new Error('请再次输入密码'))
-  } else if (value !== registerForm.password) {
-    callback(new Error('两次输入密码不一致'))
-  } else {
-    callback()
-  }
-}
+
 
 const registerRules: FormRules = {
   username: [
     { required: true, message: '请输入用户名', trigger: 'blur' },
-    { min: 3, max: 20, message: '用户名长度在 3 到 20 个字符', trigger: 'blur' }
+    { 
+      validator: (rule, value, callback) => {
+        if (!Validator.username(value)) {
+          callback(new Error('用户名格式不正确（4-20位字母、数字、下划线）'))
+        } else {
+          callback()
+        }
+      }, 
+      trigger: 'blur' 
+    }
   ],
   nickname: [
     { required: true, message: '请输入昵称', trigger: 'blur' },
-    { min: 2, max: 20, message: '昵称长度在 2 到 20 个字符', trigger: 'blur' }
+    { 
+      validator: (rule, value, callback) => {
+        if (!Validator.nickname(value)) {
+          callback(new Error('昵称格式不正确（2-20位中英文、数字、下划线）'))
+        } else {
+          callback()
+        }
+      }, 
+      trigger: 'blur' 
+    }
   ],
   email: [
     { required: true, message: '请输入邮箱地址', trigger: 'blur' },
-    { type: 'email', message: '请输入正确的邮箱地址', trigger: 'blur' }
+    { 
+      validator: (rule, value, callback) => {
+        if (!Validator.email(value)) {
+          callback(new Error('请输入正确的邮箱地址'))
+        } else {
+          callback()
+        }
+      }, 
+      trigger: 'blur' 
+    }
   ],
   password: [
     { required: true, message: '请输入密码', trigger: 'blur' },
-    { min: 6, max: 20, message: '密码长度在 6 到 20 个字符', trigger: 'blur' }
+    { 
+      validator: (rule, value, callback) => {
+        if (!Validator.password(value)) {
+          callback(new Error('密码格式不正确（6-20位，包含字母和数字）'))
+        } else {
+          callback()
+        }
+      }, 
+      trigger: 'blur' 
+    }
   ],
   confirmPassword: [
     { required: true, message: '请确认密码', trigger: 'blur' },
-    { validator: validateConfirmPassword, trigger: 'blur' }
+    {
+      validator: (rule, value, callback) => {
+        if (value !== registerForm.password) {
+          callback(new Error('两次输入的密码不一致'))
+        } else {
+          callback()
+        }
+      },
+      trigger: 'blur'
+    }
   ]
 }
 
@@ -142,11 +190,23 @@ const handleRegister = async () => {
     await registerFormRef.value.validate()
     loading.value = true
     
-    // 模拟注册
-    ElMessage.success('注册成功，请登录')
-    router.push('/login')
-  } catch (error) {
+    // 调用真实API注册
+    const response = await safeAuthApi.register({
+      username: registerForm.username,
+      nickname: registerForm.nickname,
+      email: registerForm.email,
+      password: registerForm.password
+    })
+    
+    if (response.success) {
+      ElMessage.success('注册成功，请登录')
+      router.push('/login')
+    } else {
+      ElMessage.error(response.message || '注册失败')
+    }
+  } catch (error: any) {
     console.error('注册失败:', error)
+    ElMessage.error(error.message || '注册失败，请检查网络连接')
   } finally {
     loading.value = false
   }
@@ -154,6 +214,40 @@ const handleRegister = async () => {
 
 const goToLogin = () => {
   router.push('/login')
+}
+
+// 密码强度检查
+const checkPasswordStrength = (password: string) => {
+  if (!password) return ''
+  
+  const hasLetter = /[a-zA-Z]/.test(password)
+  const hasNumber = /\d/.test(password)
+  const hasSpecial = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)
+  
+  if (password.length >= 8 && hasLetter && hasNumber && hasSpecial) {
+    return 'strong'
+  } else if (password.length >= 6 && hasLetter && hasNumber) {
+    return 'medium'
+  } else {
+    return 'weak'
+  }
+}
+
+// 获取密码强度文本
+const getPasswordStrengthText = (password: string) => {
+  if (!password) return ''
+  
+  const strength = checkPasswordStrength(password)
+  switch (strength) {
+    case 'strong':
+      return '密码强度：强'
+    case 'medium':
+      return '密码强度：中'
+    case 'weak':
+      return '密码强度：弱'
+    default:
+      return ''
+  }
 }
 </script>
 
@@ -193,6 +287,37 @@ const goToLogin = () => {
 
 .register-form-content {
   margin-top: 20px;
+}
+
+.password-strength {
+  margin-top: 8px;
+  
+  .strength-bar {
+    height: 4px;
+    border-radius: 2px;
+    margin-bottom: 4px;
+    transition: all 0.3s;
+    
+    &.weak {
+      width: 33%;
+      background-color: #f56c6c;
+    }
+    
+    &.medium {
+      width: 66%;
+      background-color: #e6a23c;
+    }
+    
+    &.strong {
+      width: 100%;
+      background-color: #67c23a;
+    }
+  }
+  
+  .strength-text {
+    font-size: 12px;
+    color: #909399;
+  }
 }
 
 .login-link {

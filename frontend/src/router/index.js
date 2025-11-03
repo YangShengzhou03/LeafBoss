@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import type { RouteRecordRaw, RouteLocationNormalized } from 'vue-router'
-import { ElMessage } from 'element-plus'
-import { useUserStore } from '@/stores'
+import type { RouteRecordRaw } from 'vue-router'
+import { setupRouterGuards } from './guards'
 
 // 路由元信息类型定义
 interface RouteMeta {
@@ -28,6 +27,18 @@ const routes: RouteRecordRaw[] = [
     meta: { title: '注册', requiresAuth: false }
   },
   {
+    path: '/forgot-password',
+    name: 'ForgotPassword',
+    component: () => import('@/views/ForgotPassword.vue'),
+    meta: { title: '忘记密码', requiresAuth: false }
+  },
+  {
+    path: '/reset-password',
+    name: 'ResetPassword',
+    component: () => import('@/views/ResetPassword.vue'),
+    meta: { title: '重置密码', requiresAuth: false }
+  },
+  {
     path: '/',
     component: () => import('@/layout/Layout.vue'),
     meta: { requiresAuth: true },
@@ -43,19 +54,19 @@ const routes: RouteRecordRaw[] = [
         path: 'categories',
         name: 'CategoryManagement',
         component: () => import('@/views/categories/CategoryList.vue'),
-        meta: { title: '分类管理', requiresAuth: true }
+        meta: { title: '分类管理', requiresAuth: true, permissions: ['admin', 'manager'] }
       },
       {
         path: 'categories/add',
         name: 'CategoryAdd',
         component: () => import('@/views/categories/CategoryForm.vue'),
-        meta: { title: '添加分类', requiresAuth: true }
+        meta: { title: '添加分类', requiresAuth: true, permissions: ['admin', 'manager'] }
       },
       {
         path: 'categories/edit/:id',
         name: 'CategoryEdit',
         component: () => import('@/views/categories/CategoryForm.vue'),
-        meta: { title: '编辑分类', requiresAuth: true }
+        meta: { title: '编辑分类', requiresAuth: true, permissions: ['admin', 'manager'] }
       },
       // 卡管理
       {
@@ -82,6 +93,20 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/views/cards/CardDetail.vue'),
         meta: { title: '卡详情', requiresAuth: true }
       },
+      // 用户管理（仅管理员）
+      {
+        path: 'users',
+        name: 'UserManagement',
+        component: () => import('@/views/users/UserList.vue'),
+        meta: { title: '用户管理', requiresAuth: true, permissions: ['admin'] }
+      },
+      // 系统设置（管理员和经理）
+      {
+        path: 'settings',
+        name: 'Settings',
+        component: () => import('@/views/settings/Settings.vue'),
+        meta: { title: '系统设置', requiresAuth: true, permissions: ['admin', 'manager'] }
+      },
       // 回收站
       {
         path: 'trash',
@@ -104,45 +129,7 @@ const router = createRouter({
   routes
 })
 
-// 路由守卫
-router.beforeEach(async (to: RouteLocationNormalized, from: RouteLocationNormalized) => {
-  const userStore = useUserStore()
-  
-  // 设置页面标题
-  if (to.meta.title) {
-    document.title = `${to.meta.title} - 枫叶卡管`
-  }
-  
-  // 检查是否需要认证
-  if (to.meta.requiresAuth) {
-    if (!userStore.token) {
-      ElMessage.warning('请先登录')
-      return { name: 'Login', query: { redirect: to.fullPath } }
-    }
-    
-    // 检查权限
-    if (to.meta.permissions && to.meta.permissions.length > 0) {
-      const hasPermission = userStore.permissions?.some(permission => 
-        to.meta.permissions?.includes(permission)
-      )
-      
-      if (!hasPermission) {
-        ElMessage.error('权限不足')
-        return from.fullPath ? false : { name: 'Dashboard' }
-      }
-    }
-  }
-  
-  // 如果已登录且访问登录页，重定向到首页
-  if (to.name === 'Login' && userStore.token) {
-    return { name: 'Dashboard' }
-  }
-})
-
-// 路由错误处理
-router.onError((error) => {
-  console.error('路由错误:', error)
-  ElMessage.error('页面加载失败，请刷新重试')
-})
+// 设置路由守卫
+setupRouterGuards(router)
 
 export default router

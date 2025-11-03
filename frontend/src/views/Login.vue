@@ -33,6 +33,11 @@
           />
         </el-form-item>
         
+        <div class="login-options">
+          <el-checkbox v-model="rememberMe">记住我</el-checkbox>
+          <el-link type="primary" @click="handleForgotPassword">忘记密码？</el-link>
+        </div>
+        
         <el-form-item>
           <el-button
             type="primary"
@@ -55,29 +60,62 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
 import { User, Lock } from '@element-plus/icons-vue'
 import { useAppStore } from '@/stores'
+import { safeAuthApi } from '@/services/auth'
+import { Validator } from '@/utils/validate'
+import { AppStorage } from '@/utils/storage'
 
 const router = useRouter()
 const appStore = useAppStore()
 const loginFormRef = ref<FormInstance>()
 const loading = ref(false)
+const rememberMe = ref(false)
 
 const loginForm = reactive({
   username: '',
   password: ''
 })
 
+// 记住我功能：从本地存储恢复用户名
+onMounted(() => {
+  const rememberedUsername = AppStorage.getUserInfo()?.username
+  if (rememberedUsername) {
+    loginForm.username = rememberedUsername
+    rememberMe.value = true
+  }
+})
+
 const loginRules: FormRules = {
   username: [
-    { required: true, message: '请输入用户名', trigger: 'blur' }
+    { required: true, message: '请输入用户名', trigger: 'blur' },
+    { 
+      validator: (rule, value, callback) => {
+        if (!Validator.username(value)) {
+          callback(new Error('用户名格式不正确（4-20位字母、数字、下划线）'))
+        } else {
+          callback()
+        }
+      }, 
+      trigger: 'blur' 
+    }
   ],
   password: [
-    { required: true, message: '请输入密码', trigger: 'blur' }
+    { required: true, message: '请输入密码', trigger: 'blur' },
+    { 
+      validator: (rule, value, callback) => {
+        if (!Validator.password(value)) {
+          callback(new Error('密码格式不正确（6-20位，包含字母和数字）'))
+        } else {
+          callback()
+        }
+      }, 
+      trigger: 'blur' 
+    }
   ]
 }
 
@@ -88,17 +126,34 @@ const handleLogin = async () => {
     await loginFormRef.value.validate()
     loading.value = true
     
-    // 模拟登录
-    if (loginForm.username === 'admin' && loginForm.password === 'admin123') {
-      appStore.setToken('mock-token-' + Date.now())
-      appStore.setUserInfo({ username: 'admin', nickname: '管理员' })
+    // 调用真实API登录
+    const response = await safeAuthApi.login({
+      username: loginForm.username,
+      password: loginForm.password
+    })
+    
+    if (response.success && response.data) {
+      const { token, user } = response.data
+      
+      // 存储token和用户信息
+      appStore.setToken(token)
+      appStore.setUserInfo(user)
+      
+      // 记住我功能
+      if (rememberMe.value) {
+        AppStorage.setUserInfo({ username: user.username })
+      } else {
+        AppStorage.removeUserInfo()
+      }
+      
       ElMessage.success('登录成功')
       router.push('/dashboard')
     } else {
-      ElMessage.error('用户名或密码错误')
+      ElMessage.error(response.message || '登录失败')
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error('登录失败:', error)
+    ElMessage.error(error.message || '登录失败，请检查网络连接')
   } finally {
     loading.value = false
   }
@@ -106,6 +161,11 @@ const handleLogin = async () => {
 
 const goToRegister = () => {
   router.push('/register')
+}
+
+// 忘记密码功能
+const handleForgotPassword = () => {
+  ElMessage.info('请联系管理员重置密码')
 }
 </script>
 
@@ -143,17 +203,28 @@ const goToRegister = () => {
   font-size: 14px;
 }
 
-.login-form-content {
-  margin-top: 20px;
-}
-
-.register-link {
-  text-align: center;
-  margin-top: 20px;
-  color: #666;
-}
-
-.register-link span {
-  margin-right: 8px;
-}
-</style>
+.login-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    
+    .el-checkbox {
+      color: #666;
+    }
+    
+    .el-link {
+      font-size: 14px;
+    }
+  }
+  
+  .register-link {
+    text-align: center;
+    margin-top: 20px;
+    color: #666;
+    
+    .el-link {
+      margin-left: 5px;
+    }
+  }
+}</style>

@@ -26,12 +26,13 @@ export const ROUTE_CONFIG = {
 
 // 本地存储键名
 export const STORAGE_KEYS = {
-  TOKEN: 'token',
-  USER_INFO: 'userInfo',
-  SIDEBAR_STATUS: 'sidebarStatus',
+  TOKEN: 'leaf_token',
+  USER_INFO: 'leaf_user_info',
+  SIDEBAR_STATUS: 'leaf_sidebar_status',
   SIZE: 'size',
-  THEME: 'theme',
-  LANGUAGE: 'language',
+  THEME: 'leaf_theme',
+  LANGUAGE: 'leaf_language',
+  SETTINGS: 'leaf_settings'
 } as const
 
 // 响应状态码
@@ -74,6 +75,69 @@ export const PERMISSIONS = {
   SETTINGS_MANAGEMENT: 'system:settings',
 } as const
 
+// 用户角色
+export const USER_ROLES = {
+  ADMIN: 'admin',
+  USER: 'user',
+  GUEST: 'guest'
+} as const
+
+// 应用状态
+export enum APP_STATUS {
+  LOADING = 'loading',
+  READY = 'ready',
+  ERROR = 'error'
+}
+
+// 日期格式
+export const DATE_FORMATS = {
+  DEFAULT: 'YYYY-MM-DD HH:mm:ss',
+  DATE: 'YYYY-MM-DD',
+  TIME: 'HH:mm:ss',
+  SHORT_DATE: 'MM-DD',
+  SHORT_TIME: 'HH:mm',
+  CHINESE: 'YYYY年MM月DD日',
+  CHINESE_FULL: 'YYYY年MM月DD日 HH时mm分ss秒'
+} as const
+
+// 动画时长
+export const ANIMATION_DURATION = {
+  FAST: 150,
+  NORMAL: 300,
+  SLOW: 500
+} as const
+
+// 图标名称
+export const ICON_NAMES = {
+  DASHBOARD: 'dashboard',
+  USER: 'user',
+  SETTINGS: 'settings',
+  LOGOUT: 'logout',
+  SEARCH: 'search',
+  ADD: 'add',
+  EDIT: 'edit',
+  DELETE: 'delete',
+  SAVE: 'save',
+  CANCEL: 'cancel',
+  UPLOAD: 'upload',
+  DOWNLOAD: 'download',
+  REFRESH: 'refresh',
+  EXPAND: 'expand',
+  COLLAPSE: 'collapse'
+} as const
+
+// 本地化语言
+export const LANGUAGES = {
+  ZH_CN: 'zh-CN',
+  EN_US: 'en-US'
+} as const
+
+// 主题模式
+export const THEMES = {
+  LIGHT: 'light',
+  DARK: 'dark'
+} as const
+
 // 响应式断点
 export const BREAKPOINTS = {
   XS: 480,
@@ -108,10 +172,14 @@ export const THEME_CONFIG = {
 
 // 表单验证规则
 export const VALIDATION_RULES = {
-  USERNAME: /^[a-zA-Z0-9_]{3,20}$/,
-  PASSWORD: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d@$!%*?&]{8,20}$/,
+  // 用户名：4-20位字母、数字、下划线
+  USERNAME: /^[a-zA-Z0-9_]{4,20}$/,
+  // 密码：6-20位，包含字母和数字
+  PASSWORD: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{6,20}$/,
+  // 邮箱
   EMAIL: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-  PHONE: /^1[3-9]\d{9}$/,
+  // 手机号
+  PHONE: /^1[3-9]\d{9}$/
 } as const
 
 export default {

@@ -1,13 +1,12 @@
 {
   "name": "leaf-card-frontend",
   "version": "1.0.0",
-  "description": "Leaf Card前端 - Vue3 + Element Plus + TypeScript",
-  "type": "module",
+  "description": "Leaf Card前端 - Vue3 + Element Plus",
+  "private": true,
   "scripts": {
-    "dev": "vite",
-    "build": "vue-tsc && vite build",
-    "preview": "vite preview",
-    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore"
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint"
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.1.0",
@@ -19,15 +18,15 @@
     "vue-router": "^4.2.4"
   },
   "devDependencies": {
-    "@types/node": "^18.16.3",
-    "@vitejs/plugin-vue": "^4.2.3",
-    "@vue/eslint-config-typescript": "^11.0.3",
-    "@vue/tsconfig": "^0.4.0",
+    "@vue/cli-plugin-eslint": "^5.0.8",
+    "@vue/cli-plugin-router": "^5.0.8",
+    "@vue/cli-service": "^5.0.8",
     "eslint": "^8.42.0",
-    "eslint-plugin-vue": "^9.15.1",
-    "prettier": "^2.8.8",
-    "typescript": "^5.0.2",
-    "vite": "^4.4.0",
-    "vue-tsc": "^1.4.2"
-  }
+    "eslint-plugin-vue": "^9.15.1"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ]
 }
