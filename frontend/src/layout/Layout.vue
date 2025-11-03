@@ -13,7 +13,7 @@
       :class="{ 'mobile-sidebar': isMobile }"
     >
       <div class="logo">
-        <h2>{{ isCollapse ? '卡' : '卡管家' }}</h2>
+        <h2>{{ isCollapse ? '枫' : '枫叶卡管' }}</h2>
       </div>
       <el-menu
         :default-active="$route.path"
@@ -157,7 +157,7 @@ const currentTitle = computed(() => {
   
   // 从路由元信息获取标题
   const routeTitle = route.meta?.title as string
-  return routeTitle || titleMap[route.path] || '卡管家'
+  return routeTitle || titleMap[route.path] || '枫叶卡管'
 })
 
 // 检测屏幕尺寸

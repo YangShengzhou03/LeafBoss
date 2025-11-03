@@ -83,7 +83,7 @@ router.beforeEach(async (to: RouteLocationNormalized, from: RouteLocationNormali
   
   // 设置页面标题
   if (to.meta.title) {
-    document.title = `${to.meta.title} - 卡管家`
+    document.title = `${to.meta.title} - 枫叶卡管`
   }
   
   // 检查是否需要认证

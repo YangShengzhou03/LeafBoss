@@ -1,7 +1,7 @@
 {
-  "name": "card-keeper-frontend",
+  "name": "leaf-card-frontend",
   "version": "1.0.0",
-  "description": "卡管家前端 - Vue3 + Element Plus + TypeScript",
+  "description": "Leaf Card前端 - Vue3 + Element Plus + TypeScript",
   "type": "module",
   "scripts": {
     "dev": "vite",

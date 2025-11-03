@@ -2,8 +2,8 @@
   <div class="login-container">
     <div class="login-form">
       <div class="login-header">
-        <h2>卡管家</h2>
-        <p>CardKeeper - 智能卡管理系统</p>
+        <h2>枫叶卡管</h2>
+        <p>Leaf Card - 智能卡管理系统</p>
       </div>
       
       <el-form
