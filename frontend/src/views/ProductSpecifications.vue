@@ -19,17 +19,9 @@
           style="width: 200px"
           clearable
         />
-        <el-select v-model="filterCategory" placeholder="商品分类" clearable @change="handleCategoryChange">
+        <el-select v-model="filterGoods" placeholder="商品" clearable>
           <el-option 
-            v-for="category in categories" 
-            :key="category.id" 
-            :label="category.name" 
-            :value="category.id" 
-          />
-        </el-select>
-        <el-select v-model="filterGoods" placeholder="商品" clearable :disabled="!filterCategory">
-          <el-option 
-            v-for="goods in filteredGoods" 
+            v-for="goods in goodsList" 
             :key="goods.id" 
             :label="goods.name" 
             :value="goods.id" 
@@ -44,7 +36,7 @@
       <!-- 规格表格 -->
       <el-table :data="filteredSpecs" v-loading="loading">
         <el-table-column prop="name" label="规格名称" width="150" />
-        <el-table-column prop="categoryName" label="商品分类" width="120" />
+        <!-- 移除了分类列 -->
         <el-table-column prop="goodsName" label="商品" width="120" />
         <el-table-column prop="type" label="规格类型" width="120">
           <template #default="{ row }">
@@ -93,20 +85,10 @@
         <el-form-item label="规格名称" prop="name">
           <el-input v-model="currentSpec.name" placeholder="请输入规格名称" />
         </el-form-item>
-        <el-form-item label="商品分类" prop="categoryId">
-          <el-select v-model="currentSpec.categoryId" placeholder="请选择商品分类" @change="handleFormCategoryChange">
-            <el-option 
-              v-for="category in categories" 
-              :key="category.id" 
-              :label="category.name" 
-              :value="category.id" 
-            />
-          </el-select>
-        </el-form-item>
         <el-form-item label="商品" prop="goodsId">
-          <el-select v-model="currentSpec.goodsId" placeholder="请选择商品" :disabled="!currentSpec.categoryId">
+          <el-select v-model="currentSpec.goodsId" placeholder="请选择商品">
             <el-option 
-              v-for="goods in formFilteredGoods" 
+              v-for="goods in goodsList" 
               :key="goods.id" 
               :label="goods.name" 
               :value="goods.id" 
@@ -149,7 +131,6 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 
 const loading = ref(false)
 const searchKeyword = ref('')
-const filterCategory = ref('')
 const filterGoods = ref('')
 const filterStatus = ref('')
 const currentPage = ref(1)
@@ -162,7 +143,6 @@ const specForm = ref(null)
 const currentSpec = ref({
   id: '',
   name: '',
-  categoryId: '',
   goodsId: '',
   type: 'text',
   description: '',
@@ -170,82 +150,70 @@ const currentSpec = ref({
   status: 'active'
 })
 
+// 响应数字验证函数
+const validateResponseNumber = (rule, value, callback) => {
+  if (value === null || value === undefined || value === '') {
+    callback(new Error('请输入响应数字'))
+  } else if (value < 1 || value > 999) {
+    callback(new Error('响应数字必须在 1-999 之间'))
+  } else {
+    // 检查响应数字是否唯一
+    const existingSpec = specifications.value.find(spec => 
+      spec.responseNumber === value && spec.id !== currentSpec.value.id
+    )
+    if (existingSpec) {
+      callback(new Error(`响应数字 ${value} 已被规格 "${existingSpec.name}" 使用`))
+    } else {
+      callback()
+    }
+  }
+}
+
 const formRules = {
   name: [
-    { required: true, message: '请输入规格名称', trigger: 'blur' }
-  ],
-  categoryId: [
-    { required: true, message: '请选择商品分类', trigger: 'change' }
+    { required: true, message: '请输入规格名称', trigger: 'blur' },
+    { min: 2, max: 20, message: '规格名称长度在 2 到 20 个字符', trigger: 'blur' }
   ],
   goodsId: [
     { required: true, message: '请选择商品', trigger: 'change' }
   ],
   responseNumber: [
-    { required: true, message: '请输入响应数字', trigger: 'blur' }
+    { required: true, message: '请输入响应数字', trigger: 'blur' },
+    { type: 'number', min: 1, max: 999, message: '响应数字必须在 1-999 之间', trigger: 'blur' },
+    { validator: validateResponseNumber, trigger: 'blur' }
   ]
 }
-
-// 模拟商品分类数据
-const categories = ref([
-  {
-    id: 1,
-    name: '会员卡',
-    code: 'VIP'
-  },
-  {
-    id: 2,
-    name: '礼品卡',
-    code: 'GIFT'
-  },
-  {
-    id: 3,
-    name: '测试卡',
-    code: 'TEST'
-  }
-])
 
 // 模拟商品数据
 const goodsList = ref([
   {
     id: 1,
     name: '月卡会员',
-    categoryId: 1,
-    categoryName: '会员卡',
     status: 'active'
   },
   {
     id: 2,
     name: '季卡会员',
-    categoryId: 1,
-    categoryName: '会员卡',
     status: 'active'
   },
   {
     id: 3,
     name: '年卡会员',
-    categoryId: 1,
-    categoryName: '会员卡',
     status: 'active'
   },
   {
     id: 4,
     name: '生日礼品卡',
-    categoryId: 2,
-    categoryName: '礼品卡',
     status: 'active'
   },
   {
     id: 5,
     name: '节日礼品卡',
-    categoryId: 2,
-    categoryName: '礼品卡',
     status: 'active'
   },
   {
     id: 6,
     name: '测试卡A',
-    categoryId: 3,
-    categoryName: '测试卡',
     status: 'active'
   }
 ])
@@ -255,8 +223,6 @@ const specifications = ref([
   {
     id: 1,
     name: '月卡',
-    categoryId: 1,
-    categoryName: '会员卡',
     goodsId: 1,
     goodsName: '月卡会员',
     type: 'text',
@@ -268,8 +234,6 @@ const specifications = ref([
   {
     id: 2,
     name: '季卡',
-    categoryId: 1,
-    categoryName: '会员卡',
     goodsId: 2,
     goodsName: '季卡会员',
     type: 'text',
@@ -281,63 +245,53 @@ const specifications = ref([
   {
     id: 3,
     name: '年卡',
-    categoryId: 1,
-    categoryName: '会员卡',
     goodsId: 3,
     goodsName: '年卡会员',
     type: 'text',
     description: '365天有效期的卡密',
     responseNumber: 3,
-    status: 'inactive',
-    createdAt: '2024-01-14 16:45:00'
+    status: 'active',
+    createdAt: '2024-01-15 08:00:00'
   },
   {
     id: 4,
     name: '生日卡',
-    categoryId: 2,
-    categoryName: '礼品卡',
     goodsId: 4,
     goodsName: '生日礼品卡',
     type: 'text',
-    description: '生日礼品卡',
+    description: '生日专属礼品卡',
     responseNumber: 4,
     status: 'active',
-    createdAt: '2024-01-13 14:20:00'
+    createdAt: '2024-01-14 16:45:00'
+  },
+  {
+    id: 5,
+    name: '节日卡',
+    goodsId: 5,
+    goodsName: '节日礼品卡',
+    type: 'text',
+    description: '节日专属礼品卡',
+    responseNumber: 5,
+    status: 'active',
+    createdAt: '2024-01-14 15:30:00'
   }
 ])
-
-// 根据分类筛选的商品列表
-const filteredGoods = computed(() => {
-  if (!filterCategory.value) return []
-  return goodsList.value.filter(goods => goods.categoryId === filterCategory.value)
-})
-
-// 表单中根据分类筛选的商品列表
-const formFilteredGoods = computed(() => {
-  if (!currentSpec.value.categoryId) return []
-  return goodsList.value.filter(goods => goods.categoryId === currentSpec.value.categoryId)
-})
 
 const filteredSpecs = computed(() => {
   return specifications.value.filter(spec => {
     const matchesKeyword = !searchKeyword.value || 
       spec.name.toLowerCase().includes(searchKeyword.value.toLowerCase())
-    const matchesCategory = !filterCategory.value || spec.categoryId === filterCategory.value
     const matchesGoods = !filterGoods.value || spec.goodsId === filterGoods.value
     const matchesStatus = !filterStatus.value || spec.status === filterStatus.value
-    return matchesKeyword && matchesCategory && matchesGoods && matchesStatus
+    return matchesKeyword && matchesGoods && matchesStatus
   })
 })
 
-// 处理分类变化
-const handleCategoryChange = () => {
-  filterGoods.value = '' // 重置商品筛选
-}
 
-// 处理表单分类变化
-const handleFormCategoryChange = () => {
-  currentSpec.value.goodsId = '' // 重置商品选择
-}
+
+
+
+
 
 const editSpec = (spec) => {
   isEditing.value = true
@@ -373,6 +327,18 @@ const saveSpec = async () => {
   try {
     await specForm.value.validate()
     
+    // 检查规格名称是否重复（同一商品下）
+    const existingNameSpec = specifications.value.find(
+      spec => spec.name === currentSpec.value.name && 
+               spec.goodsId === currentSpec.value.goodsId &&
+               spec.id !== currentSpec.value.id
+    )
+    
+    if (existingNameSpec) {
+      ElMessage.error(`商品下已存在同名规格，请使用其他名称`)
+      return
+    }
+    
     // 检查响应数字是否重复
     const existingSpec = specifications.value.find(
       spec => spec.responseNumber === currentSpec.value.responseNumber && 
@@ -384,9 +350,19 @@ const saveSpec = async () => {
       return
     }
     
-    // 查找分类名称和商品名称
-    const category = categories.value.find(cat => cat.id === currentSpec.value.categoryId)
+    // 验证规格类型和响应数字的合理性
+    if (currentSpec.value.type === 'number' && currentSpec.value.responseNumber <= 0) {
+      ElMessage.error('数字类型规格的响应数字必须大于0')
+      return
+    }
+    
+    // 查找商品名称
     const goods = goodsList.value.find(g => g.id === currentSpec.value.goodsId)
+    
+    if (!goods) {
+      ElMessage.error('商品信息不存在')
+      return
+    }
     
     if (isEditing.value) {
       // 更新规格
@@ -394,8 +370,7 @@ const saveSpec = async () => {
       if (index !== -1) {
         specifications.value[index] = {
           ...currentSpec.value,
-          categoryName: category ? category.name : '',
-          goodsName: goods ? goods.name : ''
+          goodsName: goods.name
         }
       }
       ElMessage.success('规格更新成功')
@@ -404,8 +379,7 @@ const saveSpec = async () => {
       const newSpec = {
         ...currentSpec.value,
         id: Date.now(),
-        categoryName: category ? category.name : '',
-        goodsName: goods ? goods.name : '',
+        goodsName: goods.name,
         createdAt: new Date().toLocaleString('zh-CN')
       }
       specifications.value.unshift(newSpec)
@@ -423,7 +397,6 @@ const resetForm = () => {
   currentSpec.value = {
     id: '',
     name: '',
-    categoryId: '',
     goodsId: '',
     type: 'text',
     description: '',

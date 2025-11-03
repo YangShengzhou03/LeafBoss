@@ -16,21 +16,7 @@
             </template>
           </el-input>
         </el-col>
-        <el-col :span="4">
-          <el-select
-            v-model="filterCategory"
-            placeholder="选择分类"
-            clearable
-            @change="handleSearch"
-          >
-            <el-option
-              v-for="category in categories"
-              :key="category.id"
-              :label="category.name"
-              :value="category.id"
-            />
-          </el-select>
-        </el-col>
+        <!-- 移除了分类筛选 -->
         <el-col :span="4">
           <el-select
             v-model="filterStatus"
@@ -69,7 +55,7 @@
       >
         <el-table-column prop="id" label="ID" width="80" align="center" />
         <el-table-column prop="name" label="商品名称" min-width="150" />
-        <el-table-column prop="categoryName" label="所属分类" width="120" align="center" />
+        <!-- 移除了分类列 -->
         <el-table-column prop="description" label="商品描述" min-width="200" show-overflow-tooltip />
         <el-table-column prop="status" label="状态" width="100" align="center">
           <template #default="{ row }">
@@ -166,20 +152,7 @@
             show-word-limit
           />
         </el-form-item>
-        <el-form-item label="所属分类" prop="categoryId">
-          <el-select
-            v-model="goodsForm.categoryId"
-            placeholder="请选择商品分类"
-            style="width: 100%"
-          >
-            <el-option
-              v-for="category in categories"
-              :key="category.id"
-              :label="category.name"
-              :value="category.id"
-            />
-          </el-select>
-        </el-form-item>
+        <!-- 移除了商品分类选择字段 -->
         <el-form-item label="商品描述" prop="description">
           <el-input
             v-model="goodsForm.description"
@@ -223,7 +196,6 @@ import {
 // 响应式数据
 const loading = ref(false)
 const searchKeyword = ref('')
-const filterCategory = ref('')
 const filterStatus = ref('')
 const currentPage = ref(1)
 const pageSize = ref(10)
@@ -235,7 +207,6 @@ const goodsFormRef = ref()
 const goodsForm = reactive({
   id: '',
   name: '',
-  categoryId: '',
   description: '',
   status: 'active'
 })
@@ -246,29 +217,18 @@ const goodsRules = {
     { required: true, message: '请输入商品名称', trigger: 'blur' },
     { min: 2, max: 50, message: '商品名称长度在 2 到 50 个字符', trigger: 'blur' }
   ],
-  categoryId: [
-    { required: true, message: '请选择商品分类', trigger: 'change' }
-  ],
   description: [
     { max: 200, message: '商品描述不能超过 200 个字符', trigger: 'blur' }
   ]
 }
 
-// 模拟数据 - 商品分类
-const categories = ref([
-  { id: 1, name: '游戏点卡' },
-  { id: 2, name: '软件激活码' },
-  { id: 3, name: '会员服务' },
-  { id: 4, name: '虚拟道具' }
-])
+// 移除了商品分类数据
 
 // 模拟数据 - 商品列表
 const goodsList = ref([
   {
     id: 1,
     name: '王者荣耀点券',
-    categoryId: 1,
-    categoryName: '游戏点卡',
     description: '王者荣耀游戏内点券充值',
     status: 'active',
     specCount: 3,
@@ -277,8 +237,6 @@ const goodsList = ref([
   {
     id: 2,
     name: 'Photoshop激活码',
-    categoryId: 2,
-    categoryName: '软件激活码',
     description: 'Adobe Photoshop正版软件激活码',
     status: 'active',
     specCount: 2,
@@ -287,8 +245,6 @@ const goodsList = ref([
   {
     id: 3,
     name: '视频会员月卡',
-    categoryId: 3,
-    categoryName: '会员服务',
     description: '各大视频平台会员月卡服务',
     status: 'inactive',
     specCount: 0,
@@ -305,11 +261,6 @@ const filteredGoods = computed(() => {
     filtered = filtered.filter(item => 
       item.name.toLowerCase().includes(searchKeyword.value.toLowerCase())
     )
-  }
-  
-  // 按分类筛选
-  if (filterCategory.value) {
-    filtered = filtered.filter(item => item.categoryId === filterCategory.value)
   }
   
   // 按状态筛选
@@ -337,7 +288,6 @@ const handleSearch = () => {
 
 const handleReset = () => {
   searchKeyword.value = ''
-  filterCategory.value = ''
   filterStatus.value = ''
   currentPage.value = 1
 }
@@ -399,10 +349,8 @@ const handleSubmit = async () => {
       // 编辑
       const index = goodsList.value.findIndex(item => item.id === goodsForm.id)
       if (index !== -1) {
-        const category = categories.value.find(cat => cat.id === goodsForm.categoryId)
         goodsList.value[index] = {
           ...goodsForm,
-          categoryName: category ? category.name : '',
           updateTime: new Date().toLocaleString()
         }
       }
@@ -410,11 +358,9 @@ const handleSubmit = async () => {
     } else {
       // 新增
       const newId = Math.max(...goodsList.value.map(item => item.id)) + 1
-      const category = categories.value.find(cat => cat.id === goodsForm.categoryId)
       goodsList.value.push({
         ...goodsForm,
         id: newId,
-        categoryName: category ? category.name : '',
         specCount: 0,
         createTime: new Date().toLocaleString()
       })

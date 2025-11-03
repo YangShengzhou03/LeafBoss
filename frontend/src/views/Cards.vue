@@ -20,25 +20,9 @@
           style="width: 200px"
           clearable
         />
-        <el-select v-model="filterCategory" placeholder="商品分类" clearable @change="handleCategoryChange">
+        <el-select v-model="filterSpec" placeholder="规格" clearable>
           <el-option 
-            v-for="category in categories" 
-            :key="category.id" 
-            :label="category.name" 
-            :value="category.id" 
-          />
-        </el-select>
-        <el-select v-model="filterGoods" placeholder="商品" clearable :disabled="!filterCategory">
-          <el-option 
-            v-for="goods in filteredGoods" 
-            :key="goods.id" 
-            :label="goods.name" 
-            :value="goods.id" 
-          />
-        </el-select>
-        <el-select v-model="filterSpec" placeholder="规格" clearable :disabled="!filterGoods">
-          <el-option 
-            v-for="spec in filteredSpecs" 
+            v-for="spec in specs" 
             :key="spec.id" 
             :label="spec.name" 
             :value="spec.id" 
@@ -53,7 +37,6 @@
       <!-- 卡密表格 -->
       <el-table :data="paginatedCards" v-loading="loading">
         <el-table-column prop="id" label="卡密编号" width="200" />
-        <el-table-column prop="categoryName" label="商品分类" width="120" />
         <el-table-column prop="goodsName" label="商品" width="120" />
         <el-table-column prop="specName" label="规格" width="120" />
         <el-table-column prop="responseNumber" label="响应数字" width="100" />

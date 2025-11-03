@@ -46,6 +46,10 @@
             <el-icon><Search /></el-icon>
             <span>卡密验证</span>
           </el-menu-item>
+          <el-menu-item index="/cards/logs">
+            <el-icon><Document /></el-icon>
+            <span>卡密记录</span>
+          </el-menu-item>
         </el-sub-menu>
         <el-menu-item index="/users">
           <el-icon><User /></el-icon>

@@ -50,6 +50,12 @@ const routes = [
     meta: { title: '卡密验证' }
   },
   {
+    path: '/cards/logs',
+    name: 'CardLogs',
+    component: () => import('@/views/CardLogs.vue'),
+    meta: { title: '卡密记录' }
+  },
+  {
     path: '/users',
     name: 'Users',
     component: () => import('@/views/Users.vue'),
