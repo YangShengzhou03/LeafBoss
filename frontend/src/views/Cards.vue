@@ -1,40 +1,38 @@
 <template>
-  <div class="cards-page">
-    <el-card>
-      <template #header>
-        <div class="card-header">
-          <span>卡密管理</span>
-          <el-button type="primary" @click="showAddDialog = true">
-            <el-icon><Plus /></el-icon>
-            添加卡密
-          </el-button>
-        </div>
-      </template>
+  <div class="cards-container">
+    <!-- 搜索和筛选 -->
+    <div class="card-header">
+      <span>卡密管理</span>
+      <el-button type="primary" @click="showAddDialog = true">
+        <el-icon><Plus /></el-icon>
+        添加卡密
+      </el-button>
+    </div>
 
-      <!-- 搜索和筛选 -->
-      <div class="filter-container">
-        <el-input
-          :model-value="searchKeyword"
-          @update:model-value="debouncedSearch"
-          placeholder="搜索卡密编号"
-          style="width: 200px"
-          clearable
+    <div class="filter-container">
+      <el-input
+        :model-value="searchKeyword"
+        @update:model-value="debouncedSearch"
+        placeholder="搜索卡密编号"
+        style="width: 200px"
+        clearable
+      />
+      <el-select v-model="filterSpec" placeholder="规格" clearable>
+        <el-option 
+          v-for="spec in specs" 
+          :key="spec.id" 
+          :label="spec.name" 
+          :value="spec.id" 
         />
-        <el-select v-model="filterSpec" placeholder="规格" clearable>
-          <el-option 
-            v-for="spec in specs" 
-            :key="spec.id" 
-            :label="spec.name" 
-            :value="spec.id" 
-          />
-        </el-select>
-        <el-select v-model="filterStatus" placeholder="状态" clearable>
-          <el-option label="未使用" value="unused" />
-          <el-option label="已使用" value="used" />
-        </el-select>
-      </div>
+      </el-select>
+      <el-select v-model="filterStatus" placeholder="状态" clearable>
+        <el-option label="未使用" value="unused" />
+        <el-option label="已使用" value="used" />
+      </el-select>
+    </div>
 
-      <!-- 卡密表格 -->
+    <!-- 卡密表格 -->
+    <div class="table-container">
       <el-table :data="paginatedCards" v-loading="loading">
         <el-table-column prop="id" label="卡密编号" width="200" />
         <el-table-column prop="goodsName" label="商品" width="120" />
@@ -47,7 +45,6 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="createdAt" label="生成时间" width="180" />
         <el-table-column label="操作" width="200">
           <template #default="{ row }">
             <el-button size="small" @click="viewCard(row)">查看</el-button>
@@ -65,7 +62,7 @@
           layout="total, sizes, prev, pager, next, jumper"
         />
       </div>
-    </el-card>
+    </div>
 
     <!-- 添加卡密弹窗 -->
     <el-dialog v-model="showAddDialog" title="添加卡密" width="500px" @close="resetForm">
@@ -136,7 +133,6 @@ const cards = ref([
     specType: '月卡',
     responseNumber: 0,
     status: 'unused',
-    createdAt: '2024-01-15 10:30:00',
     categoryName: '软件服务',
     goodsName: '办公软件',
     specName: '月卡'
@@ -146,7 +142,6 @@ const cards = ref([
     specType: '年卡',
     responseNumber: 0,
     status: 'used',
-    createdAt: '2024-01-15 09:15:00',
     categoryName: '软件服务',
     goodsName: '办公软件',
     specName: '年卡'
@@ -158,6 +153,11 @@ const filteredCards = computed(() => {
   const keyword = searchKeyword.value.toLowerCase()
   const spec = filterSpec.value
   const status = filterStatus.value
+  
+  // 如果没有任何筛选条件，直接返回原始数据避免不必要的计算
+  if (!keyword && !spec && !status) {
+    return cards.value
+  }
   
   return cards.value.filter(card => {
     const matchesKeyword = !keyword || card.id.toLowerCase().includes(keyword)
@@ -271,21 +271,63 @@ watch(() => searchKeyword.value, (newVal) => {
 </script>
 
 <style scoped>
+.cards-container {
+  padding: 16px;
+  background-color: #f5f7fa;
+  min-height: calc(100vh - 60px);
+}
+
 .card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 16px;
 }
 
 .filter-container {
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   display: flex;
   gap: 10px;
 }
 
+.table-container {
+  background-color: #fff;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+  padding: 16px;
+}
+
 .pagination-container {
-  margin-top: 20px;
+  margin-top: 16px;
   display: flex;
   justify-content: flex-end;
+}
+
+:deep(.el-table) {
+  border-radius: 4px;
+}
+
+:deep(.el-table th) {
+  background-color: #f8f9fa;
+  color: #606266;
+  font-weight: 500;
+}
+
+:deep(.el-dialog) {
+  border-radius: 4px;
+}
+
+:deep(.el-dialog__header) {
+  padding: 16px 16px 8px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+:deep(.el-dialog__body) {
+  padding: 16px;
+}
+
+:deep(.el-dialog__footer) {
+  padding: 8px 16px 16px;
+  border-top: 1px solid #f0f0f0;
 }
 </style>

@@ -1,50 +1,47 @@
 <template>
-  <div class="specifications-page">
-    <el-card>
-      <template #header>
-        <div class="card-header">
-          <span>规格管理</span>
-          <el-button type="primary" @click="showAddDialog = true">
-            <el-icon><Plus /></el-icon>
-            添加规格
-          </el-button>
-        </div>
-      </template>
+  <div class="spec-container">
+    <!-- 搜索和筛选 -->
+    <div class="card-header">
+      <span>规格管理</span>
+      <el-button type="primary" @click="showAddDialog = true">
+        <el-icon><Plus /></el-icon>
+        添加规格
+      </el-button>
+    </div>
 
-      <!-- 搜索和筛选 -->
-      <div class="filter-container">
-        <el-input
-          v-model="searchKeyword"
-          placeholder="搜索规格名称"
-          style="width: 200px"
-          clearable
+    <div class="filter-container">
+      <el-input
+        v-model="searchKeyword"
+        placeholder="搜索规格名称"
+        style="width: 200px"
+        clearable
+      />
+      <el-select v-model="filterGoods" placeholder="商品" clearable>
+        <el-option 
+          v-for="goods in goodsList" 
+          :key="goods.id" 
+          :label="goods.name" 
+          :value="goods.id" 
         />
-        <el-select v-model="filterGoods" placeholder="商品" clearable>
-          <el-option 
-            v-for="goods in goodsList" 
-            :key="goods.id" 
-            :label="goods.name" 
-            :value="goods.id" 
-          />
-        </el-select>
-        <el-select v-model="filterStatus" placeholder="状态" clearable>
-          <el-option label="启用" value="active" />
-          <el-option label="禁用" value="inactive" />
-        </el-select>
-      </div>
+      </el-select>
+      <el-select v-model="filterStatus" placeholder="状态" clearable>
+        <el-option label="启用" value="active" />
+        <el-option label="禁用" value="inactive" />
+      </el-select>
+    </div>
 
-      <!-- 规格表格 -->
+    <!-- 规格表格 -->
+    <div class="table-container">
       <el-table :data="filteredSpecs" v-loading="loading">
         <el-table-column prop="name" label="规格名称" width="150" />
-        <!-- 移除了分类列 -->
         <el-table-column prop="goodsName" label="商品" width="120" />
-        <el-table-column prop="type" label="规格类型" width="120">
+        <el-table-column prop="description" label="描述" />
+        <el-table-column prop="spec_code" label="规格代码" width="120" />
+        <el-table-column prop="price" label="价格" width="120">
           <template #default="{ row }">
-            <el-tag>{{ row.type === 'text' ? '文本' : '数字' }}</el-tag>
+            ¥{{ row.price.toFixed(2) }}
           </template>
         </el-table-column>
-        <el-table-column prop="description" label="描述" />
-        <el-table-column prop="responseNumber" label="响应数字" width="100" />
         <el-table-column prop="status" label="状态" width="100">
           <template #default="{ row }">
             <el-switch
@@ -55,7 +52,6 @@
             />
           </template>
         </el-table-column>
-        <el-table-column prop="createdAt" label="创建时间" width="180" />
         <el-table-column label="操作" width="200">
           <template #default="{ row }">
             <el-button size="small" @click="editSpec(row)">编辑</el-button>
@@ -73,7 +69,7 @@
           layout="total, sizes, prev, pager, next, jumper"
         />
       </div>
-    </el-card>
+    </div>
 
     <!-- 添加/编辑规格弹窗 -->
     <el-dialog 
@@ -95,25 +91,30 @@
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="规格类型">
-          <el-select v-model="currentSpec.type" placeholder="请选择规格类型">
-            <el-option label="文本" value="text" />
-            <el-option label="数字" value="number" />
-          </el-select>
-        </el-form-item>
         <el-form-item label="描述">
           <el-input 
             v-model="currentSpec.description" 
             type="textarea" 
-            :rows="3"
+            :rows="2"
             placeholder="请输入规格描述" 
           />
         </el-form-item>
-        <el-form-item label="响应数字" prop="responseNumber">
+        <el-form-item label="规格代码" prop="spec_code">
+          <el-input 
+            v-model="currentSpec.spec_code" 
+            placeholder="请输入规格代码"
+            maxlength="50"
+            show-word-limit
+          />
+        </el-form-item>
+        <el-form-item label="价格" prop="price">
           <el-input-number 
-            v-model="currentSpec.responseNumber" 
+            v-model="currentSpec.price" 
             :min="0" 
-            :max="999" 
+            :max="99999" 
+            :precision="2"
+            placeholder="请输入价格"
+            style="width: 100%"
           />
         </el-form-item>
       </el-form>
@@ -144,25 +145,25 @@ const currentSpec = ref({
   id: '',
   name: '',
   goodsId: '',
-  type: 'text',
   description: '',
-  responseNumber: 0,
+  spec_code: '',
+  price: 0,
   status: 'active'
 })
 
-// 响应数字验证函数
-const validateResponseNumber = (rule, value, callback) => {
-  if (value === null || value === undefined || value === '') {
-    callback(new Error('请输入响应数字'))
-  } else if (value < 1 || value > 999) {
-    callback(new Error('响应数字必须在 1-999 之间'))
+// 规格代码验证函数
+const validateSpecCode = (rule, value, callback) => {
+  if (!value || value.trim() === '') {
+    callback(new Error('请输入规格代码'))
+  } else if (value.length < 1 || value.length > 50) {
+    callback(new Error('规格代码长度在 1 到 50 个字符之间'))
   } else {
-    // 检查响应数字是否唯一
+    // 检查规格代码是否唯一
     const existingSpec = specifications.value.find(spec => 
-      spec.responseNumber === value && spec.id !== currentSpec.value.id
+      spec.spec_code === value && spec.id !== currentSpec.value.id
     )
     if (existingSpec) {
-      callback(new Error(`响应数字 ${value} 已被规格 "${existingSpec.name}" 使用`))
+      callback(new Error(`规格代码 "${value}" 已被规格 "${existingSpec.name}" 使用`))
     } else {
       callback()
     }
@@ -177,10 +178,14 @@ const formRules = {
   goodsId: [
     { required: true, message: '请选择商品', trigger: 'change' }
   ],
-  responseNumber: [
-    { required: true, message: '请输入响应数字', trigger: 'blur' },
-    { type: 'number', min: 1, max: 999, message: '响应数字必须在 1-999 之间', trigger: 'blur' },
-    { validator: validateResponseNumber, trigger: 'blur' }
+  spec_code: [
+    { required: true, message: '请输入规格代码', trigger: 'blur' },
+    { min: 1, max: 50, message: '规格代码长度在 1 到 50 个字符', trigger: 'blur' },
+    { validator: validateSpecCode, trigger: 'blur' }
+  ],
+  price: [
+    { required: true, message: '请输入价格', trigger: 'blur' },
+    { type: 'number', min: 0, max: 99999, message: '价格范围在 0 到 99999 之间', trigger: 'blur' }
   ]
 }
 
@@ -225,64 +230,62 @@ const specifications = ref([
     name: '月卡',
     goodsId: 1,
     goodsName: '月卡会员',
-    type: 'text',
     description: '30天有效期的卡密',
-    responseNumber: 1,
-    status: 'active',
-    createdAt: '2024-01-15 10:30:00'
+    spec_code: 'SPEC001',
+    price: 29.99,
+    status: 'active'
   },
   {
     id: 2,
     name: '季卡',
     goodsId: 2,
     goodsName: '季卡会员',
-    type: 'text',
     description: '90天有效期的卡密',
-    responseNumber: 2,
-    status: 'active',
-    createdAt: '2024-01-15 09:15:00'
+    spec_code: 'SPEC002',
+    price: 79.99,
+    status: 'active'
   },
   {
     id: 3,
     name: '年卡',
     goodsId: 3,
     goodsName: '年卡会员',
-    type: 'text',
     description: '365天有效期的卡密',
-    responseNumber: 3,
-    status: 'active',
-    createdAt: '2024-01-15 08:00:00'
+    spec_code: 'SPEC003',
+    price: 299.99,
+    status: 'active'
   },
   {
     id: 4,
     name: '生日卡',
     goodsId: 4,
     goodsName: '生日礼品卡',
-    type: 'text',
     description: '生日专属礼品卡',
-    responseNumber: 4,
-    status: 'active',
-    createdAt: '2024-01-14 16:45:00'
+    spec_code: 'SPEC004',
+    price: 99.99,
+    status: 'active'
   },
   {
     id: 5,
     name: '节日卡',
     goodsId: 5,
     goodsName: '节日礼品卡',
-    type: 'text',
     description: '节日专属礼品卡',
-    responseNumber: 5,
-    status: 'active',
-    createdAt: '2024-01-14 15:30:00'
+    spec_code: 'SPEC005',
+    price: 149.99,
+    status: 'active'
   }
 ])
 
 const filteredSpecs = computed(() => {
+  const keyword = searchKeyword.value?.toLowerCase() || ''
+  const goodsFilter = filterGoods.value
+  const statusFilter = filterStatus.value
+  
   return specifications.value.filter(spec => {
-    const matchesKeyword = !searchKeyword.value || 
-      spec.name.toLowerCase().includes(searchKeyword.value.toLowerCase())
-    const matchesGoods = !filterGoods.value || spec.goodsId === filterGoods.value
-    const matchesStatus = !filterStatus.value || spec.status === filterStatus.value
+    const matchesKeyword = !keyword || spec.name.toLowerCase().includes(keyword)
+    const matchesGoods = !goodsFilter || spec.goodsId === goodsFilter
+    const matchesStatus = !statusFilter || spec.status === statusFilter
     return matchesKeyword && matchesGoods && matchesStatus
   })
 })
@@ -339,20 +342,20 @@ const saveSpec = async () => {
       return
     }
     
-    // 检查响应数字是否重复
+    // 检查规格代码是否重复
     const existingSpec = specifications.value.find(
-      spec => spec.responseNumber === currentSpec.value.responseNumber && 
+      spec => spec.spec_code === currentSpec.value.spec_code && 
                spec.id !== currentSpec.value.id
     )
     
     if (existingSpec) {
-      ElMessage.error(`响应数字 ${currentSpec.value.responseNumber} 已存在，请使用其他数字`)
+      ElMessage.error(`规格代码 "${currentSpec.value.spec_code}" 已存在，请使用其他代码`)
       return
     }
     
-    // 验证规格类型和响应数字的合理性
-    if (currentSpec.value.type === 'number' && currentSpec.value.responseNumber <= 0) {
-      ElMessage.error('数字类型规格的响应数字必须大于0')
+    // 验证规格代码的合理性
+    if (!currentSpec.value.spec_code || currentSpec.value.spec_code.trim() === '') {
+      ElMessage.error('规格代码不能为空')
       return
     }
     
@@ -379,8 +382,7 @@ const saveSpec = async () => {
       const newSpec = {
         ...currentSpec.value,
         id: Date.now(),
-        goodsName: goods.name,
-        createdAt: new Date().toLocaleString('zh-CN')
+        goodsName: goods.name
       }
       specifications.value.unshift(newSpec)
       ElMessage.success('规格添加成功')
@@ -389,20 +391,22 @@ const saveSpec = async () => {
     showAddDialog.value = false
     resetForm()
   } catch (error) {
-    console.error('表单验证失败:', error)
-  }
-}
+     console.error('表单验证失败:', error)
+   }
+ }
 
+// 重置表单
 const resetForm = () => {
   currentSpec.value = {
     id: '',
     name: '',
     goodsId: '',
-    type: 'text',
     description: '',
-    responseNumber: 0,
+    spec_code: '',
+    price: 0,
     status: 'active'
   }
+  specForm.value?.clearValidate()
   isEditing.value = false
 }
 
@@ -416,19 +420,184 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.spec-container {
+  padding: 16px;
+  background-color: #f5f7fa;
+  min-height: calc(100vh - 60px);
+}
+
 .card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 16px;
 }
 
 .filter-container {
-  margin-bottom: 20px;
+  margin-bottom: 16px;
+  padding: 16px;
+  background-color: #fff;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.table-container {
+  background-color: #fff;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+  padding: 16px;
 }
 
 .pagination-container {
-  margin-top: 20px;
+  margin-top: 16px;
   display: flex;
   justify-content: flex-end;
+  padding: 0 16px;
+}
+
+/* 表格样式优化 - 使用更柔和的色彩 */
+:deep(.el-table) {
+  border-radius: 4px;
+  overflow: hidden;
+  font-size: 14px;
+}
+
+:deep(.el-table .cell) {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+:deep(.el-table th) {
+  background-color: #f8f9fa;
+  color: #606266;
+  font-weight: 500;
+}
+
+:deep(.el-table--border) {
+  border-color: #ebeef5;
+}
+
+:deep(.el-table--border::after),
+:deep(.el-table--group::after),
+:deep(.el-table::before) {
+  background-color: #ebeef5;
+}
+
+:deep(.el-table td),
+:deep(.el-table th.is-leaf) {
+  border-bottom: 1px solid #ebeef5;
+}
+
+/* 按钮样式优化 - 使用更柔和的色彩 */
+:deep(.el-button--small) {
+  padding: 5px 10px;
+}
+
+:deep(.el-button--primary) {
+  background-color: #5b8dee;
+  border-color: #5b8dee;
+}
+
+:deep(.el-button--primary:hover) {
+  background-color: #4b7ed8;
+  border-color: #4b7ed8;
+}
+
+:deep(.el-button--success) {
+  background-color: #67c23a;
+  border-color: #67c23a;
+}
+
+:deep(.el-button--success:hover) {
+  background-color: #5cb32e;
+  border-color: #5cb32e;
+}
+
+:deep(.el-button--danger) {
+  background-color: #f56c6c;
+  border-color: #f56c6c;
+}
+
+:deep(.el-button--danger:hover) {
+  background-color: #e45c5c;
+  border-color: #e45c5c;
+}
+
+/* 对话框样式优化 */
+:deep(.el-dialog) {
+  border-radius: 4px;
+}
+
+:deep(.el-dialog__header) {
+  padding: 16px 16px 8px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+:deep(.el-dialog__body) {
+  padding: 16px;
+}
+
+:deep(.el-dialog__footer) {
+  padding: 8px 16px 16px;
+  border-top: 1px solid #f0f0f0;
+}
+
+/* 表单样式优化 */
+:deep(.el-form-item__label) {
+  font-weight: 500;
+  color: #606266;
+}
+
+:deep(.el-input__wrapper) {
+  border-radius: 4px;
+}
+
+:deep(.el-input__wrapper:focus) {
+  border-color: #5b8dee;
+}
+
+:deep(.el-select .el-input__wrapper) {
+  border-radius: 4px;
+}
+
+:deep(.el-textarea__inner) {
+  border-radius: 4px;
+}
+
+/* 标签样式优化 */
+:deep(.el-tag--success) {
+  background-color: #f0f9ff;
+  border-color: #b3d8ff;
+  color: #409eff;
+}
+
+:deep(.el-tag--danger) {
+  background-color: #fef0f0;
+  border-color: #fbc4c4;
+  color: #f56c6c;
+}
+
+/* 分页样式优化 */
+:deep(.el-pagination) {
+  color: #606266;
+}
+
+:deep(.el-pagination .el-select .el-input) {
+  width: 110px;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .filter-container {
+    padding: 12px;
+  }
+  
+  .table-container {
+    padding: 12px;
+  }
 }
 </style>

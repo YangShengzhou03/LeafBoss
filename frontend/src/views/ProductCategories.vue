@@ -1,31 +1,29 @@
 <template>
-  <div class="product-categories-page">
-    <el-card>
-      <template #header>
-        <div class="card-header">
-          <span>商品分类管理</span>
-          <el-button type="primary" @click="showAddDialog = true">
-            <el-icon><Plus /></el-icon>
-            添加分类
-          </el-button>
-        </div>
-      </template>
+  <div class="categories-container">
+    <!-- 搜索和筛选 -->
+    <div class="card-header">
+      <span>商品分类管理</span>
+      <el-button type="primary" @click="showAddDialog = true">
+        <el-icon><Plus /></el-icon>
+        添加分类
+      </el-button>
+    </div>
 
-      <!-- 搜索和筛选 -->
-      <div class="filter-container">
-        <el-input
-          v-model="searchKeyword"
-          placeholder="搜索分类名称"
-          style="width: 200px"
-          clearable
-        />
-        <el-select v-model="filterStatus" placeholder="状态" clearable>
-          <el-option label="启用" value="active" />
-          <el-option label="禁用" value="inactive" />
-        </el-select>
-      </div>
+    <div class="filter-container">
+      <el-input
+        v-model="searchKeyword"
+        placeholder="搜索分类名称"
+        style="width: 200px"
+        clearable
+      />
+      <el-select v-model="filterStatus" placeholder="状态" clearable>
+        <el-option label="启用" value="active" />
+        <el-option label="禁用" value="inactive" />
+      </el-select>
+    </div>
 
-      <!-- 分类表格 -->
+    <!-- 分类表格 -->
+    <div class="table-container">
       <el-table :data="filteredCategories" v-loading="loading">
         <el-table-column prop="name" label="分类名称" width="150" />
         <el-table-column prop="code" label="分类编码" width="120" />
@@ -63,7 +61,7 @@
           layout="total, sizes, prev, pager, next, jumper"
         />
       </div>
-    </el-card>
+    </div>
 
     <!-- 添加/编辑分类弹窗 -->
     <el-dialog 
@@ -234,21 +232,89 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.categories-container {
+  background-color: #f5f7fa;
+  padding: 16px;
+  border-radius: 4px;
+}
+
 .card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 16px;
 }
 
 .filter-container {
-  margin-bottom: 20px;
   display: flex;
   gap: 10px;
+  margin-bottom: 16px;
+}
+
+.table-container {
+  background-color: #fff;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  padding: 16px;
 }
 
 .pagination-container {
-  margin-top: 20px;
+  margin-top: 16px;
   display: flex;
   justify-content: flex-end;
+}
+
+/* 表格样式优化 */
+:deep(.el-table) {
+  font-size: 14px;
+}
+
+:deep(.el-table__header) {
+  background-color: #f8f9fa;
+}
+
+:deep(.el-table__header th) {
+  font-weight: 500;
+  color: #606266;
+}
+
+/* 对话框样式优化 */
+:deep(.el-dialog) {
+  border-radius: 4px;
+}
+
+:deep(.el-dialog__header) {
+  border-bottom: 1px solid #f0f0f0;
+  padding: 16px 20px;
+}
+
+:deep(.el-dialog__body) {
+  padding: 20px;
+}
+
+/* 表单样式优化 */
+:deep(.el-form-item__label) {
+  font-weight: 500;
+}
+
+:deep(.el-input__inner) {
+  border-radius: 4px;
+}
+
+/* 按钮样式优化 */
+:deep(.el-button) {
+  border-radius: 4px;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .filter-container {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .filter-container > * {
+    width: 100%;
+  }
 }
 </style>

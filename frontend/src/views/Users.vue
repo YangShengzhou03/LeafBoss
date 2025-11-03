@@ -1,35 +1,46 @@
 <template>
-  <div class="users-page">
-    <el-card>
-      <template #header>
-        <div class="card-header">
-          <span>用户管理</span>
-          <el-button type="primary" @click="showAddDialog = true">
+  <div class="users-container">
+    <!-- 搜索和筛选 -->
+    <div class="card-header">
+      <span>用户管理</span>
+      <el-button type="primary" @click="showAddDialog = true">
+        <el-icon><Plus /></el-icon>
+        添加用户
+      </el-button>
+    </div>
+
+    <div class="filter-container">
+      <el-row :gutter="20">
+        <el-col :span="6">
+          <el-input
+            v-model="searchKeyword"
+            placeholder="搜索用户名或邮箱"
+            clearable
+          />
+        </el-col>
+        <el-col :span="4">
+          <el-select v-model="filterRole" placeholder="用户角色" clearable style="width: 100%">
+            <el-option label="管理员" value="admin" />
+            <el-option label="普通用户" value="user" />
+          </el-select>
+        </el-col>
+        <el-col :span="4">
+          <el-select v-model="filterStatus" placeholder="用户状态" clearable style="width: 100%">
+            <el-option label="启用" value="active" />
+            <el-option label="禁用" value="inactive" />
+          </el-select>
+        </el-col>
+        <el-col :span="10" style="text-align: right">
+          <el-button type="success" @click="showAddDialog = true">
             <el-icon><Plus /></el-icon>
             添加用户
           </el-button>
-        </div>
-      </template>
+        </el-col>
+      </el-row>
+    </div>
 
-      <!-- 搜索和筛选 -->
-      <div class="filter-container">
-        <el-input
-          v-model="searchKeyword"
-          placeholder="搜索用户名或邮箱"
-          style="width: 200px"
-          clearable
-        />
-        <el-select v-model="filterRole" placeholder="用户角色" clearable>
-          <el-option label="管理员" value="admin" />
-          <el-option label="普通用户" value="user" />
-        </el-select>
-        <el-select v-model="filterStatus" placeholder="用户状态" clearable>
-          <el-option label="启用" value="active" />
-          <el-option label="禁用" value="inactive" />
-        </el-select>
-      </div>
-
-      <!-- 用户表格 -->
+    <!-- 用户表格 -->
+    <div class="table-container">
       <el-table :data="paginatedUsers" v-loading="loading">
         <el-table-column prop="id" label="用户ID" width="80" align="center" />
         <el-table-column prop="username" label="用户名" width="120" />
@@ -70,7 +81,7 @@
           layout="total, sizes, prev, pager, next, jumper"
         />
       </div>
-    </el-card>
+    </div>
 
     <!-- 添加/编辑用户弹窗 -->
     <el-dialog 
@@ -117,6 +128,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { useDebounceFn } from '@vueuse/core'
 
 const loading = ref(false)
 const searchKeyword = ref('')
@@ -128,6 +140,11 @@ const total = ref(100)
 const showAddDialog = ref(false)
 const isEditing = ref(false)
 const userForm = ref(null)
+
+// 防抖搜索
+const debouncedSearch = useDebounceFn((value) => {
+  searchKeyword.value = value
+}, 300)
 
 const currentUser = ref({
   id: '',
@@ -190,6 +207,11 @@ const filteredUsers = computed(() => {
   const keyword = searchKeyword.value.toLowerCase()
   const role = filterRole.value
   const status = filterStatus.value
+  
+  // 如果没有任何筛选条件，直接返回原始数据避免不必要的计算
+  if (!keyword && !role && !status) {
+    return users.value
+  }
   
   return users.value.filter(user => {
     const matchesKeyword = !keyword || 
@@ -287,20 +309,89 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.users-container {
+  background-color: #f5f7fa;
+  padding: 16px;
+  border-radius: 4px;
+}
+
 .card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 16px;
 }
 
 .filter-container {
-  margin-bottom: 20px;
   display: flex;
   gap: 10px;
+  margin-bottom: 16px;
+}
+
+.table-container {
+  background-color: #fff;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  padding: 16px;
 }
 
 .pagination-container {
-  margin-top: 20px;
-  text-align: right;
+  margin-top: 16px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* 表格样式优化 */
+:deep(.el-table) {
+  font-size: 14px;
+}
+
+:deep(.el-table__header) {
+  background-color: #f8f9fa;
+}
+
+:deep(.el-table__header th) {
+  font-weight: 500;
+  color: #606266;
+}
+
+/* 对话框样式优化 */
+:deep(.el-dialog) {
+  border-radius: 4px;
+}
+
+:deep(.el-dialog__header) {
+  border-bottom: 1px solid #f0f0f0;
+  padding: 16px 20px;
+}
+
+:deep(.el-dialog__body) {
+  padding: 20px;
+}
+
+/* 表单样式优化 */
+:deep(.el-form-item__label) {
+  font-weight: 500;
+}
+
+:deep(.el-input__inner) {
+  border-radius: 4px;
+}
+
+/* 按钮样式优化 */
+:deep(.el-button) {
+  border-radius: 4px;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .filter-container {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .filter-container > * {
+    width: 100%;
+  }
 }
 </style>

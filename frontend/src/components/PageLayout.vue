@@ -86,8 +86,8 @@ const hasBreadcrumb = computed(() => props.breadcrumb.length > 0)
 .page-header {
   background-color: var(--bg-primary);
   border-bottom: 1px solid var(--border-light);
-  padding: var(--spacing-lg) var(--spacing-xl);
-  box-shadow: var(--shadow-light);
+  padding: 20px 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .header-content {
@@ -101,79 +101,84 @@ const hasBreadcrumb = computed(() => props.breadcrumb.length > 0)
 .header-left {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-sm);
+  gap: 8px;
 }
 
 .page-title {
   margin: 0;
-  font-size: var(--font-size-xl);
+  font-size: 20px;
   font-weight: 600;
   color: var(--text-primary);
 }
 
 .breadcrumb {
-  font-size: var(--font-size-sm);
+  font-size: 14px;
 }
 
 .header-actions {
   display: flex;
-  gap: var(--spacing-sm);
+  gap: 12px;
   align-items: center;
 }
 
 .page-content {
   flex: 1;
-  padding: var(--spacing-xl);
+  padding: 24px;
   overflow-y: auto;
 }
 
 .page-content.with-header {
-  padding-top: var(--spacing-lg);
+  padding-top: 20px;
 }
 
 .filter-section {
-  margin-bottom: var(--spacing-lg);
+  margin-bottom: 20px;
 }
 
 .filter-card {
   background-color: var(--bg-tertiary);
   border: 1px solid var(--border-light);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .stats-section {
-  margin-bottom: var(--spacing-lg);
+  margin-bottom: 20px;
 }
 
 .main-section {
   flex: 1;
-  margin-bottom: var(--spacing-lg);
+  margin-bottom: 20px;
 }
 
 .main-card {
   min-height: 400px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .toolbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: var(--spacing-sm) 0;
+  padding: 8px 0;
 }
 
 .pagination-section {
   display: flex;
   justify-content: flex-end;
+  margin-top: 16px;
 }
 
 /* 响应式设计 */
 @media (max-width: 768px) {
   .page-header {
-    padding: var(--spacing-base);
+    padding: 16px;
   }
   
   .header-content {
     flex-direction: column;
-    gap: var(--spacing-base);
+    gap: 16px;
     align-items: stretch;
   }
   
@@ -182,12 +187,12 @@ const hasBreadcrumb = computed(() => props.breadcrumb.length > 0)
   }
   
   .page-content {
-    padding: var(--spacing-base);
+    padding: 16px;
   }
   
   .toolbar {
     flex-direction: column;
-    gap: var(--spacing-sm);
+    gap: 12px;
     align-items: stretch;
   }
 }

@@ -16,7 +16,6 @@
             </template>
           </el-input>
         </el-col>
-        <!-- 移除了分类筛选 -->
         <el-col :span="4">
           <el-select
             v-model="filterStatus"
@@ -28,15 +27,13 @@
             <el-option label="禁用" value="inactive" />
           </el-select>
         </el-col>
-        <el-col :span="4">
+        <el-col :span="14" style="text-align: right;">
+          <el-button @click="handleReset">重置</el-button>
           <el-button type="primary" @click="handleSearch">
             <el-icon><Search /></el-icon>
             搜索
           </el-button>
-          <el-button @click="handleReset">重置</el-button>
-        </el-col>
-        <el-col :span="6" style="text-align: right;">
-          <el-button type="primary" @click="handleAdd">
+          <el-button type="success" @click="handleAdd">
             <el-icon><Plus /></el-icon>
             新增商品
           </el-button>
@@ -53,66 +50,51 @@
         stripe
         style="width: 100%"
       >
-        <el-table-column prop="id" label="ID" width="80" align="center" />
-        <el-table-column prop="name" label="商品名称" min-width="150" />
-        <!-- 移除了分类列 -->
-        <el-table-column prop="description" label="商品描述" min-width="200" show-overflow-tooltip />
-        <el-table-column prop="status" label="状态" width="100" align="center">
+        <el-table-column prop="id" label="ID" width="70" align="center" />
+        <el-table-column prop="name" label="商品名称" min-width="180" />
+        <el-table-column prop="description" label="商品描述" min-width="220" show-overflow-tooltip />
+        <el-table-column prop="status" label="状态" width="90" align="center">
           <template #default="{ row }">
             <el-tag :type="row.status === 'active' ? 'success' : 'danger'">
               {{ row.status === 'active' ? '启用' : '禁用' }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="specCount" label="规格数量" width="100" align="center" />
-        <el-table-column prop="createTime" label="创建时间" width="160" align="center" />
-        <el-table-column label="操作" width="200" align="center" fixed="right">
+        <el-table-column prop="specCount" label="规格数量" width="90" align="center" />
+        <el-table-column label="操作" width="240" align="center" fixed="right">
           <template #default="{ row }">
-            <el-button
-              type="primary"
-              size="small"
-              @click="handleEdit(row)"
-              :icon="Edit"
-            >
-              编辑
-            </el-button>
-            <el-button
-              type="success"
-              size="small"
-              @click="handleViewSpecs(row)"
-              :icon="List"
-            >
-              规格
-            </el-button>
-            <el-popconfirm
-              title="确定删除这个商品吗？"
-              @confirm="handleDelete(row)"
-              v-if="row.specCount === 0"
-            >
-              <template #reference>
-                <el-button
-                  type="danger"
-                  size="small"
-                  :icon="Delete"
-                >
-                  删除
-                </el-button>
-              </template>
-            </el-popconfirm>
-            <el-tooltip
-              v-else
-              content="该商品下有规格，无法删除"
-              placement="top"
-            >
+            <div class="table-actions">
               <el-button
-                type="danger"
+                type="primary"
                 size="small"
-                :icon="Delete"
-                disabled
+                @click="handleEdit(row)"
+                :icon="Edit"
               >
-                删除
+                编辑
               </el-button>
-            </el-tooltip>
+              <el-button
+                type="success"
+                size="small"
+                @click="handleViewSpecs(row)"
+                :icon="List"
+              >
+                规格
+              </el-button>
+              <el-popconfirm
+                title="确定删除这个商品吗？删除商品将同时删除其所有规格"
+                @confirm="handleDelete(row)"
+              >
+                <template #reference>
+                  <el-button
+                    type="danger"
+                    size="small"
+                    :icon="Delete"
+                  >
+                    删除
+                  </el-button>
+                </template>
+              </el-popconfirm>
+            </div>
           </template>
         </el-table-column>
       </el-table>
@@ -152,7 +134,6 @@
             show-word-limit
           />
         </el-form-item>
-        <!-- 移除了商品分类选择字段 -->
         <el-form-item label="商品描述" prop="description">
           <el-input
             v-model="goodsForm.description"
@@ -231,24 +212,21 @@ const goodsList = ref([
     name: '王者荣耀点券',
     description: '王者荣耀游戏内点券充值',
     status: 'active',
-    specCount: 3,
-    createTime: '2024-01-15 10:30:00'
+    specCount: 3
   },
   {
     id: 2,
     name: 'Photoshop激活码',
     description: 'Adobe Photoshop正版软件激活码',
     status: 'active',
-    specCount: 2,
-    createTime: '2024-01-16 14:20:00'
+    specCount: 2
   },
   {
     id: 3,
     name: '视频会员月卡',
     description: '各大视频平台会员月卡服务',
     status: 'inactive',
-    specCount: 0,
-    createTime: '2024-01-17 09:15:00'
+    specCount: 0
   }
 ])
 
@@ -313,7 +291,7 @@ const handleViewSpecs = (row) => {
 const handleDelete = async (row) => {
   try {
     await ElMessageBox.confirm(
-      `确定删除商品"${row.name}"吗？此操作不可恢复。`,
+      `确定删除商品"${row.name}"吗？删除商品将同时删除其所有规格，此操作不可恢复。`,
       '确认删除',
       {
         confirmButtonText: '确定',
@@ -326,6 +304,14 @@ const handleDelete = async (row) => {
     const index = goodsList.value.findIndex(item => item.id === row.id)
     if (index !== -1) {
       goodsList.value.splice(index, 1)
+      
+      // 如果有规格，这里应该调用API删除对应规格
+      if (row.specCount > 0) {
+        console.log(`已删除商品"${row.name}"及其${row.specCount}个规格`)
+        // 实际项目中，这里应该调用API删除商品及其规格
+        // await deleteProductWithSpecs(row.id)
+      }
+      
       ElMessage.success('删除成功')
     }
   } catch (error) {
@@ -361,8 +347,7 @@ const handleSubmit = async () => {
       goodsList.value.push({
         ...goodsForm,
         id: newId,
-        specCount: 0,
-        createTime: new Date().toLocaleString()
+        specCount: 0
       })
       ElMessage.success('新增成功')
     }
@@ -389,7 +374,6 @@ const resetForm = () => {
   Object.assign(goodsForm, {
     id: '',
     name: '',
-    categoryId: '',
     description: '',
     status: 'active'
   })
@@ -404,33 +388,173 @@ onMounted(() => {
 
 <style scoped>
 .product-goods-container {
-  padding: 20px;
-  background-color: #fff;
-  border-radius: 4px;
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  padding: 16px;
+  background-color: #f5f7fa;
+  min-height: calc(100vh - 60px);
 }
 
 .search-section {
-  margin-bottom: 20px;
+  margin-bottom: 16px;
+  padding: 16px;
+  background-color: #fff;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
 }
 
 .table-section {
-  margin-bottom: 20px;
+  margin-bottom: 16px;
+  background-color: #fff;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+  padding: 16px;
 }
 
 .pagination-section {
   display: flex;
   justify-content: flex-end;
-  margin-top: 20px;
+  margin-top: 16px;
+  padding: 0 16px;
 }
 
+.table-actions {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+}
+
+/* 表格样式优化 - 使用更柔和的色彩 */
 :deep(.el-table) {
-  margin-top: 10px;
+  margin-top: 8px;
+  border-radius: 4px;
+  overflow: hidden;
+  font-size: 14px;
 }
 
 :deep(.el-table .cell) {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+:deep(.el-table th) {
+  background-color: #f8f9fa;
+  color: #606266;
+  font-weight: 500;
+}
+
+:deep(.el-table--border) {
+  border-color: #ebeef5;
+}
+
+:deep(.el-table--border::after),
+:deep(.el-table--group::after),
+:deep(.el-table::before) {
+  background-color: #ebeef5;
+}
+
+:deep(.el-table td),
+:deep(.el-table th.is-leaf) {
+  border-bottom: 1px solid #ebeef5;
+}
+
+/* 按钮样式优化 - 使用更柔和的色彩 */
+:deep(.el-button--small) {
+  padding: 5px 10px;
+}
+
+:deep(.el-button--primary) {
+  background-color: #5b8dee;
+  border-color: #5b8dee;
+}
+
+:deep(.el-button--primary:hover) {
+  background-color: #4b7ed8;
+  border-color: #4b7ed8;
+}
+
+:deep(.el-button--success) {
+  background-color: #67c23a;
+  border-color: #67c23a;
+}
+
+:deep(.el-button--success:hover) {
+  background-color: #5cb32e;
+  border-color: #5cb32e;
+}
+
+:deep(.el-button--danger) {
+  background-color: #f56c6c;
+  border-color: #f56c6c;
+}
+
+:deep(.el-button--danger:hover) {
+  background-color: #e45c5c;
+  border-color: #e45c5c;
+}
+
+/* 对话框样式优化 */
+:deep(.el-dialog) {
+  border-radius: 4px;
+}
+
+:deep(.el-dialog__header) {
+  border-bottom: 1px solid #f0f0f0;
+  padding: 16px 20px;
+}
+
+:deep(.el-dialog__body) {
+  padding: 20px;
+}
+
+/* 表单样式优化 */
+:deep(.el-form-item__label) {
+  font-weight: 500;
+  color: #606266;
+}
+
+:deep(.el-input__inner) {
+  border-radius: 4px;
+}
+
+:deep(.el-input__inner:focus) {
+  border-color: #5b8dee;
+}
+
+/* 标签样式优化 */
+:deep(.el-tag--success) {
+  background-color: #f0f9ff;
+  border-color: #b3d8ff;
+  color: #409eff;
+}
+
+:deep(.el-tag--danger) {
+  background-color: #fef0f0;
+  border-color: #fbc4c4;
+  color: #f56c6c;
+}
+
+/* 分页样式优化 */
+:deep(.el-pagination) {
+  color: #606266;
+}
+
+:deep(.el-pagination .el-select .el-input .el-input__inner) {
+  border-radius: 4px;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .search-section {
+    padding: 12px;
+  }
+  
+  .table-section {
+    padding: 12px;
+  }
+  
+  .table-actions {
+    flex-direction: column;
+    gap: 4px;
+  }
 }
 </style>

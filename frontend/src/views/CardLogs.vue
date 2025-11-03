@@ -1,85 +1,85 @@
 <template>
-  <div class="card-logs-page">
-    <el-card>
-      <template #header>
-        <div class="card-header">
-          <span>卡密操作记录</span>
-          <div class="header-actions">
-            <el-button @click="exportLogs" :loading="exporting">
-              <el-icon><Download /></el-icon>
-              导出日志
-            </el-button>
-            <el-button type="danger" @click="clearLogs" :loading="clearing">
-              <el-icon><Delete /></el-icon>
-              清理日志
-            </el-button>
-          </div>
-        </div>
-      </template>
-
-      <!-- 搜索和筛选 -->
-      <div class="filter-container">
-        <el-input
-          v-model="searchKeyword"
-          placeholder="搜索卡密编号、操作人或操作内容"
-          style="width: 300px"
-          clearable
-          @clear="handleSearch"
-        />
-        <el-select v-model="filterAction" placeholder="操作类型" clearable @change="handleSearch">
-          <el-option label="添加卡密" value="add" />
-          <el-option label="删除卡密" value="delete" />
-          <el-option label="验证卡密" value="validate" />
-          <el-option label="批量操作" value="batch" />
-        </el-select>
-        <el-select v-model="filterStatus" placeholder="操作状态" clearable @change="handleSearch">
-          <el-option label="成功" value="success" />
-          <el-option label="失败" value="failed" />
-        </el-select>
-        <el-date-picker
-          v-model="dateRange"
-          type="daterange"
-          range-separator="至"
-          start-placeholder="开始日期"
-          end-placeholder="结束日期"
-          @change="handleSearch"
-        />
-        <el-button type="primary" @click="handleSearch">
-          <el-icon><Search /></el-icon>
-          搜索
+  <div class="logs-container">
+    <!-- 页面标题 -->
+    <div class="card-header">
+      <span class="page-title">卡密操作记录</span>
+      <div class="header-actions">
+        <el-button @click="exportLogs" :loading="exporting">
+          <el-icon><Download /></el-icon>
+          导出日志
+        </el-button>
+        <el-button type="danger" @click="clearLogs" :loading="clearing">
+          <el-icon><Delete /></el-icon>
+          清理日志
         </el-button>
       </div>
+    </div>
 
-      <!-- 统计信息 -->
-      <div class="stats-container">
-        <el-row :gutter="20">
-          <el-col :span="6">
-            <div class="stat-item">
-              <div class="stat-value">{{ stats.totalLogs }}</div>
-              <div class="stat-label">总记录数</div>
-            </div>
-          </el-col>
-          <el-col :span="6">
-            <div class="stat-item">
-              <div class="stat-value success">{{ stats.successLogs }}</div>
-              <div class="stat-label">成功操作</div>
-            </div>
-          </el-col>
-          <el-col :span="6">
-            <div class="stat-item">
-              <div class="stat-value failed">{{ stats.failedLogs }}</div>
-              <div class="stat-label">失败操作</div>
-            </div>
-          </el-col>
-          <el-col :span="6">
-            <div class="stat-item">
-              <div class="stat-value">{{ stats.todayLogs }}</div>
-              <div class="stat-label">今日操作</div>
-            </div>
-          </el-col>
-        </el-row>
-      </div>
+    <!-- 搜索和筛选 -->
+    <div class="filter-container">
+      <el-input
+        v-model="searchKeyword"
+        placeholder="搜索卡密编号、操作人或操作内容"
+        style="width: 300px"
+        clearable
+        @clear="handleSearch"
+      />
+      <el-select v-model="filterAction" placeholder="操作类型" clearable @change="handleSearch">
+        <el-option label="添加卡密" value="add" />
+        <el-option label="删除卡密" value="delete" />
+        <el-option label="验证卡密" value="validate" />
+        <el-option label="批量操作" value="batch" />
+      </el-select>
+      <el-select v-model="filterStatus" placeholder="操作状态" clearable @change="handleSearch">
+        <el-option label="成功" value="success" />
+        <el-option label="失败" value="failed" />
+      </el-select>
+      <el-date-picker
+        v-model="dateRange"
+        type="daterange"
+        range-separator="至"
+        start-placeholder="开始日期"
+        end-placeholder="结束日期"
+        @change="handleSearch"
+      />
+      <el-button type="primary" @click="handleSearch">
+        <el-icon><Search /></el-icon>
+        搜索
+      </el-button>
+    </div>
 
+    <!-- 统计信息 -->
+    <div class="stats-container">
+      <el-row :gutter="20">
+        <el-col :span="6">
+          <div class="stat-item">
+            <div class="stat-value">{{ stats.totalLogs }}</div>
+            <div class="stat-label">总记录数</div>
+          </div>
+        </el-col>
+        <el-col :span="6">
+          <div class="stat-item">
+            <div class="stat-value success">{{ stats.successLogs }}</div>
+            <div class="stat-label">成功操作</div>
+          </div>
+        </el-col>
+        <el-col :span="6">
+          <div class="stat-item">
+            <div class="stat-value failed">{{ stats.failedLogs }}</div>
+            <div class="stat-label">失败操作</div>
+          </div>
+        </el-col>
+        <el-col :span="6">
+          <div class="stat-item">
+            <div class="stat-value">{{ stats.todayLogs }}</div>
+            <div class="stat-label">今日操作</div>
+          </div>
+        </el-col>
+      </el-row>
+    </div>
+
+    <!-- 表格容器 -->
+    <div class="table-container">
       <!-- 日志表格 -->
       <el-table 
         :data="paginatedLogs" 
@@ -147,7 +147,7 @@
           @current-change="handleCurrentChange"
         />
       </div>
-    </el-card>
+    </div>
 
     <!-- 日志详情弹窗 -->
     <el-dialog v-model="showDetailDialog" title="操作详情" width="600px">
@@ -405,10 +405,23 @@ onMounted(() => {
   padding: 0;
 }
 
+.logs-container {
+  background-color: #f5f7fa;
+  padding: 16px;
+  border-radius: 4px;
+}
+
 .card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 16px;
+}
+
+.page-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #303133;
 }
 
 .header-actions {
@@ -417,7 +430,7 @@ onMounted(() => {
 }
 
 .filter-container {
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   display: flex;
   gap: 10px;
   align-items: center;
@@ -482,14 +495,57 @@ onMounted(() => {
 }
 
 .pagination-container {
-  margin-top: 20px;
+  margin-top: 16px;
   display: flex;
   justify-content: flex-end;
+}
+
+/* 表格样式优化 */
+:deep(.el-table) {
+  font-size: 14px;
+}
+
+:deep(.el-table__header) {
+  background-color: #f8f9fa;
+}
+
+:deep(.el-table__header th) {
+  font-weight: 500;
+  color: #606266;
+}
+
+/* 对话框样式优化 */
+:deep(.el-dialog) {
+  border-radius: 4px;
+}
+
+:deep(.el-dialog__header) {
+  border-bottom: 1px solid #f0f0f0;
+  padding: 16px 20px;
+}
+
+:deep(.el-dialog__body) {
+  padding: 20px;
+}
+
+/* 表单样式优化 */
+:deep(.el-form-item__label) {
+  font-weight: 500;
+}
+
+:deep(.el-input__inner) {
+  border-radius: 4px;
+}
+
+/* 按钮样式优化 */
+:deep(.el-button) {
+  border-radius: 4px;
 }
 
 @media (max-width: 768px) {
   .filter-container {
     flex-direction: column;
+    gap: 8px;
     align-items: stretch;
   }
   
