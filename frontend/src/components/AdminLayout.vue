@@ -59,27 +59,6 @@
               <span>操作日志</span>
             </el-menu-item>
             
-            <el-sub-menu index="products">
-              <template #title>
-                <el-icon>
-                  <Box />
-                </el-icon>
-                <span>商品管理</span>
-              </template>
-              <el-menu-item index="/admin/products">
-                <el-icon>
-                  <Goods />
-                </el-icon>
-                <span>商品列表</span>
-              </el-menu-item>
-              <el-menu-item index="/admin/product-spec-management">
-                <el-icon>
-                  <List />
-                </el-icon>
-                <span>规格管理</span>
-              </el-menu-item>
-            </el-sub-menu>
-            
             <el-menu-item index="/admin/card-keys">
               <el-icon>
                 <Key />
@@ -99,14 +78,11 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, reactive, nextTick, getCurrentInstance } from 'vue'
+import { ref, computed, onMounted, reactive, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { User, ArrowDown, Monitor, Setting, Document, Box, Goods, List, Key } from '@element-plus/icons-vue'
+import { User, ArrowDown, Monitor, Setting, Document, Key } from '@element-plus/icons-vue'
 import store from '@/utils/store.js'
-
-// 获取当前实例以访问全局store
-const { proxy } = getCurrentInstance()
 
 // 控制水印显示
 const showWatermark = ref(false)

@@ -36,7 +36,7 @@
           <div class="hero-image">
             <h2>广告位展示</h2>
             <p>您能看到，您的潜在用户也能看到</p>
-            <!-- <video src="https://www.bilibili.com/video/BV1KdkeYQEKg/" alt="枫叶网盘" controls></video> -->
+            <!-- <video src="https://www.bilibili.com/video/BV1KdkeYQEKg/" alt="枫叶卡管" controls></video> -->
           </div>
         </div>
       </section>
@@ -57,7 +57,7 @@
                 <i class="el-icon-box"></i>
               </div>
               <h3>商品管理</h3>
-              <p>灵活的商品和规格管理，支持多种产品类型和定价策略。</p>
+              <p>灵活的商品和规格管理，支持多种产品类型和销售策略。</p>
             </div>
             <div class="feature-card">
               <div class="feature-icon">
@@ -77,23 +77,21 @@
         </div>
       </section>
 
-      <section class="pricing-section" id="pricing">
+      <section class="features-section" id="features">
         <div class="container">
-          <h2>选择适合您的版本</h2>
-          <div class="pricing-cards">
-            <div class="pricing-card">
+          <h2>功能特色</h2>
+          <div class="features-cards">
+            <div class="feature-card">
               <h3>基础版</h3>
-              <div class="price">免费</div>
               <ul class="features-list">
                 <li>支持1000个卡密管理</li>
                 <li>基础商品管理功能</li>
                 <li>简单数据统计</li>
               </ul>
             </div>
-            <div class="pricing-card popular">
+            <div class="feature-card popular">
               <div class="badge">热门选择</div>
               <h3>专业版</h3>
-              <div class="price">¥99<span>/月</span></div>
               <ul class="features-list">
                 <li>无限卡密管理</li>
                 <li>高级商品管理工具</li>
@@ -101,9 +99,8 @@
                 <li>API接口支持</li>
               </ul>
             </div>
-            <div class="pricing-card">
+            <div class="feature-card">
               <h3>企业版</h3>
-              <div class="price">¥299<span>/月</span></div>
               <ul class="features-list">
                 <li>无限卡密管理</li>
                 <li>企业级管理工具</li>
@@ -128,7 +125,7 @@
             <h4>产品功能</h4>
             <ul>
               <li><a href="#features">功能特色</a></li>
-              <li><a href="#pricing">版本对比</a></li>
+              <li><a href="#features">功能对比</a></li>
             </ul>
           </div>
           <div class="footer-section">
@@ -419,26 +416,26 @@ export default {
   line-height: 1.6;
 }
 
-/* Pricing Section */
-.pricing-section {
+/* Features Section */
+.features-section {
   background-color: #f5f7fa;
   padding: 80px 0;
   text-align: center;
 }
 
-.pricing-section h2 {
+.features-section h2 {
   font-size: 36px;
   margin-bottom: 50px;
   color: #303133;
 }
 
-.pricing-cards {
+.features-cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 30px;
 }
 
-.pricing-card {
+.feature-card {
   background: #fff;
   border-radius: 8px;
   padding: 30px;
@@ -447,12 +444,7 @@ export default {
   transition: transform 0.3s, box-shadow 0.3s;
 }
 
-.pricing-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-}
-
-.pricing-card.popular {
+.feature-card.popular {
   border: 2px solid #409EFF;
 }
 
@@ -468,22 +460,10 @@ export default {
   font-size: 14px;
 }
 
-.pricing-card h3 {
+.feature-card h3 {
   font-size: 24px;
   margin-bottom: 15px;
   color: #303133;
-}
-
-.price {
-  font-size: 36px;
-  font-weight: bold;
-  color: #409EFF;
-  margin-bottom: 20px;
-}
-
-.price span {
-  font-size: 16px;
-  color: #909399;
 }
 
 .features-list {
@@ -588,7 +568,7 @@ export default {
     justify-content: center;
   }
 
-  .pricing-cards {
+  .features-cards {
     grid-template-columns: 1fr;
   }
 }

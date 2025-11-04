@@ -10,6 +10,11 @@ export function saveToken(token) {
   localStorage.setItem('token', token)
 }
 
+// 设置token（与saveToken功能相同，为了保持命名一致性）
+export function setToken(token) {
+  localStorage.setItem('token', token)
+}
+
 // 从localStorage移除token
 export function removeToken() {
   localStorage.removeItem('token')

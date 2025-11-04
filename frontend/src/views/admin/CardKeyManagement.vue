@@ -75,24 +75,19 @@
           </template>
         </el-table-column>
         <el-table-column prop="productName" label="商品名称" min-width="150" />
-        <el-table-column prop="specName" label="规格名称" min-width="120" />
-        <el-table-column prop="price" label="价格" width="100">
-          <template #default="scope">
-            ¥{{ scope.row.price }}
-          </template>
-        </el-table-column>
-        <el-table-column prop="status" label="状态" width="100">
-          <template #default="scope">
-            <el-tag :type="getStatusType(scope.row.status)">
-              {{ getStatusText(scope.row.status) }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column prop="validityPeriod" label="有效期" width="120">
-          <template #default="scope">
-            {{ scope.row.validityPeriod }}天
-          </template>
-        </el-table-column>
+      <el-table-column prop="specName" label="规格名称" min-width="120" />
+      <el-table-column prop="status" label="状态" width="100">
+        <template #default="scope">
+          <el-tag :type="getStatusType(scope.row.status)">
+            {{ getStatusText(scope.row.status) }}
+          </el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column prop="validityPeriod" label="有效期" width="120">
+        <template #default="scope">
+          {{ scope.row.validityPeriod }}天
+        </template>
+      </el-table-column>
         <el-table-column prop="createTime" label="生成时间" width="180" />
         <el-table-column prop="usedTime" label="使用时间" width="180">
           <template #default="scope">
@@ -161,12 +156,11 @@
         </el-descriptions-item>
         <el-descriptions-item label="商品名称">{{ currentKey.productName }}</el-descriptions-item>
         <el-descriptions-item label="规格名称">{{ currentKey.specName }}</el-descriptions-item>
-        <el-descriptions-item label="价格">¥{{ currentKey.price }}</el-descriptions-item>
         <el-descriptions-item label="有效期">{{ currentKey.validityPeriod }}天</el-descriptions-item>
         <el-descriptions-item label="生成时间">{{ currentKey.createTime }}</el-descriptions-item>
         <el-descriptions-item label="使用时间">{{ currentKey.usedTime || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="购买人">{{ currentKey.buyer || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="购买时间">{{ currentKey.buyTime || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="使用人">{{ currentKey.buyer || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="使用时间">{{ currentKey.buyTime || '-' }}</el-descriptions-item>
       </el-descriptions>
       
       <template #footer>
@@ -254,7 +248,7 @@ const fetchKeyList = () => {
         key: 'LEAF-2023-ABCD-1234-EFGH',
         productName: '游戏点卡100元',
         specName: '标准版',
-        price: 85.00,
+
         status: 'unsold',
         validityPeriod: 365,
         createTime: '2023-11-20 10:30:00',
@@ -267,7 +261,7 @@ const fetchKeyList = () => {
         key: 'LEAF-2023-IJKL-5678-MNOP',
         productName: '游戏点卡100元',
         specName: '标准版',
-        price: 85.00,
+
         status: 'sold',
         validityPeriod: 365,
         createTime: '2023-11-20 10:30:00',
@@ -280,7 +274,7 @@ const fetchKeyList = () => {
         key: 'LEAF-2023-QRST-9012-UVWX',
         productName: '视频会员月卡',
         specName: '普通会员',
-        price: 15.00,
+
         status: 'used',
         validityPeriod: 30,
         createTime: '2023-11-19 09:15:00',
@@ -293,7 +287,7 @@ const fetchKeyList = () => {
         key: 'LEAF-2023-YZAB-3456-CDEF',
         productName: '视频会员月卡',
         specName: '高级会员',
-        price: 25.00,
+
         status: 'expired',
         validityPeriod: 30,
         createTime: '2023-10-15 14:20:00',
@@ -306,7 +300,7 @@ const fetchKeyList = () => {
         key: 'LEAF-2023-GHIJ-7890-KLMN',
         productName: '音乐会员季卡',
         specName: '基础版',
-        price: 30.00,
+
         status: 'unsold',
         validityPeriod: 90,
         createTime: '2023-11-18 16:45:00',
