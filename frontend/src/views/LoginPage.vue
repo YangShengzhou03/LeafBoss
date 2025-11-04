@@ -218,7 +218,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, markRaw } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useRouter } from 'vue-router'
 import store from '@/utils/store.js'
@@ -538,8 +538,20 @@ const handleForgotPassword = async () => {
   }
 }
 
-// 组件挂载时自动填充测试账号
+// 在模板挂载后设置组件引用为markRaw
 onMounted(() => {
+  // 确保组件引用不被响应式化
+  if (loginFormRef.value) {
+    loginFormRef.value = markRaw(loginFormRef.value)
+  }
+  if (registerFormRef.value) {
+    registerFormRef.value = markRaw(registerFormRef.value)
+  }
+  if (forgotFormRef.value) {
+    forgotFormRef.value = markRaw(forgotFormRef.value)
+  }
+  
+  // 组件挂载时自动填充测试账号
   loginForm.username = 'admin'
   loginForm.password = '123456'
 })

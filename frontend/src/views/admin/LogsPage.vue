@@ -10,41 +10,30 @@
       <!-- 筛选区域 -->
       <div class="filter-section">
         <el-row :gutter="20">
-          <el-col :span="6">
-            <el-select v-model="filter.operationType" placeholder="操作类型" clearable @change="handleFilter">
-              <el-option label="全部" value="" />
-              <el-option label="登录" value="LOGIN" />
-              <el-option label="生成卡密" value="CARD_KEY_GENERATE" />
-              <el-option label="验证卡密" value="CARD_KEY_VERIFY" />
-              <el-option label="编辑卡密" value="CARD_KEY_EDIT" />
-              <el-option label="删除卡密" value="CARD_KEY_DELETE" />
-              <el-option label="导出卡密" value="CARD_KEY_EXPORT" />
-              <el-option label="商品管理" value="PRODUCT_MANAGE" />
-              <el-option label="规格管理" value="SPEC_MANAGE" />
-              <el-option label="系统设置" value="SYSTEM_SETTING" />
-              <el-option label="清空日志" value="CLEAR_LOGS" />
-            </el-select>
+          <el-col :span="5">
+            <el-date-picker
+              v-model="filter.dateRange"
+              type="daterange"
+              range-separator="至"
+              start-placeholder="开始日期"
+              end-placeholder="结束日期"
+              value-format="YYYY-MM-DD"
+              @change="handleFilter"
+              style="width: 100%"
+            />
           </el-col>
-          <el-col :span="6">
-            <el-select v-model="filter.targetType" placeholder="目标类型" clearable @change="handleFilter">
-              <el-option label="全部" value="" />
-              <el-option label="用户" value="USER" />
-              <el-option label="卡密" value="CARD_KEY" />
-              <el-option label="商品" value="PRODUCT" />
-              <el-option label="规格" value="SPEC" />
-              <el-option label="系统" value="SYSTEM" />
-            </el-select>
-          </el-col>
-          <el-col :span="12">
-            <el-button @click="resetFilter">重置</el-button>
-            <el-button @click="exportLogs" :loading="exporting">
-              <el-icon><Download /></el-icon>
-              导出
-            </el-button>
-            <el-button type="danger" @click="clearLogs" :loading="clearing">
-              <el-icon><Delete /></el-icon>
-              清空
-            </el-button>
+          <el-col :span="19">
+            <div class="action-buttons">
+              <el-button @click="resetFilter">重置</el-button>
+              <el-button @click="exportLogs" :loading="exporting">
+                <el-icon><Download /></el-icon>
+                导出
+              </el-button>
+              <el-button type="danger" @click="clearLogs" :loading="clearing">
+                <el-icon><Delete /></el-icon>
+                清空
+              </el-button>
+            </div>
           </el-col>
         </el-row>
       </div>
@@ -164,8 +153,7 @@ const stats = ref({
 
 // 筛选条件
 const filter = reactive({
-  operationType: '',
-  targetType: ''
+  dateRange: []
 })
 
 // 获取操作类型对应的标签类型
@@ -198,8 +186,7 @@ const getOperationTypeName = (operationType) => {
 
 // 重置筛选条件
 const resetFilter = () => {
-  filter.operationType = ''
-  filter.targetType = ''
+  filter.dateRange = []
   currentPage.value = 1
   loadLogs()
 }
@@ -246,10 +233,15 @@ const loadLogs = async () => {
   try {
     const params = {
       page: currentPage.value - 1,
-      size: pageSize.value,
-      operationType: filter.operationType,
-      targetType: filter.targetType
+      size: pageSize.value
     }
+    
+    // 添加时间范围参数
+    if (filter.dateRange && filter.dateRange.length === 2) {
+      params.startDate = filter.dateRange[0]
+      params.endDate = filter.dateRange[1]
+    }
+    
     const response = await AdminService.getLogList(params)
     logs.value = response.content || []
     totalLogs.value = response.totalElements || 0
@@ -290,12 +282,17 @@ const viewLogDetail = (log) => {
 const exportLogs = async () => {
   exporting.value = true
   try {
+    const params = {}
+    
+    // 添加时间范围参数
+    if (filter.dateRange && filter.dateRange.length === 2) {
+      params.startDate = filter.dateRange[0]
+      params.endDate = filter.dateRange[1]
+    }
+    
     const response = await AdminService.get('/admin/log/export', {
       responseType: 'blob',
-      params: {
-        operationType: filter.operationType,
-        targetType: filter.targetType
-      }
+      params: params
     })
 
     // 创建下载链接
@@ -382,6 +379,12 @@ onMounted(() => {
 .filter-section {
   margin-bottom: 16px;
   padding: 16px;
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
 }
 
 .stats-section {
