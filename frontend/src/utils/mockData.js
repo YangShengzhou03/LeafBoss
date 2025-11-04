@@ -227,92 +227,9 @@ export const getSystemConfig = () => {
   }
 }
 
-/**
- * 获取文件列表模拟数据
- * @param {string} parentId 父文件夹ID
- * @returns {Array} 文件列表数据
- */
-export const getFileList = (parentId = 'root') => {
-  const files = [
-    {
-      id: generateId('file'),
-      name: '项目文档.docx',
-      type: 'document',
-      size: 2048576, // 2MB
-      parentId,
-      createdAt: generateRandomDate(5),
-      updatedAt: generateRandomDate(2),
-      downloadUrl: '#'
-    },
-    {
-      id: generateId('file'),
-      name: '会议记录.pdf',
-      type: 'pdf',
-      size: 1024000, // 1MB
-      parentId,
-      createdAt: generateRandomDate(10),
-      updatedAt: generateRandomDate(3),
-      downloadUrl: '#'
-    },
-    {
-      id: generateId('folder'),
-      name: '图片',
-      type: 'folder',
-      size: 0,
-      parentId,
-      createdAt: generateRandomDate(15),
-      updatedAt: generateRandomDate(5),
-      downloadUrl: null
-    },
-    {
-      id: generateId('file'),
-      name: '设计图.png',
-      type: 'image',
-      size: 5120000, // 5MB
-      parentId,
-      createdAt: generateRandomDate(7),
-      updatedAt: generateRandomDate(1),
-      downloadUrl: '#'
-    }
-  ]
-
-  return files
-}
-
-/**
- * 获取分享链接模拟数据
- * @returns {Array} 分享链接列表数据
- */
-export const getShareLinks = () => {
-  return [
-    {
-      id: generateId('share'),
-      name: '项目资料',
-      url: `https://example.com/s/${generateId()}`,
-      password: 'leaf123',
-      expireTime: generateRandomDate(7),
-      downloadCount: 15,
-      maxDownloadCount: 100,
-      createdAt: generateRandomDate(3)
-    },
-    {
-      id: generateId('share'),
-      name: '会议记录',
-      url: `https://example.com/s/${generateId()}`,
-      password: '',
-      expireTime: generateRandomDate(14),
-      downloadCount: 8,
-      maxDownloadCount: 50,
-      createdAt: generateRandomDate(5)
-    }
-  ]
-}
-
 export default {
   getDashboardStats,
   getUserList,
   getLogList,
-  getSystemConfig,
-  getFileList,
-  getShareLinks
+  getSystemConfig
 }

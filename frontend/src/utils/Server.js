@@ -60,11 +60,7 @@ Server.interceptors.response.use(
         return Promise.resolve(mockDataService.getLogList(page, size))
       } else if (url.includes('/admin/config') && method === 'GET') {
         return Promise.resolve(mockDataService.getSystemConfig())
-      } else if (url.includes('/file/list') && method === 'GET') {
-        const parentId = new URLSearchParams(error.config?.params?.toString() || '').get('parentId') || 'root'
-        return Promise.resolve(mockDataService.getFileList(parentId))
-      } else if (url.includes('/share/list') && method === 'GET') {
-        return Promise.resolve(mockDataService.getShareLinks())
+
       }
       return null
     }
@@ -86,7 +82,6 @@ Server.interceptors.response.use(
     }
     
     const status = error.response.status
-    // const message = error.response.data?.message || '请求失败' // 未使用的变量
     
     let mockResult
     switch (status) {

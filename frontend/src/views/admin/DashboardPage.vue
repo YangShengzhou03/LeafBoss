@@ -146,8 +146,6 @@ const stats = ref({
   dailyGrowth: 0
 })
 
-// 系统运行时间
-const uptime = ref('0天0小时0分钟')
 const loading = ref(false)
 
 // 销量前五的商品数据
