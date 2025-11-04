@@ -16,7 +16,7 @@
             <span class="logo-text">枫</span>
           </div>
           <h1 class="app-title">LeafCard</h1>
-          <p class="subtitle">枫叶卡管系统 - 管理员系统</p>
+          <p class="subtitle">管理员系统</p>
         </div>
         
         <!-- 表单区域 -->

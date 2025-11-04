@@ -209,7 +209,7 @@ export const getLogList = (page = 0, size = 20) => {
 export const getSystemConfig = () => {
   return {
     maxFileSize: 5120, // MB (5GB)
-    appName: 'LeafPan网盘系统',
+    appName: 'LeafCard枫叶卡管系统',
     apiVersion: 'v1',
     allowRegistration: true,
     defaultUserQuota: 1073741824, // 1GB

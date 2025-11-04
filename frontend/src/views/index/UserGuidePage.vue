@@ -4,7 +4,7 @@
     <header class="page-header">
       <div class="container">
         <h1>使用指南</h1>
-        <p>LeafPan网盘系统的完整使用教程和操作说明</p>
+        <p>LeafCard枫叶卡管系统快速入门指南</p>
       </div>
     </header>
 
@@ -15,13 +15,19 @@
           <section class="guide-section">
             <div class="section-header">
               <h2>快速入门</h2>
-              <p>新手用户快速上手LeafPan网盘系统</p>
+              <p>新手用户快速上手LeafCard枫叶卡管系统</p>
             </div>
             <div class="guide-content">
               <el-collapse v-model="activeNames" accordion>
                 <el-collapse-item name="register" title="注册账号">
                   <div class="collapse-content">
-                    <p>访问LeafPan首页，点击"注册"按钮，填写用户名、邮箱和密码完成注册。注册后需要验证邮箱才能使用完整功能。用户名要求3-20个字符，支持中英文、数字和下划线，密码要求8-20个字符且必须包含字母和数字。</p>
+                    <p>注册LeafCard枫叶卡管系统账号需要满足以下要求：</p>
+                    <ul>
+                      <li>用户名：3-20个字符，支持中文、英文、数字和下划线</li>
+                      <li>密码：8-20个字符，必须包含字母和数字</li>
+                      <li>邮箱：用于验证和找回密码</li>
+                    </ul>
+                    <p>注册成功后，系统会自动发送验证邮件到您的邮箱，请及时验证。</p>
                   </div>
                 </el-collapse-item>
                 
@@ -31,9 +37,15 @@
                   </div>
                 </el-collapse-item>
                 
-                <el-collapse-item name="upload" title="上传文件">
+                <el-collapse-item name="card" title="卡管理">
                   <div class="collapse-content">
-                    <p>登录后进入文件管理页面，点击"上传"按钮选择文件或直接将文件拖拽到上传区域。支持所有常见文件格式，单个文件大小限制为5GB，支持断点续传和批量上传。</p>
+                    <p>LeafCard枫叶卡管系统支持多种卡管理操作：</p>
+                    <ul>
+                      <li>添加卡片：点击"添加卡片"按钮填写卡信息</li>
+                      <li>编辑卡片：点击卡片列表中的编辑按钮修改信息</li>
+                      <li>删除卡片：选择需要删除的卡片进行移除</li>
+                    </ul>
+                    <p>支持功能：卡号验证、持卡人信息管理、有效期跟踪、批量导入导出等。</p>
                   </div>
                 </el-collapse-item>
                 

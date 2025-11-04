@@ -4,7 +4,7 @@
     <header class="page-header">
       <div class="container">
         <h1>关于作者</h1>
-        <p>LeafPan网盘系统开发者简介</p>
+        <p>LeafCard枫叶卡管系统开发者简介</p>
       </div>
     </header>
 
@@ -26,7 +26,7 @@
                 <div class="profile-info">
                   <div class="name-title">
                     <h3>Yangshengzhou</h3>
-                    <span class="developer-badge">Leaf-Pan 开发者</span>
+                    <span class="developer-badge">LeafCard 开发者</span>
                   </div>
                                     <div class="expertise-tags">
                     <span class="tag">Vue.js</span>
@@ -54,38 +54,38 @@
             <div class="section-content">
               <div class="timeline">
                 <div class="timeline-item">
-                  <div class="timeline-marker"></div>
-                  <div class="timeline-content">
-                    <h3>项目构思(2025年1月)</h3>
-                    <p>基于对现有网盘系统的分析，构思开发一个轻量级、易用的个人网盘系统</p>
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-content">
+                      <h3>项目构思(2024年1月)</h3>
+                      <p>基于对现有卡管理系统的分析，构思开发一个轻量级、易用的卡管系统</p>
+                    </div>
                   </div>
-                </div>
+                <div class="timeline-item">
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-content">
+                      <h3>技术选型(2024年2月)</h3>
+                      <p>确定使用Vue 3 + Spring Boot 3的技术栈，开始系统架构设计</p>
+                    </div>
+                  </div>
+                <div class="timeline-item">
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-content">
+                      <h3>核心开发(2024年3月-7月)</h3>
+                      <p>完成前后端核心功能开发，包括卡管理、用户管理、权限控制等</p>
+                    </div>
+                  </div>
+                <div class="timeline-item">
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-content">
+                      <h3>测试优化(2024年8月-9月)</h3>
+                      <p>进行系统测试和性能优化，完善用户体验</p>
+                    </div>
+                  </div>
                 <div class="timeline-item">
                   <div class="timeline-marker"></div>
                   <div class="timeline-content">
-                    <h3>技术选型(2025年2月)</h3>
-                    <p>确定使用Vue 3 + Spring Boot 3的技术栈，开始系统架构设计</p>
-                  </div>
-                </div>
-                <div class="timeline-item">
-                  <div class="timeline-marker"></div>
-                  <div class="timeline-content">
-                    <h3>核心开发(2025年3月-7月)</h3>
-                    <p>完成前后端核心功能开发，包括文件上传下载、用户管理、权限控制等</p>
-                  </div>
-                </div>
-                <div class="timeline-item">
-                  <div class="timeline-marker"></div>
-                  <div class="timeline-content">
-                    <h3>测试优化(2025年8月-9月)</h3>
-                    <p>进行系统测试和性能优化，完善用户体验</p>
-                  </div>
-                </div>
-                <div class="timeline-item">
-                  <div class="timeline-marker"></div>
-                  <div class="timeline-content">
-                    <h3>正式发布(2025年10月27日)</h3>
-                    <p>LeafPan网盘系统正式上线，为用户提供服务</p>
+                    <h3>正式发布(2024年10月27日)</h3>
+                    <p>LeafCard枫叶卡管系统正式上线，为用户提供服务</p>
                   </div>
                 </div>
               </div>

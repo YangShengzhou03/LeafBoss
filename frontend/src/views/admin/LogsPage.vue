@@ -75,7 +75,7 @@
       
       <!-- 日志列表 -->
       <el-table v-loading="loading" :data="logs" style="width: 100%" stripe>
-        <el-table-column prop="id" label="ID" width="80" />
+        <el-table-column prop="id" label="ID" width="100" show-overflow-tooltip />
         <el-table-column prop="operationType" label="操作类型" width="200">
           <template #default="{ row }">
             <el-tag :type="getLevelType(row.operationType)" size="small">
@@ -364,7 +364,7 @@ onMounted(() => {
 }
 
 .logs-card :deep(.el-card__body) {
-  padding: 0;
+  padding: 16px;
 }
 
 .card-header {

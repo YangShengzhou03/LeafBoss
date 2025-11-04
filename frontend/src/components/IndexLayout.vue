@@ -5,7 +5,7 @@
     <header class="header">
       <div class="container">
         <div class="logo-area">
-          <h1 class="logo">LeafAuto卡密系统</h1>
+          <h1 class="logo">LeafCard</h1>
         </div>
         <div class="auth-section">
           <div class="auth-buttons" v-if="!isAuthenticated">
