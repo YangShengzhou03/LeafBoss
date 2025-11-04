@@ -1,19 +1,39 @@
-import { createApp } from 'vue'
-import { createPinia } from 'pinia'
-import ElementPlus from 'element-plus'
-import 'element-plus/dist/index.css'
-import * as ElementPlusIconsVue from '@element-plus/icons-vue'
-import App from './App.vue'
-import router from './router'
+// main.js
+import { createApp } from 'vue';
+import ElementPlus from 'element-plus';
+import 'element-plus/dist/index.css';
+import router from './route';
+import App from './App.vue';
+import { loadConfig } from './utils/config';
+import store from './utils/store.js';
 
-const app = createApp(App)
+// 引入所有图标
+import * as ElementPlusIconsVue from '@element-plus/icons-vue';
 
-// 注册所有Element Plus图标
+// 创建Vue应用实例
+const app = createApp(App);
+
+// 使用插件
+app.use(ElementPlus);
+app.use(router);
+
+// 全局注册图标组件
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
-  app.component(key, component)
+  app.component(key, component);
 }
 
-app.use(createPinia())
-app.use(router)
-app.use(ElementPlus)
-app.mount('#app')
+// 将store添加到全局属性，方便在组件中使用
+app.config.globalProperties.$store = store;
+
+// 初始化应用状态
+store.init().then(() => {
+}).catch(error => {
+});
+
+// 立即挂载应用，不等待配置加载
+app.mount('#app');
+
+// 异步加载配置（不影响页面渲染）
+loadConfig().then(config => {
+}).catch(error => {
+});
