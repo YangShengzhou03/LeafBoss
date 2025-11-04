@@ -85,14 +85,15 @@
                 </el-icon>
                 <template #title>卡密列表</template>
               </el-menu-item>
+              <el-menu-item index="/admin/card-verify">
+                <el-icon>
+                  <Check />
+                </el-icon>
+                <template #title>卡密验证</template>
+              </el-menu-item>
             </el-sub-menu>
 
-            <el-menu-item index="/admin/system">
-              <el-icon>
-                <Setting />
-              </el-icon>
-              <template #title>系统设置</template>
-            </el-menu-item>
+
 
             <el-menu-item index="/admin/logs">
               <el-icon>
@@ -119,7 +120,7 @@
 import { computed, onMounted, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { User, ArrowDown, Monitor, Setting, Document, Key, Goods, List, Operation } from '@element-plus/icons-vue'
+import { User, ArrowDown, Monitor, Document, Key, Goods, List, Operation, Check } from '@element-plus/icons-vue'
 import store from '@/utils/store.js'
 
 const router = useRouter()

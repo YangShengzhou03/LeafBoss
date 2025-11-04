@@ -1,5 +1,5 @@
 <template>
-  <div class="admin-logs">
+  <div class="admin-logs-page">
     <el-card class="logs-card">
       <template #header>
         <div class="card-header">
@@ -10,39 +10,34 @@
       <!-- 筛选区域 -->
       <div class="filter-section">
         <el-row :gutter="20">
-          <el-col :span="5">
+          <el-col :span="6">
             <el-select v-model="filter.operationType" placeholder="操作类型" clearable @change="handleFilter">
               <el-option label="全部" value="" />
               <el-option label="登录" value="LOGIN" />
-              <el-option label="卡密管理" value="CARD_KEY_MANAGE" />
-              <el-option label="用户管理" value="USER_MANAGE" />
+              <el-option label="生成卡密" value="CARD_KEY_GENERATE" />
+              <el-option label="验证卡密" value="CARD_KEY_VERIFY" />
+              <el-option label="编辑卡密" value="CARD_KEY_EDIT" />
+              <el-option label="删除卡密" value="CARD_KEY_DELETE" />
+              <el-option label="导出卡密" value="CARD_KEY_EXPORT" />
+              <el-option label="商品管理" value="PRODUCT_MANAGE" />
+              <el-option label="规格管理" value="SPEC_MANAGE" />
               <el-option label="系统设置" value="SYSTEM_SETTING" />
               <el-option label="清空日志" value="CLEAR_LOGS" />
             </el-select>
           </el-col>
-          <el-col :span="5">
+          <el-col :span="6">
             <el-select v-model="filter.targetType" placeholder="目标类型" clearable @change="handleFilter">
               <el-option label="全部" value="" />
               <el-option label="用户" value="USER" />
               <el-option label="卡密" value="CARD_KEY" />
+              <el-option label="商品" value="PRODUCT" />
+              <el-option label="规格" value="SPEC" />
               <el-option label="系统" value="SYSTEM" />
             </el-select>
           </el-col>
-          <el-col :span="8">
-            <el-date-picker
-              v-model="filter.dateRange"
-              type="daterange"
-              range-separator="至"
-              start-placeholder="开始日期"
-              end-placeholder="结束日期"
-              format="YYYY-MM-DD"
-              value-format="YYYY-MM-DD"
-              @change="handleFilter"
-            />
-          </el-col>
-          <el-col :span="6">
+          <el-col :span="12">
             <el-button @click="resetFilter">重置</el-button>
-                        <el-button @click="exportLogs" :loading="exporting">
+            <el-button @click="exportLogs" :loading="exporting">
               <el-icon><Download /></el-icon>
               导出
             </el-button>
@@ -57,37 +52,49 @@
       <!-- 统计信息 -->
       <div class="stats-section">
         <el-row :gutter="20">
-          <el-col :span="4">
+          <el-col :span="3">
             <div class="stat-item">
               <span class="stat-label">登录：</span>
               <span class="stat-value success">{{ stats.loginCount }}</span>
             </div>
           </el-col>
-          <el-col :span="4">
+          <el-col :span="3">
             <div class="stat-item">
-              <span class="stat-label">卡密：</span>
-              <span class="stat-value primary">{{ stats.cardKeyCount }}</span>
+              <span class="stat-label">生成卡密：</span>
+              <span class="stat-value primary">{{ stats.generateCount }}</span>
             </div>
           </el-col>
-          <el-col :span="4">
+          <el-col :span="3">
             <div class="stat-item">
-              <span class="stat-label">用户：</span>
-              <span class="stat-value info">{{ stats.userCount }}</span>
+              <span class="stat-label">验证卡密：</span>
+              <span class="stat-value info">{{ stats.verifyCount }}</span>
             </div>
           </el-col>
-          <el-col :span="4">
+          <el-col :span="3">
             <div class="stat-item">
-              <span class="stat-label">系统：</span>
-              <span class="stat-value warning">{{ stats.systemCount }}</span>
+              <span class="stat-label">编辑卡密：</span>
+              <span class="stat-value warning">{{ stats.editCount }}</span>
             </div>
           </el-col>
-          <el-col :span="4">
+          <el-col :span="3">
             <div class="stat-item">
-              <span class="stat-label">其他：</span>
-              <span class="stat-value">{{ stats.otherCount }}</span>
+              <span class="stat-label">删除卡密：</span>
+              <span class="stat-value danger">{{ stats.deleteCount }}</span>
             </div>
           </el-col>
-          <el-col :span="4">
+          <el-col :span="3">
+            <div class="stat-item">
+              <span class="stat-label">商品管理：</span>
+              <span class="stat-value">{{ stats.productCount }}</span>
+            </div>
+          </el-col>
+          <el-col :span="3">
+            <div class="stat-item">
+              <span class="stat-label">规格管理：</span>
+              <span class="stat-value">{{ stats.specCount }}</span>
+            </div>
+          </el-col>
+          <el-col :span="3">
             <div class="stat-item">
               <span class="stat-label">总计：</span>
               <span class="stat-value total">{{ stats.totalCount }}</span>
@@ -173,18 +180,20 @@ const selectedLog = ref(null)
 
 // 统计信息
 const stats = ref({
-  uploadCount: 0,
-  downloadCount: 0,
-  deleteCount: 0,
   loginCount: 0,
+  generateCount: 0,
+  verifyCount: 0,
+  editCount: 0,
+  deleteCount: 0,
+  productCount: 0,
+  specCount: 0,
   totalCount: 0
 })
 
 // 筛选条件
 const filter = reactive({
   operationType: '',
-  targetType: '',
-  dateRange: []
+  targetType: ''
 })
 
 // 获取操作类型对应的标签类型
@@ -215,41 +224,60 @@ const getOperationTypeName = (operationType) => {
   }
 }
 
-// 获取目标类型名称
-const getTargetTypeName = (targetType) => {
-  switch (targetType) {
-    case 'USER': return '用户'
-    case 'FILE': return '文件'
-    case 'FOLDER': return '文件夹'
-    case 'SHARE': return '分享'
-    case 'SYSTEM': return '系统'
-    default: return targetType
-  }
-}
-
 // 重置筛选条件
 const resetFilter = () => {
   filter.operationType = ''
   filter.targetType = ''
-  filter.dateRange = []
   currentPage.value = 1
   loadLogs()
 }
 
 // 更新统计数据
 const updateStats = () => {
-  const uploadCount = logs.value.filter(log => log.operationType === 'UPLOAD_FILE').length
-  const downloadCount = logs.value.filter(log => log.operationType === 'DOWNLOAD_FILE').length
-  const deleteCount = logs.value.filter(log => log.operationType === 'DELETE_FILE').length
-  const loginCount = logs.value.filter(log => log.operationType === 'LOGIN').length
+  const statsData = calculateStats(logs.value)
+  stats.value = statsData
+}
 
-  stats.value = {
-    uploadCount,
-    downloadCount,
-    deleteCount,
-    loginCount,
-    totalCount: logs.value.length
+// 计算统计信息
+const calculateStats = (logs) => {
+  const stats = {
+    loginCount: 0,
+    generateCount: 0,
+    verifyCount: 0,
+    editCount: 0,
+    deleteCount: 0,
+    productCount: 0,
+    specCount: 0,
+    totalCount: logs.length
   }
+  
+  logs.forEach(log => {
+    switch (log.operationType) {
+      case 'LOGIN':
+        stats.loginCount++
+        break
+      case 'CARD_KEY_GENERATE':
+        stats.generateCount++
+        break
+      case 'CARD_KEY_VERIFY':
+        stats.verifyCount++
+        break
+      case 'CARD_KEY_EDIT':
+        stats.editCount++
+        break
+      case 'CARD_KEY_DELETE':
+        stats.deleteCount++
+        break
+      case 'PRODUCT_MANAGE':
+        stats.productCount++
+        break
+      case 'SPEC_MANAGE':
+        stats.specCount++
+        break
+    }
+  })
+  
+  return stats
 }
 
 // 加载日志数据
@@ -260,9 +288,7 @@ const loadLogs = async () => {
       page: currentPage.value - 1,
       size: pageSize.value,
       operationType: filter.operationType,
-      targetType: filter.targetType,
-      startDate: filter.dateRange?.[0],
-      endDate: filter.dateRange?.[1]
+      targetType: filter.targetType
     }
     const response = await AdminService.getLogList(params)
     logs.value = response.content || []
@@ -304,13 +330,11 @@ const viewLogDetail = (log) => {
 const exportLogs = async () => {
   exporting.value = true
   try {
-    const response = await Server.get('/admin/log/export', {
+    const response = await AdminService.get('/admin/log/export', {
       responseType: 'blob',
       params: {
         operationType: filter.operationType,
-        targetType: filter.targetType,
-        startDate: filter.dateRange?.[0],
-        endDate: filter.dateRange?.[1]
+        targetType: filter.targetType
       }
     })
 
@@ -346,7 +370,7 @@ const clearLogs = async () => {
 
     clearing.value = true
 
-    await Server.delete('/admin/log')
+    await AdminService.delete('/admin/log')
 
     logs.value = []
     totalLogs.value = 0
@@ -366,9 +390,8 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.admin-logs {
+.admin-logs-page {
   padding: 0;
-  min-height: 100vh;
   background-color: #f0f2f5;
 }
 
@@ -386,6 +409,9 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  font-weight: 600;
+  font-size: 16px;
+  color: #303133;
 }
 
 .header-actions {
@@ -421,20 +447,28 @@ onMounted(() => {
   margin-left: 5px;
 }
 
-.stat-value.error {
-  color: #f56c6c;
+.stat-value.success {
+  color: #67c23a;
+}
+
+.stat-value.primary {
+  color: #409eff;
+}
+
+.stat-value.info {
+  color: #909399;
 }
 
 .stat-value.warning {
   color: #e6a23c;
 }
 
-.stat-value.info {
-  color: #409eff;
+.stat-value.danger {
+  color: #f56c6c;
 }
 
 .stat-value.total {
-  color: #909399;
+  color: #303133;
 }
 
 .pagination-container {
@@ -455,7 +489,7 @@ onMounted(() => {
 }
 
 @media (max-width: 768px) {
-  .admin-logs {
+  .admin-logs-page {
     padding: 10px;
   }
   

@@ -1,49 +1,54 @@
 <template>
-  <div class="product-management">
+  <div class="admin-product-management">
     <el-card class="product-card">
       <template #header>
         <div class="card-header">
           <span>商品管理</span>
+          <el-button type="primary" @click="handleAddProduct">
+            <el-icon><Plus /></el-icon>
+            新增商品
+          </el-button>
         </div>
       </template>
 
-      <!-- 搜索区域 -->
-      <div class="search-form">
-        <el-form :inline="true" :model="searchForm" class="demo-form-inline">
-          <el-form-item label="商品名称">
-            <el-input v-model="searchForm.name" placeholder="请输入商品名称" clearable />
-          </el-form-item>
-          <el-form-item label="商品分类">
-            <el-select v-model="searchForm.category" placeholder="请选择分类" clearable>
+      <!-- 搜索栏 -->
+      <div class="search-bar">
+        <el-row :gutter="16">
+          <el-col :span="6">
+            <el-input
+              v-model="searchQuery"
+              placeholder="商品名称"
+              clearable
+              @keyup.enter="handleSearch"
+            >
+              <template #prefix>
+                <el-icon><Search /></el-icon>
+              </template>
+            </el-input>
+          </el-col>
+          <el-col :span="6">
+            <el-select v-model="categoryFilter" placeholder="商品分类" clearable>
               <el-option label="虚拟商品" value="virtual" />
               <el-option label="实体商品" value="physical" />
               <el-option label="服务类" value="service" />
             </el-select>
-          </el-form-item>
-          <el-form-item label="商品状态">
-            <el-select v-model="searchForm.status" placeholder="请选择状态" clearable>
-              <el-option label="上架" value="active" />
-              <el-option label="下架" value="inactive" />
+          </el-col>
+          <el-col :span="6">
+            <el-select v-model="statusFilter" placeholder="商品状态" clearable>
+              <el-option label="使用中" value="active" />
+              <el-option label="未使用" value="inactive" />
             </el-select>
-          </el-form-item>
-          <el-form-item>
+          </el-col>
+          <el-col :span="6">
             <el-button type="primary" @click="handleSearch">查询</el-button>
-            <el-button @click="handleReset">重置</el-button>
-          </el-form-item>
-        </el-form>
-      </div>
-
-      <!-- 操作按钮 -->
-      <div class="action-bar">
-        <el-button type="primary" @click="handleAddProduct">
-          <el-icon><Plus /></el-icon>
-          新增商品
-        </el-button>
+            <el-button @click="resetFilters">重置</el-button>
+          </el-col>
+        </el-row>
       </div>
 
       <!-- 商品列表 -->
       <div class="table-container">
-        <el-table :data="productList" v-loading="loading" border stripe>
+        <el-table :data="filteredProducts" v-loading="loading" stripe>
           <el-table-column prop="id" label="ID" width="80" />
           <el-table-column prop="name" label="商品名称" min-width="200" />
           <el-table-column prop="category" label="分类" width="100">
@@ -62,12 +67,12 @@
           <el-table-column prop="status" label="状态" width="100">
             <template #default="{ row }">
               <el-tag :type="row.status === 'active' ? 'success' : 'info'">
-                {{ row.status === 'active' ? '上架' : '下架' }}
+                {{ row.status === 'active' ? '使用中' : '未使用' }}
               </el-tag>
             </template>
           </el-table-column>
-          <el-table-column prop="createTime" label="创建时间" width="180" />
-          <el-table-column label="操作" width="180" fixed="right">
+          <el-table-column prop="createTime" label="创建时间" width="160" />
+          <el-table-column label="操作" width="150" fixed="right">
             <template #default="{ row }">
               <el-button size="small" @click="handleEditProduct(row)">编辑</el-button>
               <el-button size="small" type="danger" @click="handleDeleteProduct(row)">删除</el-button>
@@ -93,25 +98,47 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Plus } from '@element-plus/icons-vue'
+import { Plus, Search } from '@element-plus/icons-vue'
 
-// 搜索表单
-const searchForm = reactive({
-  name: '',
-  category: '',
-  status: ''
-})
-
-// 商品列表数据
-const productList = ref([])
+// 加载状态
 const loading = ref(false)
 
-// 分页
+// 商品列表数据
+const products = ref([])
+
+// 搜索条件
+const searchQuery = ref('')
+const categoryFilter = ref('')
+const statusFilter = ref('')
+
+// 分页信息
 const currentPage = ref(1)
 const pageSize = ref(10)
 const total = ref(0)
+
+// 计算属性：筛选后的商品列表
+const filteredProducts = computed(() => {
+  let filtered = products.value
+  
+  if (searchQuery.value) {
+    const query = searchQuery.value.toLowerCase()
+    filtered = filtered.filter(product => 
+      product.name.toLowerCase().includes(query)
+    )
+  }
+  
+  if (categoryFilter.value) {
+    filtered = filtered.filter(product => product.category === categoryFilter.value)
+  }
+  
+  if (statusFilter.value) {
+    filtered = filtered.filter(product => product.status === statusFilter.value)
+  }
+  
+  return filtered
+})
 
 // 分类标签类型映射
 const getCategoryTagType = (category) => {
@@ -133,12 +160,12 @@ const getCategoryText = (category) => {
   return textMap[category] || '未知'
 }
 
-// 模拟商品数据加载
-const loadProductData = () => {
+// 加载商品数据
+const loadProducts = async () => {
   loading.value = true
-  // 模拟异步请求
-  setTimeout(() => {
-    productList.value = [
+  try {
+    // 模拟数据 - 实际项目中应该调用API
+    products.value = [
       {
         id: 1,
         name: 'VIP会员月卡',
@@ -167,22 +194,25 @@ const loadProductData = () => {
         createTime: '2024-01-03 09:15:00'
       }
     ]
-    total.value = 3
+    total.value = products.value.length
+  } catch (error) {
+    ElMessage.error('加载商品数据失败')
+  } finally {
     loading.value = false
-  }, 500)
+  }
 }
 
-// 搜索
+// 搜索处理
 const handleSearch = () => {
   currentPage.value = 1
-  loadProductData()
+  // 实际项目中应该重新调用API
 }
 
-// 重置
-const handleReset = () => {
-  Object.keys(searchForm).forEach(key => {
-    searchForm[key] = ''
-  })
+// 重置筛选
+const resetFilters = () => {
+  searchQuery.value = ''
+  categoryFilter.value = ''
+  statusFilter.value = ''
   handleSearch()
 }
 
@@ -208,60 +238,55 @@ const handleDeleteProduct = (row) => {
     }
   ).then(() => {
     ElMessage.success('删除成功')
-    loadProductData()
+    loadProducts()
   }).catch(() => {
     // 取消操作
   })
 }
 
-// 分页大小改变
+// 分页处理
 const handleSizeChange = (size) => {
   pageSize.value = size
-  loadProductData()
+  currentPage.value = 1
+  // 实际项目中应该重新调用API
 }
 
-// 当前页改变
 const handleCurrentChange = (page) => {
   currentPage.value = page
-  loadProductData()
+  // 实际项目中应该重新调用API
 }
 
-// 组件挂载时加载数据
 onMounted(() => {
-  loadProductData()
+  loadProducts()
 })
 </script>
 
 <style scoped>
-.product-management {
-  padding: 12px;
+.admin-product-management {
+  padding: 0;
+  background-color: #f0f2f5;
 }
 
-.page-header {
-  margin-bottom: 24px;
+.product-card {
+  margin-bottom: 16px;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-.page-header h2 {
-  margin: 0 0 8px 0;
-  font-size: 24px;
+.product-card :deep(.el-card__body) {
+  padding: 16px;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   font-weight: 600;
+  font-size: 16px;
   color: #303133;
 }
 
-.page-header p {
-  margin: 0;
-  color: #909399;
-  font-size: 14px;
-}
-
-.search-form {
-  margin-bottom: 16px;
-  padding: 16px;
-  background-color: #f8f9fa;
-  border-radius: 6px;
-}
-
-.action-bar {
+.search-bar {
   margin-bottom: 16px;
 }
 
@@ -270,34 +295,8 @@ onMounted(() => {
 }
 
 .pagination-container {
-  margin-top: 20px;
-  text-align: right;
-}
-
-/* 响应式设计 */
-@media (max-width: 768px) {
-  .search-form {
-    padding: 12px;
-  }
-  
-  .action-bar {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-  
-  .action-bar .el-button {
-    width: 100%;
-  }
-}
-
-@media (max-width: 480px) {
-  .product-management {
-    padding: 8px;
-  }
-  
-  .page-header h2 {
-    font-size: 20px;
-  }
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 16px;
 }
 </style>

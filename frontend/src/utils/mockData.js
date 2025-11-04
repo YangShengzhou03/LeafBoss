@@ -125,35 +125,75 @@ export const getLogList = (page = 0, size = 20) => {
     },
     {
       id: 2,
-      operationType: 'UPLOAD_FILE',
-      description: '上传文件: document.pdf',
+      operationType: 'CARD_KEY_GENERATE',
+      description: '生成卡密: 10张VIP会员卡密',
       ipAddress: '192.168.1.101',
       createTime: generateRandomDate(1),
       userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
     },
     {
       id: 3,
-      operationType: 'DELETE_FILE',
-      description: '删除文件: old-photo.jpg',
+      operationType: 'CARD_KEY_VERIFY',
+      description: '验证卡密: VIP会员卡密验证成功',
       ipAddress: '192.168.1.102',
       createTime: generateRandomDate(2),
       userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36'
     },
     {
       id: 4,
-      operationType: 'CREATE_SHARE',
-      description: '创建分享链接: 重要文档',
+      operationType: 'CARD_KEY_EDIT',
+      description: '编辑卡密: 修改卡密状态为已使用',
       ipAddress: '192.168.1.103',
       createTime: generateRandomDate(3),
       userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
     },
     {
       id: 5,
-      operationType: 'DOWNLOAD_FILE',
-      description: '下载文件: report.xlsx',
+      operationType: 'CARD_KEY_DELETE',
+      description: '删除卡密: 删除过期的测试卡密',
       ipAddress: '192.168.1.104',
       createTime: generateRandomDate(4),
       userAgent: 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36'
+    },
+    {
+      id: 6,
+      operationType: 'CARD_KEY_EXPORT',
+      description: '导出卡密: 导出VIP会员卡密列表',
+      ipAddress: '192.168.1.105',
+      createTime: generateRandomDate(5),
+      userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+    },
+    {
+      id: 7,
+      operationType: 'PRODUCT_MANAGE',
+      description: '商品管理: 添加新商品"VIP会员套餐"',
+      ipAddress: '192.168.1.106',
+      createTime: generateRandomDate(6),
+      userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+    },
+    {
+      id: 8,
+      operationType: 'SPEC_MANAGE',
+      description: '规格管理: 编辑商品规格信息',
+      ipAddress: '192.168.1.107',
+      createTime: generateRandomDate(7),
+      userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+    },
+    {
+      id: 9,
+      operationType: 'SYSTEM_SETTING',
+      description: '系统设置: 更新系统配置参数',
+      ipAddress: '192.168.1.108',
+      createTime: generateRandomDate(8),
+      userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+    },
+    {
+      id: 10,
+      operationType: 'CLEAR_LOGS',
+      description: '清空日志: 清理30天前的操作日志',
+      ipAddress: '192.168.1.109',
+      createTime: generateRandomDate(9),
+      userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
     }
   ]
 

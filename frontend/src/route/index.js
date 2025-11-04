@@ -49,15 +49,7 @@ const routes = [
           requiresAuth: true
         }
       },
-      {
-        path: 'system',
-        name: 'AdminSystem',
-        component: () => import('@/views/admin/SystemPage.vue'),
-        meta: {
-          title: '枫叶卡管 - 系统设置',
-          requiresAuth: true
-        }
-      },
+      
       {
         path: 'logs',
         name: 'AdminLogs',
@@ -82,6 +74,15 @@ const routes = [
         component: () => import('@/views/admin/CardKeyManagement.vue'),
         meta: {
           title: '枫叶卡管 - 卡密管理',
+          requiresAuth: true
+        }
+      },
+      {
+        path: 'card-verify',
+        name: 'CardKeyVerifyAdmin',
+        component: () => import('@/views/admin/CardKeyVerify.vue'),
+        meta: {
+          title: '枫叶卡管 - 卡密验证',
           requiresAuth: true
         }
       },

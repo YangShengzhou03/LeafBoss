@@ -97,12 +97,29 @@ const handleVerify = async () => {
 
 <style scoped>
 .card-key-verify {
-  padding: 12px;
+  padding: 0;
+  background-color: #f0f2f5;
 }
 
 .verify-card {
   max-width: 600px;
   margin: 0 auto;
+  border: 1px solid #e6e6e6;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.verify-card :deep(.el-card__body) {
+  padding: 0;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+  font-size: 16px;
+  color: #303133;
 }
 
 .verify-content {

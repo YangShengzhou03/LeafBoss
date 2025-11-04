@@ -33,8 +33,8 @@
             <el-col :span="6">
               <el-select v-model="statusFilter" placeholder="状态" clearable @change="handleSearch">
                 <el-option label="全部" value="" />
-                <el-option label="启用" value="active" />
-                <el-option label="禁用" value="disabled" />
+                <el-option label="使用中" value="active" />
+                <el-option label="未使用" value="disabled" />
               </el-select>
             </el-col>
             <el-col :span="4">
@@ -79,7 +79,7 @@
             <el-table-column prop="status" label="状态" width="100">
               <template #default="scope">
                 <el-tag :type="scope.row.status === 'active' ? 'success' : 'danger'">
-                  {{ scope.row.status === 'active' ? '启用' : '禁用' }}
+                  {{ scope.row.status === 'active' ? '使用中' : '未使用' }}
                 </el-tag>
               </template>
             </el-table-column>
@@ -92,7 +92,7 @@
                   :type="scope.row.status === 'active' ? 'warning' : 'success'"
                   @click="toggleSpecStatus(scope.row)"
                 >
-                  {{ scope.row.status === 'active' ? '禁用' : '启用' }}
+                  {{ scope.row.status === 'active' ? '停用' : '启用' }}
                 </el-button>
 
               </template>
@@ -137,9 +137,9 @@
         </el-form-item>
         <el-form-item label="状态" prop="status">
           <el-radio-group v-model="specForm.status">
-            <el-radio label="active">启用</el-radio>
-            <el-radio label="disabled">禁用</el-radio>
-          </el-radio-group>
+              <el-radio label="active">使用中</el-radio>
+              <el-radio label="disabled">未使用</el-radio>
+            </el-radio-group>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -383,7 +383,6 @@ onMounted(() => {
 <style scoped>
 .admin-product-specs {
   padding: 0;
-  min-height: 100vh;
   background-color: #f0f2f5;
 }
 

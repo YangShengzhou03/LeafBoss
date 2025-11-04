@@ -10,122 +10,39 @@
       <div class="dashboard-content">
         <el-row :gutter="20">
           <el-col :span="8">
-            <el-card shadow="hover" class="stat-card">
+            <div class="stat-card">
               <div class="stat-item">
-                <div class="stat-icon">
-                  <el-icon size="24"><Key /></el-icon>
-                </div>
                 <div class="stat-content">
                   <div class="stat-title">卡密总数</div>
                   <div class="stat-value">{{ stats.cardKeyCount }}</div>
                 </div>
               </div>
-            </el-card>
+            </div>
           </el-col>
           
           <el-col :span="8">
-            <el-card shadow="hover" class="stat-card">
+            <div class="stat-card">
               <div class="stat-item">
-                <div class="stat-icon">
-                  <el-icon size="24"><CircleCheck /></el-icon>
-                </div>
                 <div class="stat-content">
                   <div class="stat-title">已使用卡密</div>
                   <div class="stat-value">{{ stats.usedCardKeys }}</div>
                 </div>
               </div>
-            </el-card>
+            </div>
           </el-col>
           
           <el-col :span="8">
-            <el-card shadow="hover" class="stat-card">
+            <div class="stat-card">
               <div class="stat-item">
-                <div class="stat-icon">
-                  <el-icon size="24"><Document /></el-icon>
-                </div>
                 <div class="stat-content">
                   <div class="stat-title">操作日志</div>
                   <div class="stat-value">{{ stats.logCount }}</div>
                 </div>
               </div>
-            </el-card>
+            </div>
           </el-col>
         </el-row>
         
-        <!-- 商品规格使用统计 -->
-        <el-row :gutter="20" style="margin-top: 20px">
-          <el-col :span="24">
-            <el-card shadow="hover">
-              <template #header>
-                <div class="card-header">
-                  <span>商品规格使用统计</span>
-                </div>
-              </template>
-              <div class="spec-stats">
-                <el-table :data="specStats" style="width: 100%" v-loading="loading" :scroll="{ x: 'max-content' }">
-                  <el-table-column prop="productName" label="商品名称" width="150" />
-                  <el-table-column prop="specName" label="规格名称" width="120" />
-                  <el-table-column prop="price" label="价格" width="100">
-                    <template #default="scope">
-                      ¥{{ scope.row.price }}
-                    </template>
-                  </el-table-column>
-                  <el-table-column prop="totalKeys" label="卡密总数" width="100" />
-                  <el-table-column prop="usedKeys" label="已使用" width="80" />
-                  <el-table-column prop="usageRate" label="使用率" width="100">
-                    <template #default="scope">
-                      <el-progress 
-                        :percentage="scope.row.usageRate" 
-                        :show-text="false"
-                        :color="getUsageColor(scope.row.usageRate)"
-                      />
-                      <span style="margin-left: 8px">{{ scope.row.usageRate }}%</span>
-                    </template>
-                  </el-table-column>
-                  <el-table-column prop="revenue" label="收入" width="120">
-                    <template #default="scope">
-                      ¥{{ scope.row.revenue }}
-                    </template>
-                  </el-table-column>
-                  <el-table-column label="趋势" width="100">
-                    <template #default="scope">
-                      <el-tag :type="scope.row.trend > 0 ? 'success' : scope.row.trend < 0 ? 'danger' : 'info'">
-                        {{ scope.row.trend > 0 ? '↑' : scope.row.trend < 0 ? '↓' : '→' }}
-                        {{ Math.abs(scope.row.trend) }}%
-                      </el-tag>
-                    </template>
-                  </el-table-column>
-                </el-table>
-              </div>
-            </el-card>
-          </el-col>
-        </el-row>
-        
-        <el-row :gutter="20" style="margin-top: 20px">
-          <el-col :span="24">
-            <el-card shadow="hover">
-              <template #header>
-                <div class="card-header">
-                  <span>系统信息</span>
-                </div>
-              </template>
-              <div class="system-info">
-                <div class="info-item">
-                  <span class="info-label">系统版本：</span>
-                  <span class="info-value">枫叶卡管 v1.0.0</span>
-                </div>
-                <div class="info-item">
-                  <span class="info-label">运行时间：</span>
-                  <span class="info-value">{{ uptime }}</span>
-                </div>
-                <div class="info-item">
-                  <span class="info-label">系统状态：</span>
-                  <span class="info-value">正常运行</span>
-                </div>
-              </div>
-            </el-card>
-          </el-col>
-        </el-row>
       </div>
     </el-card>
   </div>
@@ -134,7 +51,6 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
-import { Key, CircleCheck, Document } from '@element-plus/icons-vue'
 
 // 统计数据
 const stats = ref({
@@ -235,14 +151,13 @@ onMounted(() => {
 <style scoped>
 .admin-dashboard {
   padding: 0;
-  min-height: 100vh;
-  background-color: #f0f2f5;
+  background-color: #f5f7fa;
 }
 
 .dashboard-card {
   margin-bottom: 16px;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  border: 1px solid #ebeef5;
 }
 
 .dashboard-card :deep(.el-card__body) {
@@ -261,44 +176,26 @@ onMounted(() => {
 /* 统计卡片样式 - 简约风格 */
 .stat-card {
   height: 100%;
-  border: 1px solid #e6e8eb;
-  border-radius: 8px;
-  overflow: hidden;
-  position: relative;
+  border: 1px solid #ebeef5;
+  border-radius: 4px;
   background-color: #fff;
-  transition: all 0.3s ease;
-}
-
-.stat-card:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  transform: translateY(-2px);
-}
-
-.stat-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 4px;
-  background-color: #409EFF;
+  padding: 16px;
 }
 
 .stat-item {
   display: flex;
   align-items: center;
-  padding: 20px;
 }
 
 .stat-icon {
   margin-right: 16px;
-  width: 56px;
-  height: 56px;
-  border-radius: 8px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #409EFF;
+  background: linear-gradient(135deg, #409eff, #79bbff);
 }
 
 .stat-icon .el-icon {
@@ -315,12 +212,11 @@ onMounted(() => {
   color: #909399;
   margin-bottom: 8px;
   font-weight: 500;
-  letter-spacing: 0.5px;
 }
 
 .stat-value {
-  font-size: 28px;
-  font-weight: 700;
+  font-size: 24px;
+  font-weight: 600;
   color: #303133;
   line-height: 1.2;
 }
@@ -339,64 +235,47 @@ onMounted(() => {
 /* 系统信息卡片样式 */
 .system-info {
   padding: 16px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .info-item {
-  margin-bottom: 12px;
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  padding: 12px 16px;
-  border-radius: 6px;
-  background-color: #f8f9fa;
-  border: 1px solid #e9ecef;
+  padding: 8px 0;
+  border-bottom: 1px solid #ebeef5;
 }
 
 .info-item:last-child {
-  margin-bottom: 0;
+  border-bottom: none;
 }
 
 .info-label {
-  width: 120px;
-  color: #606266;
-  font-weight: 500;
   font-size: 14px;
-  display: flex;
-  align-items: center;
-}
-
-.info-label::before {
-  content: '';
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  background-color: #409EFF;
-  border-radius: 50%;
-  margin-right: 8px;
+  color: #606266;
 }
 
 .info-value {
+  font-size: 14px;
   color: #303133;
-  font-weight: 600;
-  font-size: 15px;
-  padding: 4px 12px;
-  background-color: #fff;
-  border-radius: 4px;
-  border: 1px solid #e9ecef;
+  font-weight: 500;
 }
 
 /* 响应式设计 */
 @media (max-width: 1024px) {
   .stat-item {
-    padding: 20px;
+    padding: 16px;
   }
   
   .stat-icon {
-    width: 48px;
-    height: 48px;
+    width: 40px;
+    height: 40px;
   }
   
   .stat-value {
-    font-size: 24px;
+    font-size: 20px;
   }
 }
 
@@ -413,23 +292,13 @@ onMounted(() => {
   }
   
   .stat-value {
-    font-size: 22px;
+    font-size: 20px;
   }
   
   .info-item {
     flex-direction: column;
     align-items: flex-start;
-    padding: 10px 12px;
-  }
-  
-  .info-label {
-    width: auto;
-    margin-bottom: 6px;
-  }
-  
-  .info-value {
-    width: 100%;
-    text-align: center;
+    gap: 4px;
   }
 }
 
@@ -439,16 +308,16 @@ onMounted(() => {
   }
   
   .stat-icon {
-    width: 44px;
-    height: 44px;
+    width: 36px;
+    height: 36px;
   }
   
   .stat-icon .el-icon {
-    font-size: 20px;
+    font-size: 18px;
   }
   
   .stat-value {
-    font-size: 20px;
+    font-size: 18px;
   }
   
   .stat-title {

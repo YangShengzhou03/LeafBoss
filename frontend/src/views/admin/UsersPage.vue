@@ -30,8 +30,8 @@
             <el-col :span="6">
               <el-select v-model="statusFilter" placeholder="用户状态" clearable @change="handleSearch">
                 <el-option label="全部" value="" />
-                <el-option label="正常" value="active" />
-                <el-option label="禁用" value="disabled" />
+                <el-option label="使用中" value="active" />
+                <el-option label="未使用" value="disabled" />
               </el-select>
             </el-col>
             <el-col :span="6">
@@ -86,7 +86,7 @@
         <el-table-column prop="status" label="状态" width="100">
               <template #default="scope">
                 <el-tag :type="scope.row.status === 'active' ? 'success' : 'danger'">
-                  {{ scope.row.status === 'active' ? '正常' : '禁用' }}
+                  {{ scope.row.status === 'active' ? '使用中' : '未使用' }}
                 </el-tag>
               </template>
             </el-table-column>
@@ -99,7 +99,7 @@
                   :type="scope.row.status === 'active' ? 'warning' : 'success'"
                   @click="toggleUserStatus(scope.row)"
                 >
-                  {{ scope.row.status === 'active' ? '禁用' : '启用' }}
+                  {{ scope.row.status === 'active' ? '停用' : '启用' }}
                 </el-button>
                 <el-button size="small" type="info" @click="resetPassword(scope.row)">重置密码</el-button>
               </template>
@@ -172,9 +172,9 @@
         </el-form-item>
         <el-form-item label="状态" prop="status">
           <el-radio-group v-model="userForm.status">
-            <el-radio label="active">正常</el-radio>
-            <el-radio label="disabled">禁用</el-radio>
-          </el-radio-group>
+              <el-radio label="active">使用中</el-radio>
+              <el-radio label="disabled">未使用</el-radio>
+            </el-radio-group>
         </el-form-item>
 
       </el-form>
@@ -331,7 +331,7 @@ const resetPassword = async (user) => {
       }
     )
     
-    await Server.put(`/admin/user/${user.id}/password?newPassword=123456`)
+    await AdminService.resetUserPassword(user.id, '123456')
     ElMessage.success(`密码重置成功，新密码为：123456`)
   } catch (error) {
     if (error !== 'cancel') {
@@ -482,7 +482,6 @@ onMounted(() => {
 <style scoped>
 .admin-users {
   padding: 0;
-  min-height: 100vh;
   background-color: #f0f2f5;
 }
 
