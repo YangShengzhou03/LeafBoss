@@ -52,49 +52,25 @@
       <!-- 统计信息 -->
       <div class="stats-section">
         <el-row :gutter="20">
-          <el-col :span="3">
+          <el-col :span="6">
             <div class="stat-item">
               <span class="stat-label">登录：</span>
               <span class="stat-value success">{{ stats.loginCount }}</span>
             </div>
           </el-col>
-          <el-col :span="3">
+          <el-col :span="6">
             <div class="stat-item">
-              <span class="stat-label">生成卡密：</span>
-              <span class="stat-value primary">{{ stats.generateCount }}</span>
+              <span class="stat-label">卡密操作：</span>
+              <span class="stat-value primary">{{ stats.cardKeyCount }}</span>
             </div>
           </el-col>
-          <el-col :span="3">
+          <el-col :span="6">
             <div class="stat-item">
-              <span class="stat-label">验证卡密：</span>
-              <span class="stat-value info">{{ stats.verifyCount }}</span>
+              <span class="stat-label">商品规格管理：</span>
+              <span class="stat-value info">{{ stats.productSpecCount }}</span>
             </div>
           </el-col>
-          <el-col :span="3">
-            <div class="stat-item">
-              <span class="stat-label">编辑卡密：</span>
-              <span class="stat-value warning">{{ stats.editCount }}</span>
-            </div>
-          </el-col>
-          <el-col :span="3">
-            <div class="stat-item">
-              <span class="stat-label">删除卡密：</span>
-              <span class="stat-value danger">{{ stats.deleteCount }}</span>
-            </div>
-          </el-col>
-          <el-col :span="3">
-            <div class="stat-item">
-              <span class="stat-label">商品管理：</span>
-              <span class="stat-value">{{ stats.productCount }}</span>
-            </div>
-          </el-col>
-          <el-col :span="3">
-            <div class="stat-item">
-              <span class="stat-label">规格管理：</span>
-              <span class="stat-value">{{ stats.specCount }}</span>
-            </div>
-          </el-col>
-          <el-col :span="3">
+          <el-col :span="6">
             <div class="stat-item">
               <span class="stat-label">总计：</span>
               <span class="stat-value total">{{ stats.totalCount }}</span>
@@ -181,12 +157,8 @@ const selectedLog = ref(null)
 // 统计信息
 const stats = ref({
   loginCount: 0,
-  generateCount: 0,
-  verifyCount: 0,
-  editCount: 0,
-  deleteCount: 0,
-  productCount: 0,
-  specCount: 0,
+  cardKeyCount: 0,
+  productSpecCount: 0,
   totalCount: 0
 })
 
@@ -242,12 +214,8 @@ const updateStats = () => {
 const calculateStats = (logs) => {
   const stats = {
     loginCount: 0,
-    generateCount: 0,
-    verifyCount: 0,
-    editCount: 0,
-    deleteCount: 0,
-    productCount: 0,
-    specCount: 0,
+    cardKeyCount: 0,
+    productSpecCount: 0,
     totalCount: logs.length
   }
   
@@ -257,22 +225,14 @@ const calculateStats = (logs) => {
         stats.loginCount++
         break
       case 'CARD_KEY_GENERATE':
-        stats.generateCount++
-        break
       case 'CARD_KEY_VERIFY':
-        stats.verifyCount++
-        break
       case 'CARD_KEY_EDIT':
-        stats.editCount++
-        break
       case 'CARD_KEY_DELETE':
-        stats.deleteCount++
+        stats.cardKeyCount++
         break
       case 'PRODUCT_MANAGE':
-        stats.productCount++
-        break
       case 'SPEC_MANAGE':
-        stats.specCount++
+        stats.productSpecCount++
         break
     }
   })

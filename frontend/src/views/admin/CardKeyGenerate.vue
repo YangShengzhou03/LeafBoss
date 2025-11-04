@@ -9,33 +9,33 @@
 
       <!-- 生成配置 -->
       <div class="config-section">
-        <el-form :model="generateForm" label-width="120px">
-          <el-row :gutter="20">
-            <el-col :span="8">
+        <el-form :model="generateForm" label-width="100px">
+          <el-row :gutter="16">
+            <el-col :span="6">
               <el-form-item label="生成数量">
                 <el-input-number 
                   v-model="generateForm.count" 
                   :min="1" 
                   :max="10000" 
                   controls-position="right"
-                  placeholder="请输入生成数量"
+                  placeholder="请输入数量"
                   class="form-input"
                 />
               </el-form-item>
             </el-col>
-            <el-col :span="8">
+            <el-col :span="6">
               <el-form-item label="卡密长度">
                 <el-input-number 
                   v-model="generateForm.length" 
                   :min="8" 
                   :max="32" 
                   controls-position="right"
-                  placeholder="请输入卡密长度"
+                  placeholder="请输入长度"
                   class="form-input"
                 />
               </el-form-item>
             </el-col>
-            <el-col :span="8">
+            <el-col :span="6">
               <el-form-item label="商品">
                 <el-select v-model="generateForm.productId" placeholder="请选择商品" clearable class="form-input">
                   <el-option 
@@ -47,10 +47,7 @@
                 </el-select>
               </el-form-item>
             </el-col>
-          </el-row>
-          
-          <el-row :gutter="20">
-            <el-col :span="8">
+            <el-col :span="6">
               <el-form-item label="规格">
                 <el-select v-model="generateForm.specId" placeholder="请选择规格" clearable class="form-input">
                   <el-option 
@@ -75,11 +72,9 @@
           <el-form-item>
             <div class="form-actions">
               <el-button type="primary" @click="generateCardKeys" :loading="generating" class="action-btn">
-                <el-icon><Plus /></el-icon>
                 生成卡密
               </el-button>
               <el-button type="success" @click="addToStock" :loading="addingToStock" class="action-btn">
-                <el-icon><Plus /></el-icon>
                 添加库存
               </el-button>
               <el-button @click="resetForm" class="action-btn">重置</el-button>
@@ -411,6 +406,18 @@ onMounted(() => {
 
 .config-section {
   margin-bottom: 24px;
+}
+
+.config-section :deep(.el-form-item) {
+  margin-bottom: 16px;
+}
+
+.config-section :deep(.el-form-item__label) {
+  font-weight: 500;
+}
+
+.form-input {
+  width: 100%;
 }
 
 .result-section {

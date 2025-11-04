@@ -17,14 +17,11 @@
             size="large"
             @keyup.enter="handleVerify"
             @clear="clearResult"
-          >
-            <template #append>
-              <el-button type="primary" @click="handleVerify" :loading="verifying">
-                <el-icon><Search /></el-icon>
-                验证
-              </el-button>
-            </template>
-          </el-input>
+            class="cardkey-input"
+          />
+          <el-button type="primary" @click="handleVerify" :loading="verifying" class="verify-btn">
+            验证
+          </el-button>
         </div>
 
         <!-- 验证结果区域 -->
@@ -63,7 +60,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { ElMessage } from 'element-plus'
-import { Search, CircleCheck, CircleClose, Warning } from '@element-plus/icons-vue'
+import { CircleCheck, CircleClose, Warning } from '@element-plus/icons-vue'
 
 // 卡密输入
 const cardKeyInput = ref('')
@@ -235,14 +232,21 @@ const clearResult = () => {
 .input-section {
   display: flex;
   justify-content: center;
+  align-items: center;
+  gap: 16px;
 }
 
-.input-section :deep(.el-input) {
-  width: 500px;
+.cardkey-input {
+  width: 400px;
 }
 
-.input-section :deep(.el-input__wrapper) {
+.cardkey-input :deep(.el-input__wrapper) {
   border-radius: 8px;
+}
+
+.verify-btn {
+  height: 40px;
+  padding: 0 20px;
 }
 
 .result-section {
