@@ -1,333 +1,651 @@
 <template>
   <div class="cards-container">
-    <!-- 搜索和筛选 -->
-    <div class="card-header">
-      <span>卡密管理</span>
-      <el-button type="primary" @click="showAddDialog = true">
+    <!-- 页面标题和操作区域 -->
+    <div class="page-header">
+      <div class="header-content">
+        <h1 class="page-title">卡密管理</h1>
+        <p class="page-description">管理系统中的卡密信息，支持搜索、筛选和批量操作</p>
+      </div>
+      <el-button type="primary" size="large" @click="showAddDialog = true" class="add-button">
         <el-icon><Plus /></el-icon>
         添加卡密
       </el-button>
     </div>
 
-    <div class="filter-container">
-      <el-input
-        :model-value="searchKeyword"
-        @update:model-value="debouncedSearch"
-        placeholder="搜索卡密编号"
-        style="width: 200px"
-        clearable
-      />
-      <el-select v-model="filterSpec" placeholder="规格" clearable>
-        <el-option 
-          v-for="spec in specs" 
-          :key="spec.id" 
-          :label="spec.name" 
-          :value="spec.id" 
-        />
-      </el-select>
-      <el-select v-model="filterStatus" placeholder="状态" clearable>
-        <el-option label="未使用" value="unused" />
-        <el-option label="已使用" value="used" />
-      </el-select>
-    </div>
-
-    <!-- 卡密表格 -->
-    <div class="table-container">
-      <el-table :data="paginatedCards" v-loading="loading">
-        <el-table-column prop="id" label="卡密编号" width="200" />
-        <el-table-column prop="goodsName" label="商品" width="120" />
-        <el-table-column prop="specName" label="规格" width="120" />
-        <el-table-column prop="responseNumber" label="响应数字" width="100" />
-        <el-table-column prop="status" label="状态" width="100">
-          <template #default="{ row }">
-            <el-tag :type="row.status === 'unused' ? 'success' : 'info'">
-              {{ row.status === 'unused' ? '未使用' : '已使用' }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column label="操作" width="200">
-          <template #default="{ row }">
-            <el-button size="small" @click="viewCard(row)">查看</el-button>
-            <el-button size="small" type="danger" @click="deleteCard(row)">删除</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-
-      <!-- 分页 -->
-      <div class="pagination-container">
-        <el-pagination
-          v-model:current-page="currentPage"
-          v-model:page-size="pageSize"
-          :total="total"
-          layout="total, sizes, prev, pager, next, jumper"
-        />
+    <!-- 搜索和筛选区域 -->
+    <el-card class="filter-card" shadow="never">
+      <div class="filter-content">
+        <div class="filter-group">
+          <el-input
+            v-model="searchKeyword"
+            placeholder="搜索卡密ID"
+            clearable
+            size="large"
+            class="search-input"
+            @input="handleSearch"
+          >
+            <template #prefix>
+              <el-icon><Search /></el-icon>
+            </template>
+          </el-input>
+          
+          <el-select v-model="filterSpec" placeholder="规格类型" clearable size="large">
+            <el-option label="月卡" value="月卡" />
+            <el-option label="季卡" value="季卡" />
+            <el-option label="年卡" value="年卡" />
+          </el-select>
+          
+          <el-select v-model="filterStatus" placeholder="状态" clearable size="large">
+            <el-option label="未使用" value="unused" />
+            <el-option label="已使用" value="used" />
+            <el-option label="已过期" value="expired" />
+          </el-select>
+        </div>
+        
+        <div class="filter-stats">
+          <span class="stats-text">共 {{ filteredCards.length }} 条记录</span>
+        </div>
       </div>
-    </div>
+    </el-card>
+
+    <!-- 卡密表格区域 -->
+    <el-card class="table-card" shadow="never">
+      <div class="table-wrapper">
+        <el-table
+          :data="paginatedCards"
+          v-loading="loading"
+          stripe
+          style="width: 100%"
+          class="data-table"
+          :header-cell-style="{ background: '#f8f9fa', color: '#606266', fontWeight: '600' }"
+        >
+          <el-table-column prop="id" label="卡密ID" min-width="220" />
+          <el-table-column prop="specType" label="规格类型" width="100" align="center" />
+          <el-table-column prop="responseNumber" label="响应次数" width="100" align="center" />
+          <el-table-column prop="status" label="状态" width="120" align="center">
+            <template #default="{ row }">
+              <el-tag 
+                :type="getStatusType(row.status)"
+                size="small"
+                effect="light"
+                class="status-tag"
+              >
+                {{ getStatusText(row.status) }}
+              </el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column prop="categoryName" label="分类" width="120" />
+          <el-table-column prop="goodsName" label="商品" width="120" />
+          <el-table-column prop="specName" label="规格" width="100" />
+          <el-table-column label="操作" width="180" fixed="right" align="center">
+            <template #default="{ row }">
+              <div class="action-buttons">
+                <el-button type="primary" size="small" link @click="viewCard(row)">
+                  <el-icon><View /></el-icon>
+                  查看
+                </el-button>
+                <el-button type="danger" size="small" link @click="deleteCard(row)">
+                  <el-icon><Delete /></el-icon>
+                  删除
+                </el-button>
+              </div>
+            </template>
+          </el-table-column>
+        </el-table>
+
+        <!-- 分页 -->
+        <div class="pagination-wrapper">
+          <el-pagination
+            v-model:current-page="currentPage"
+            v-model:page-size="pageSize"
+            :page-sizes="[10, 20, 50, 100]"
+            :total="filteredCards.length"
+            layout="total, sizes, prev, pager, next, jumper"
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
+            class="custom-pagination"
+          />
+        </div>
+      </div>
+    </el-card>
 
     <!-- 添加卡密弹窗 -->
-    <el-dialog v-model="showAddDialog" title="添加卡密" width="500px" @close="resetForm">
-      <el-form ref="cardFormRef" :model="newCard" :rules="formRules" label-width="80px">
+    <el-dialog
+      v-model="showAddDialog"
+      title="添加卡密"
+      width="520px"
+      :before-close="handleClose"
+      class="add-dialog"
+    >
+      <el-form
+        ref="cardFormRef"
+        :model="newCard"
+        :rules="rules"
+        label-width="100px"
+        label-position="left"
+      >
         <el-form-item label="规格类型" prop="specType">
-          <el-select v-model="newCard.specType" placeholder="请选择规格类型">
-            <el-option label="月卡" value="month" />
-            <el-option label="季卡" value="quarter" />
-            <el-option label="年卡" value="year" />
+          <el-select v-model="newCard.specType" placeholder="请选择规格类型" size="large" style="width: 100%">
+            <el-option label="月卡" value="月卡" />
+            <el-option label="季卡" value="季卡" />
+            <el-option label="年卡" value="年卡" />
           </el-select>
         </el-form-item>
-        <el-form-item label="数量" prop="quantity">
-          <el-input-number v-model="newCard.quantity" :min="1" :max="1000" />
+        <el-form-item label="生成数量" prop="quantity">
+          <el-input-number
+            v-model="newCard.quantity"
+            :min="1"
+            :max="1000"
+            controls-position="right"
+            size="large"
+            style="width: 100%"
+          />
         </el-form-item>
       </el-form>
+      
       <template #footer>
-        <el-button @click="showAddDialog = false">取消</el-button>
-        <el-button type="primary" @click="handleAddCards">生成</el-button>
+        <div class="dialog-footer">
+          <el-button @click="showAddDialog = false" size="large">取消</el-button>
+          <el-button type="primary" @click="handleAddCards" :loading="loading" size="large">
+            生成卡密
+          </el-button>
+        </div>
       </template>
     </el-dialog>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
+import { ref, reactive, computed, onMounted, watch } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { useDebounceFn } from '@vueuse/core'
-import { generateCardsBatch, validateCardFormat, cardStatusManager, cardCacheManager } from '@/utils/cardUtils'
+import { Plus, Search, View, Delete } from '@element-plus/icons-vue'
 
 // 响应式数据
 const loading = ref(false)
+const showAddDialog = ref(false)
 const searchKeyword = ref('')
 const filterSpec = ref('')
 const filterStatus = ref('')
 const currentPage = ref(1)
 const pageSize = ref(20)
-const total = ref(100)
-const showAddDialog = ref(false)
-
-// 防抖搜索
-const debouncedSearch = useDebounceFn((value) => {
-  searchKeyword.value = value
-}, 300)
-
-// 表单验证规则
-const formRules = ref({
-  specType: [
-    { required: true, message: '请选择规格类型', trigger: 'change' }
-  ],
-  quantity: [
-    { required: true, message: '请输入数量', trigger: 'blur' },
-    { type: 'number', min: 1, max: 1000, message: '数量必须在1-1000之间', trigger: 'blur' }
-  ]
-})
-
-const newCard = ref({
-  specType: '',
-  quantity: 1
-})
 
 // 表单引用
 const cardFormRef = ref()
 
-// 模拟数据 - 优化数据结构
+// 模拟数据
 const cards = ref([
   {
-    id: 'CARD-20240115-001',
+    id: 'CM202401010001',
     specType: '月卡',
-    responseNumber: 0,
+    responseNumber: 100,
     status: 'unused',
-    categoryName: '软件服务',
-    goodsName: '办公软件',
-    specName: '月卡'
+    categoryName: 'AI助手',
+    goodsName: '智能对话',
+    specName: '基础版'
   },
   {
-    id: 'CARD-20240115-002',
-    specType: '年卡',
-    responseNumber: 0,
+    id: 'CM202401010002',
+    specType: '季卡',
+    responseNumber: 300,
     status: 'used',
-    categoryName: '软件服务',
-    goodsName: '办公软件',
-    specName: '年卡'
+    categoryName: 'AI助手',
+    goodsName: '智能对话',
+    specName: '专业版'
+  },
+  {
+    id: 'CM202401010003',
+    specType: '年卡',
+    responseNumber: 1200,
+    status: 'expired',
+    categoryName: 'AI助手',
+    goodsName: '智能对话',
+    specName: '企业版'
   }
 ])
 
-// 优化计算属性 - 使用记忆化减少重复计算
+const newCard = reactive({
+  specType: '',
+  quantity: 1
+})
+
+// 表单验证规则
+const rules = {
+  specType: [
+    { required: true, message: '请选择规格类型', trigger: 'change' }
+  ],
+  quantity: [
+    { required: true, message: '请输入生成数量', trigger: 'blur' },
+    { type: 'number', min: 1, max: 1000, message: '数量范围1-1000', trigger: 'blur' }
+  ]
+}
+
+// 计算属性
 const filteredCards = computed(() => {
-  const keyword = searchKeyword.value.toLowerCase()
-  const spec = filterSpec.value
-  const status = filterStatus.value
-  
-  // 如果没有任何筛选条件，直接返回原始数据避免不必要的计算
-  if (!keyword && !spec && !status) {
-    return cards.value
-  }
-  
   return cards.value.filter(card => {
-    const matchesKeyword = !keyword || card.id.toLowerCase().includes(keyword)
-    const matchesSpec = !spec || card.specType === spec
-    const matchesStatus = !status || card.status === status
-    return matchesKeyword && matchesSpec && matchesStatus
+    const matchesSearch = searchKeyword.value === '' || 
+      card.id.toLowerCase().includes(searchKeyword.value.toLowerCase())
+    const matchesSpec = filterSpec.value === '' || card.specType === filterSpec.value
+    const matchesStatus = filterStatus.value === '' || card.status === filterStatus.value
+    
+    return matchesSearch && matchesSpec && matchesStatus
   })
 })
 
-// 添加分页数据计算
 const paginatedCards = computed(() => {
   const start = (currentPage.value - 1) * pageSize.value
   const end = start + pageSize.value
   return filteredCards.value.slice(start, end)
 })
 
+// 方法
+const handleSearch = () => {
+  currentPage.value = 1
+}
+
+const handleSizeChange = (size) => {
+  pageSize.value = size
+  currentPage.value = 1
+}
+
+const handleCurrentChange = (page) => {
+  currentPage.value = page
+}
+
+const getStatusType = (status) => {
+  const statusMap = {
+    'unused': 'success',
+    'used': 'info',
+    'expired': 'warning'
+  }
+  return statusMap[status] || 'info'
+}
+
+const getStatusText = (status) => {
+  const statusMap = {
+    'unused': '未使用',
+    'used': '已使用',
+    'expired': '已过期'
+  }
+  return statusMap[status] || '未知'
+}
+
 const viewCard = (card) => {
-  ElMessage.info(`查看卡密: ${card.id}`)
+  ElMessage.info(`查看卡密详情: ${card.id}`)
+  // 这里可以打开详情弹窗
 }
 
 const deleteCard = async (card) => {
   try {
     await ElMessageBox.confirm(
-      `确定要删除卡密 ${card.id} 吗？`,
+      `确定要删除卡密 "${card.id}" 吗？此操作不可恢复。`,
       '确认删除',
       {
-        confirmButtonText: '确定',
+        confirmButtonText: '确定删除',
         cancelButtonText: '取消',
-        type: 'warning'
+        type: 'warning',
+        confirmButtonClass: 'el-button--danger'
       }
     )
-    ElMessage.success('删除成功')
-  } catch {
+    
+    const index = cards.value.findIndex(c => c.id === card.id)
+    if (index !== -1) {
+      cards.value.splice(index, 1)
+      ElMessage.success('卡密删除成功')
+    }
+  } catch (error) {
     // 用户取消删除
   }
 }
 
-// 重置表单
-const resetForm = () => {
+const handleClose = (done) => {
   if (cardFormRef.value) {
     cardFormRef.value.resetFields()
   }
-  newCard.value = {
-    specType: '',
-    quantity: 1
-  }
+  done()
 }
 
-// 添加卡密 - 带完整错误处理
 const handleAddCards = async () => {
+  if (!cardFormRef.value) return
+  
   try {
-    // 表单验证
-    if (!cardFormRef.value) return
-    
-    const valid = await cardFormRef.value.validate()
-    if (!valid) return
+    await cardFormRef.value.validate()
     
     loading.value = true
     
     // 模拟API调用
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    await new Promise(resolve => setTimeout(resolve, 1500))
     
-    // 生成卡密
-    const generatedCards = generateCards(newCard.value.specType, newCard.value.quantity)
-    cards.value = [...generatedCards, ...cards.value]
+    const newCards = []
+    for (let i = 0; i < newCard.quantity; i++) {
+      const timestamp = new Date().getTime()
+      const newId = `CM${timestamp}${String(i).padStart(4, '0')}`
+      
+      newCards.push({
+        id: newId,
+        specType: newCard.specType,
+        responseNumber: newCard.specType === '月卡' ? 100 : 
+                       newCard.specType === '季卡' ? 300 : 1200,
+        status: 'unused',
+        categoryName: 'AI助手',
+        goodsName: '智能对话',
+        specName: newCard.specType === '月卡' ? '基础版' : 
+                 newCard.specType === '季卡' ? '专业版' : '企业版'
+      })
+    }
     
-    ElMessage.success(`成功生成 ${newCard.value.quantity} 张卡密`)
+    cards.value.unshift(...newCards)
+    
+    ElMessage.success(`成功生成 ${newCard.quantity} 张卡密`)
     showAddDialog.value = false
-    resetForm()
-    
+    cardFormRef.value.resetFields()
   } catch (error) {
-    console.error('添加卡密失败:', error)
-    ElMessage.error('卡密生成失败，请重试')
+    if (error && error.errors) {
+      ElMessage.error('请完善表单信息')
+    } else {
+      ElMessage.error('生成卡密失败，请重试')
+    }
   } finally {
     loading.value = false
   }
 }
 
-// 使用优化后的卡密生成算法
-const generateCards = (specType, quantity) => {
-  return generateCardsBatch(specType, quantity, {
-    prefix: 'CARD',
-    categoryName: '软件服务',
-    goodsName: '办公软件'
-  })
-}
-
-// 内存泄漏防护
-let dataLoadingTimer = null
+// 监听筛选条件变化
+watch([filterSpec, filterStatus], () => {
+  currentPage.value = 1
+})
 
 onMounted(() => {
-  loading.value = true
-  // 模拟加载数据 - 使用可清理的定时器
-  dataLoadingTimer = setTimeout(() => {
-    loading.value = false
-  }, 500)
-})
-
-onUnmounted(() => {
-  // 清理定时器防止内存泄漏
-  if (dataLoadingTimer) {
-    clearTimeout(dataLoadingTimer)
-    dataLoadingTimer = null
-  }
-})
-
-// 监听搜索关键词变化，添加防抖
-watch(() => searchKeyword.value, (newVal) => {
-  debouncedSearch(newVal)
+  // 初始化数据加载
+  console.log('卡密管理页面初始化完成')
 })
 </script>
 
 <style scoped>
 .cards-container {
-  padding: 16px;
-  background-color: #f5f7fa;
-  min-height: calc(100vh - 60px);
+  padding: 24px;
+  background: #f5f7fa;
+  min-height: calc(100vh - 64px);
 }
 
-.card-header {
+/* 页面标题区域 */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+  background: #ffffff;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.header-content {
+  flex: 1;
+}
+
+.page-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 8px 0;
+  line-height: 1.2;
+}
+
+.page-description {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.add-button {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  border: none;
+  border-radius: 8px;
+  padding: 12px 24px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.add-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+/* 筛选卡片区域 */
+.filter-card {
+  margin-bottom: 24px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+}
+
+.filter-content {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
+  padding: 8px 0;
 }
 
-.filter-container {
-  margin-bottom: 16px;
+.filter-group {
   display: flex;
-  gap: 10px;
+  gap: 16px;
+  align-items: center;
+  flex: 1;
 }
 
-.table-container {
-  background-color: #fff;
-  border-radius: 4px;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
-  padding: 16px;
+.search-input {
+  width: 300px;
 }
 
-.pagination-container {
-  margin-top: 16px;
-  display: flex;
-  justify-content: flex-end;
+.search-input :deep(.el-input__inner) {
+  border-radius: 8px;
 }
 
-:deep(.el-table) {
-  border-radius: 4px;
-}
-
-:deep(.el-table th) {
-  background-color: #f8f9fa;
-  color: #606266;
+.filter-stats {
+  color: #6b7280;
+  font-size: 14px;
   font-weight: 500;
 }
 
-:deep(.el-dialog) {
-  border-radius: 4px;
+/* 表格卡片区域 */
+.table-card {
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  overflow: hidden;
 }
 
-:deep(.el-dialog__header) {
-  padding: 16px 16px 8px;
-  border-bottom: 1px solid #f0f0f0;
+.table-wrapper {
+  padding: 0;
 }
 
-:deep(.el-dialog__body) {
-  padding: 16px;
+.data-table {
+  border: none;
 }
 
-:deep(.el-dialog__footer) {
-  padding: 8px 16px 16px;
-  border-top: 1px solid #f0f0f0;
+.data-table :deep(.el-table__header) {
+  background: #f8f9fa;
+}
+
+.data-table :deep(.el-table__row) {
+  transition: background-color 0.2s ease;
+}
+
+.data-table :deep(.el-table__row:hover) {
+  background-color: #f8fafc;
+}
+
+.status-tag {
+  font-weight: 500;
+  border-radius: 6px;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.action-buttons .el-button {
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+/* 分页区域 */
+.pagination-wrapper {
+  padding: 20px 24px;
+  background: #f8f9fa;
+  border-top: 1px solid #e5e7eb;
+}
+
+.custom-pagination {
+  justify-content: flex-end;
+}
+
+.custom-pagination :deep(.el-pagination__total) {
+  color: #6b7280;
+  font-weight: 500;
+}
+
+/* 添加卡密弹窗 */
+.add-dialog :deep(.el-dialog) {
+  border-radius: 12px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.add-dialog :deep(.el-dialog__header) {
+  padding: 24px 24px 0;
+  margin: 0;
+}
+
+.add-dialog :deep(.el-dialog__title) {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.add-dialog :deep(.el-dialog__body) {
+  padding: 24px;
+}
+
+.add-dialog :deep(.el-form-item__label) {
+  font-weight: 500;
+  color: #374151;
+}
+
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 16px 24px 24px;
+  border-top: 1px solid #e5e7eb;
+}
+
+/* 响应式设计 */
+@media (max-width: 1200px) {
+  .cards-container {
+    padding: 20px;
+  }
+  
+  .filter-group {
+    flex-wrap: wrap;
+  }
+  
+  .search-input {
+    width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .cards-container {
+    padding: 16px;
+  }
+  
+  .page-header {
+    flex-direction: column;
+    gap: 16px;
+    padding: 20px;
+  }
+  
+  .filter-content {
+    flex-direction: column;
+    gap: 16px;
+    align-items: stretch;
+  }
+  
+  .filter-group {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+    gap: 4px;
+  }
+  
+  .pagination-wrapper {
+    padding: 16px;
+  }
+  
+  .custom-pagination {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .cards-container {
+    padding: 12px;
+  }
+  
+  .page-header {
+    padding: 16px;
+  }
+  
+  .page-title {
+    font-size: 20px;
+  }
+  
+  .add-dialog :deep(.el-dialog) {
+    width: 95% !important;
+    margin: 20px auto;
+  }
+}
+
+/* 动画效果 */
+.page-header,
+.filter-card,
+.table-card {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 滚动条样式优化 */
+.table-wrapper :deep(.el-table__body-wrapper)::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.table-wrapper :deep(.el-table__body-wrapper)::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.table-wrapper :deep(.el-table__body-wrapper)::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.table-wrapper :deep(.el-table__body-wrapper)::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
 }
 </style>

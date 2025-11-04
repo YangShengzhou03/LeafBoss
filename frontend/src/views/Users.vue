@@ -128,7 +128,6 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { useDebounceFn } from '@vueuse/core'
 
 const loading = ref(false)
 const searchKeyword = ref('')
@@ -140,11 +139,6 @@ const total = ref(100)
 const showAddDialog = ref(false)
 const isEditing = ref(false)
 const userForm = ref(null)
-
-// 防抖搜索
-const debouncedSearch = useDebounceFn((value) => {
-  searchKeyword.value = value
-}, 300)
 
 const currentUser = ref({
   id: '',

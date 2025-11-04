@@ -1,13 +1,30 @@
 <template>
   <div class="product-goods-container">
-    <!-- 搜索和筛选区域 -->
-    <div class="search-section">
-      <el-row :gutter="20">
-        <el-col :span="6">
+    <!-- 页面标题和操作区域 -->
+    <div class="page-header">
+      <div class="header-content">
+        <h1 class="page-title">商品管理</h1>
+        <p class="page-description">管理您的商品信息，包括商品名称、描述、状态和规格配置</p>
+      </div>
+      <el-button 
+        type="primary" 
+        class="add-button"
+        @click="handleAdd"
+        :icon="Plus"
+      >
+        新增商品
+      </el-button>
+    </div>
+
+    <!-- 搜索筛选区域 -->
+    <el-card class="filter-card" shadow="never">
+      <div class="filter-content">
+        <div class="filter-group">
           <el-input
             v-model="searchKeyword"
             placeholder="搜索商品名称"
             clearable
+            class="search-input"
             @clear="handleSearch"
             @keyup.enter="handleSearch"
           >
@@ -15,8 +32,7 @@
               <el-icon><Search /></el-icon>
             </template>
           </el-input>
-        </el-col>
-        <el-col :span="4">
+          
           <el-select
             v-model="filterStatus"
             placeholder="选择状态"
@@ -26,98 +42,118 @@
             <el-option label="启用" value="active" />
             <el-option label="禁用" value="inactive" />
           </el-select>
-        </el-col>
-        <el-col :span="14" style="text-align: right;">
+          
           <el-button @click="handleReset">重置</el-button>
           <el-button type="primary" @click="handleSearch">
             <el-icon><Search /></el-icon>
             搜索
           </el-button>
-          <el-button type="success" @click="handleAdd">
-            <el-icon><Plus /></el-icon>
-            新增商品
-          </el-button>
-        </el-col>
-      </el-row>
-    </div>
+        </div>
+        
+        <div class="filter-stats">
+          共 {{ totalCount }} 个商品
+        </div>
+      </div>
+    </el-card>
 
-    <!-- 商品列表 -->
-    <div class="table-section">
-      <el-table
-        :data="paginatedGoods"
-        v-loading="loading"
-        border
-        stripe
-        style="width: 100%"
-      >
-        <el-table-column prop="id" label="ID" width="70" align="center" />
-        <el-table-column prop="name" label="商品名称" min-width="180" />
-        <el-table-column prop="description" label="商品描述" min-width="220" show-overflow-tooltip />
-        <el-table-column prop="status" label="状态" width="90" align="center">
-          <template #default="{ row }">
-            <el-tag :type="row.status === 'active' ? 'success' : 'danger'">
-              {{ row.status === 'active' ? '启用' : '禁用' }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column prop="specCount" label="规格数量" width="90" align="center" />
-        <el-table-column label="操作" width="240" align="center" fixed="right">
-          <template #default="{ row }">
-            <div class="table-actions">
-              <el-button
-                type="primary"
-                size="small"
-                @click="handleEdit(row)"
-                :icon="Edit"
-              >
-                编辑
-              </el-button>
-              <el-button
-                type="success"
-                size="small"
-                @click="handleViewSpecs(row)"
-                :icon="List"
-              >
-                规格
-              </el-button>
-              <el-popconfirm
-                title="确定删除这个商品吗？删除商品将同时删除其所有规格"
-                @confirm="handleDelete(row)"
-              >
-                <template #reference>
-                  <el-button
-                    type="danger"
-                    size="small"
-                    :icon="Delete"
-                  >
-                    删除
-                  </el-button>
-                </template>
-              </el-popconfirm>
-            </div>
-          </template>
-        </el-table-column>
-      </el-table>
+    <!-- 商品表格区域 -->
+    <el-card class="table-card" shadow="never">
+      <div class="table-wrapper">
+        <el-table
+          :data="paginatedGoods"
+          v-loading="loading"
+          class="data-table"
+          stripe
+          style="width: 100%"
+        >
+          <el-table-column prop="id" label="ID" width="80" align="center" />
+          <el-table-column prop="name" label="商品名称" min-width="200" />
+          <el-table-column prop="description" label="商品描述" min-width="250" show-overflow-tooltip />
+          <el-table-column prop="status" label="状态" width="100" align="center">
+            <template #default="{ row }">
+              <div class="status-cell">
+                <el-switch
+                  v-model="row.status"
+                  :active-value="'active'"
+                  :inactive-value="'inactive'"
+                  class="status-switch"
+                  @change="handleStatusChange(row)"
+                />
+                <span :class="['status-text', row.status === 'active' ? 'active' : 'inactive']">
+                  {{ row.status === 'active' ? '启用' : '禁用' }}
+                </span>
+              </div>
+            </template>
+          </el-table-column>
+          <el-table-column prop="specCount" label="规格数量" width="100" align="center">
+            <template #default="{ row }">
+              <el-tag class="count-tag" :type="row.specCount > 0 ? 'primary' : 'info'">
+                {{ row.specCount }}
+              </el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column label="操作" width="260" align="center" fixed="right">
+            <template #default="{ row }">
+              <div class="action-buttons">
+                <el-button
+                  type="primary"
+                  size="small"
+                  @click="handleEdit(row)"
+                  :icon="Edit"
+                >
+                  编辑
+                </el-button>
+                <el-button
+                  type="success"
+                  size="small"
+                  @click="handleViewSpecs(row)"
+                  :icon="List"
+                >
+                  规格
+                </el-button>
+                <el-popconfirm
+                  title="确定删除这个商品吗？删除商品将同时删除其所有规格"
+                  confirm-button-text="确定"
+                  cancel-button-text="取消"
+                  @confirm="handleDelete(row)"
+                >
+                  <template #reference>
+                    <el-button
+                      type="danger"
+                      size="small"
+                      :icon="Delete"
+                    >
+                      删除
+                    </el-button>
+                  </template>
+                </el-popconfirm>
+              </div>
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
 
-      <!-- 分页 -->
-      <div class="pagination-section">
+      <!-- 分页控件 -->
+      <div class="pagination-wrapper">
         <el-pagination
           v-model:current-page="currentPage"
           v-model:page-size="pageSize"
           :page-sizes="[10, 20, 50, 100]"
           :total="totalCount"
           layout="total, sizes, prev, pager, next, jumper"
+          class="custom-pagination"
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
         />
       </div>
-    </div>
+    </el-card>
 
     <!-- 添加/编辑商品弹窗 -->
     <el-dialog
       :title="dialogTitle"
       v-model="dialogVisible"
       width="600px"
+      class="category-dialog"
       :before-close="handleClose"
     >
       <el-form
@@ -152,12 +188,12 @@
         </el-form-item>
       </el-form>
       <template #footer>
-        <span class="dialog-footer">
+        <div class="dialog-footer">
           <el-button @click="handleClose">取消</el-button>
           <el-button type="primary" @click="handleSubmit">
             确定
           </el-button>
-        </span>
+        </div>
       </template>
     </el-dialog>
   </div>
@@ -288,6 +324,10 @@ const handleViewSpecs = (row) => {
   // 实际项目中这里应该跳转到规格管理页面并传递商品ID
 }
 
+const handleStatusChange = (row) => {
+  ElMessage.success(`商品"${row.name}"已${row.status === 'active' ? '启用' : '禁用'}`)
+}
+
 const handleDelete = async (row) => {
   try {
     await ElMessageBox.confirm(
@@ -296,7 +336,8 @@ const handleDelete = async (row) => {
       {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
-        type: 'warning'
+        type: 'warning',
+        confirmButtonClass: 'el-button--danger'
       }
     )
     
@@ -343,11 +384,12 @@ const handleSubmit = async () => {
       ElMessage.success('编辑成功')
     } else {
       // 新增
-      const newId = Math.max(...goodsList.value.map(item => item.id)) + 1
-      goodsList.value.push({
+      const newId = goodsList.value.length > 0 ? Math.max(...goodsList.value.map(item => item.id)) + 1 : 1
+      goodsList.value.unshift({
         ...goodsForm,
         id: newId,
-        specCount: 0
+        specCount: 0,
+        createTime: new Date().toLocaleString()
       })
       ElMessage.success('新增成功')
     }
@@ -379,182 +421,337 @@ const resetForm = () => {
   })
 }
 
+// 监听筛选条件变化
+import { watch } from 'vue'
+
+watch([searchKeyword, filterStatus], () => {
+  currentPage.value = 1
+})
+
 // 生命周期
 onMounted(() => {
   // 初始化数据
   loading.value = false
+  console.log('商品管理页面初始化完成')
 })
 </script>
 
 <style scoped>
 .product-goods-container {
-  padding: 16px;
-  background-color: #f5f7fa;
-  min-height: calc(100vh - 60px);
+  padding: 24px;
+  background: #f5f7fa;
+  min-height: calc(100vh - 64px);
 }
 
-.search-section {
-  margin-bottom: 16px;
-  padding: 16px;
-  background-color: #fff;
-  border-radius: 4px;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
-}
-
-.table-section {
-  margin-bottom: 16px;
-  background-color: #fff;
-  border-radius: 4px;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
-  padding: 16px;
-}
-
-.pagination-section {
+/* 页面标题区域 */
+.page-header {
   display: flex;
-  justify-content: flex-end;
-  margin-top: 16px;
-  padding: 0 16px;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+  background: #ffffff;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-.table-actions {
+.header-content {
+  flex: 1;
+}
+
+.page-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 8px 0;
+  line-height: 1.2;
+}
+
+.page-description {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.add-button {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  border: none;
+  border-radius: 8px;
+  padding: 12px 24px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.add-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+/* 筛选卡片区域 */
+.filter-card {
+  margin-bottom: 24px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+}
+
+.filter-content {
   display: flex;
-  gap: 6px;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+}
+
+.filter-group {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex: 1;
+}
+
+.search-input {
+  width: 300px;
+}
+
+.search-input :deep(.el-input__inner) {
+  border-radius: 8px;
+}
+
+.filter-stats {
+  color: #6b7280;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* 表格卡片区域 */
+.table-card {
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  overflow: hidden;
+}
+
+.table-wrapper {
+  padding: 0;
+}
+
+.data-table {
+  border: none;
+}
+
+.data-table :deep(.el-table__header) {
+  background: #f8f9fa;
+}
+
+.data-table :deep(.el-table__row) {
+  transition: background-color 0.2s ease;
+}
+
+.data-table :deep(.el-table__row:hover) {
+  background-color: #f8fafc;
+}
+
+.count-tag {
+  font-weight: 500;
+  border-radius: 6px;
+  min-width: 40px;
+  text-align: center;
+}
+
+.status-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.status-switch {
+  transform: scale(0.9);
+}
+
+.status-text {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.status-text.active {
+  color: #10b981;
+  background-color: #ecfdf5;
+}
+
+.status-text.inactive {
+  color: #6b7280;
+  background-color: #f9fafb;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 8px;
   justify-content: center;
 }
 
-/* 表格样式优化 - 使用更柔和的色彩 */
-:deep(.el-table) {
-  margin-top: 8px;
-  border-radius: 4px;
-  overflow: hidden;
-  font-size: 14px;
-}
-
-:deep(.el-table .cell) {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-:deep(.el-table th) {
-  background-color: #f8f9fa;
-  color: #606266;
+.action-buttons .el-button {
+  padding: 6px 12px;
+  border-radius: 6px;
   font-weight: 500;
 }
 
-:deep(.el-table--border) {
-  border-color: #ebeef5;
+/* 分页区域 */
+.pagination-wrapper {
+  padding: 20px 24px;
+  background: #f8f9fa;
+  border-top: 1px solid #e5e7eb;
 }
 
-:deep(.el-table--border::after),
-:deep(.el-table--group::after),
-:deep(.el-table::before) {
-  background-color: #ebeef5;
+.custom-pagination {
+  justify-content: flex-end;
 }
 
-:deep(.el-table td),
-:deep(.el-table th.is-leaf) {
-  border-bottom: 1px solid #ebeef5;
-}
-
-/* 按钮样式优化 - 使用更柔和的色彩 */
-:deep(.el-button--small) {
-  padding: 5px 10px;
-}
-
-:deep(.el-button--primary) {
-  background-color: #5b8dee;
-  border-color: #5b8dee;
-}
-
-:deep(.el-button--primary:hover) {
-  background-color: #4b7ed8;
-  border-color: #4b7ed8;
-}
-
-:deep(.el-button--success) {
-  background-color: #67c23a;
-  border-color: #67c23a;
-}
-
-:deep(.el-button--success:hover) {
-  background-color: #5cb32e;
-  border-color: #5cb32e;
-}
-
-:deep(.el-button--danger) {
-  background-color: #f56c6c;
-  border-color: #f56c6c;
-}
-
-:deep(.el-button--danger:hover) {
-  background-color: #e45c5c;
-  border-color: #e45c5c;
-}
-
-/* 对话框样式优化 */
-:deep(.el-dialog) {
-  border-radius: 4px;
-}
-
-:deep(.el-dialog__header) {
-  border-bottom: 1px solid #f0f0f0;
-  padding: 16px 20px;
-}
-
-:deep(.el-dialog__body) {
-  padding: 20px;
-}
-
-/* 表单样式优化 */
-:deep(.el-form-item__label) {
+.custom-pagination :deep(.el-pagination__total) {
+  color: #6b7280;
   font-weight: 500;
-  color: #606266;
 }
 
-:deep(.el-input__inner) {
-  border-radius: 4px;
+/* 商品弹窗 */
+.category-dialog :deep(.el-dialog) {
+  border-radius: 12px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
 }
 
-:deep(.el-input__inner:focus) {
-  border-color: #5b8dee;
+.category-dialog :deep(.el-dialog__header) {
+  padding: 24px 24px 0;
+  margin: 0;
 }
 
-/* 标签样式优化 */
-:deep(.el-tag--success) {
-  background-color: #f0f9ff;
-  border-color: #b3d8ff;
-  color: #409eff;
+.category-dialog :deep(.el-dialog__title) {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1f2937;
 }
 
-:deep(.el-tag--danger) {
-  background-color: #fef0f0;
-  border-color: #fbc4c4;
-  color: #f56c6c;
+.category-dialog :deep(.el-dialog__body) {
+  padding: 24px;
 }
 
-/* 分页样式优化 */
-:deep(.el-pagination) {
-  color: #606266;
+.category-dialog :deep(.el-form-item__label) {
+  font-weight: 500;
+  color: #374151;
 }
 
-:deep(.el-pagination .el-select .el-input .el-input__inner) {
-  border-radius: 4px;
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 16px 24px 24px;
+  border-top: 1px solid #e5e7eb;
 }
 
 /* 响应式设计 */
+@media (max-width: 1200px) {
+  .product-goods-container {
+    padding: 20px;
+  }
+  
+  .filter-group {
+    flex-wrap: wrap;
+  }
+  
+  .search-input {
+    width: 100%;
+  }
+}
+
 @media (max-width: 768px) {
-  .search-section {
-    padding: 12px;
+  .product-goods-container {
+    padding: 16px;
   }
   
-  .table-section {
-    padding: 12px;
+  .page-header {
+    flex-direction: column;
+    gap: 16px;
+    padding: 20px;
   }
   
-  .table-actions {
+  .filter-content {
+    flex-direction: column;
+    gap: 16px;
+    align-items: stretch;
+  }
+  
+  .filter-group {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .action-buttons {
     flex-direction: column;
     gap: 4px;
   }
+  
+  .pagination-wrapper {
+    padding: 16px;
+  }
+  
+  .custom-pagination {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .product-goods-container {
+    padding: 12px;
+  }
+  
+  .page-header {
+    padding: 16px;
+  }
+  
+  .page-title {
+    font-size: 20px;
+  }
+  
+  .category-dialog :deep(.el-dialog) {
+    width: 95% !important;
+    margin: 20px auto;
+  }
+}
+
+/* 动画效果 */
+.page-header,
+.filter-card,
+.table-card {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 滚动条样式优化 */
+.table-wrapper :deep(.el-table__body-wrapper)::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.table-wrapper :deep(.el-table__body-wrapper)::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.table-wrapper :deep(.el-table__body-wrapper)::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.table-wrapper :deep(.el-table__body-wrapper)::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
 }
 </style>

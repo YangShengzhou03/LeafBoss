@@ -1,58 +1,7 @@
-import { defineStore } from 'pinia'
-
-export const useAppStore = defineStore('app', {
-  state: () => ({
-    sidebar: {
-      opened: true
-    },
-    theme: 'light'
-  }),
-  
-  getters: {
-    sidebarOpened: (state) => state.sidebar.opened
-  },
-  
-  actions: {
-    toggleSidebar() {
-      this.sidebar.opened = !this.sidebar.opened
-    },
-    setTheme(theme) {
-      this.theme = theme
-    }
-  }
-})
-
-export const useCardStore = defineStore('card', {
-  state: () => ({
-    cards: [],
-    currentCard: null,
-    loading: false
-  }),
-  
-  actions: {
-    async fetchCards() {
-      this.loading = true
-      try {
-        // 这里将调用API获取卡密列表
-        // const response = await api.getCards()
-        // this.cards = response.data
-      } catch (error) {
-        console.error('获取卡密列表失败:', error)
-      } finally {
-        this.loading = false
-      }
-    },
-    
-    async validateCard(cardKey) {
-      try {
-        // 这里将调用卡密验证API
-        // const response = await api.validateCard(cardKey)
-        // return response.data
-        console.log('验证卡密:', cardKey) // 临时添加使用cardKey
-      } catch (error) {
-        console.error('卡密验证失败:', error)
-        throw error
-      }
-    }
-  }
-})
+// 导出所有store
+export { useUserStore } from './user'
+export { useAppStore } from './app'
+export { useCardStore } from './card'
+export { useProductStore } from './product'
+export { useAuthStore } from './auth'
+export { useNotificationStore } from './notification'

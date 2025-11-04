@@ -1,270 +1,170 @@
 <template>
-  <div class="admin-dashboard">
-    <el-card class="dashboard-card">
-      <template #header>
-        <div class="card-header">
-          <span>管理员仪表盘</span>
-        </div>
-      </template>
-      
-      <div class="dashboard-content">
-        <el-row :gutter="20">
-          <el-col :span="6">
-            <el-card shadow="hover" class="stat-card">
-              <div class="stat-item">
-                <div class="stat-icon user-icon">
-                  <el-icon size="24"><User /></el-icon>
-                </div>
-                <div class="stat-content">
-                  <div class="stat-title">用户总数</div>
-                  <div class="stat-value">{{ stats.userCount }}</div>
-                  <div class="stat-trend">
-                    <span :class="['trend-indicator', stats.userGrowth >= 0 ? 'up' : 'down']">
-                      {{ stats.userGrowth >= 0 ? '+' : '' }}{{ stats.userGrowth }}%
-                    </span>
-                    <span class="trend-text">较上月</span>
-                  </div>
-                </div>
+  <div class="dashboard">
+    <!-- 统计卡片区域 -->
+    <el-row :gutter="20" class="stats-grid">
+      <el-col :xs="24" :sm="12" :md="6" v-for="stat in stats" :key="stat.title">
+        <el-card class="stat-card" shadow="hover">
+          <div class="stat-content">
+            <div class="stat-icon" :class="stat.iconClass">
+              <i :class="stat.icon"></i>
+            </div>
+            <div class="stat-info">
+              <div class="stat-value">{{ stat.value }}</div>
+              <div class="stat-title">{{ stat.title }}</div>
+              <div v-if="stat.trend" class="stat-trend" :class="stat.trend > 0 ? 'trend-up' : 'trend-down'">
+                <i :class="stat.trend > 0 ? 'el-icon-top' : 'el-icon-bottom'"></i>
+                {{ Math.abs(stat.trend) }}%
               </div>
-            </el-card>
-          </el-col>
-          
-          <el-col :span="6">
-            <el-card shadow="hover" class="stat-card">
-              <div class="stat-item">
-                <div class="stat-icon card-icon">
-                  <el-icon size="24"><CreditCard /></el-icon>
-                </div>
-                <div class="stat-content">
-                  <div class="stat-title">卡密总数</div>
-                  <div class="stat-value">{{ stats.cardCount }}</div>
-                  <div class="stat-trend">
-                    <span :class="['trend-indicator', stats.cardGrowth >= 0 ? 'up' : 'down']">
-                      {{ stats.cardGrowth >= 0 ? '+' : '' }}{{ stats.cardGrowth }}%
-                    </span>
-                    <span class="trend-text">较上月</span>
-                  </div>
-                </div>
+            </div>
+          </div>
+        </el-card>
+      </el-col>
+    </el-row>
+
+    <!-- 图表区域 -->
+    <el-row :gutter="20" class="charts-section">
+      <el-col :xs="24" :lg="12">
+        <el-card class="chart-card">
+          <template #header>
+            <div class="chart-header">
+              <h3 class="chart-title">卡密激活趋势</h3>
+              <el-radio-group v-model="activationPeriod" size="small" @change="updateActivationChart">
+                <el-radio-button label="day">日</el-radio-button>
+                <el-radio-button label="week">周</el-radio-button>
+                <el-radio-button label="month">月</el-radio-button>
+              </el-radio-group>
+            </div>
+          </template>
+          <div id="activationChart" class="chart-container"></div>
+        </el-card>
+      </el-col>
+      <el-col :xs="24" :lg="12">
+        <el-card class="chart-card">
+          <template #header>
+            <div class="chart-header">
+              <h3 class="chart-title">收入趋势</h3>
+              <el-radio-group v-model="revenuePeriod" size="small" @change="updateRevenueChart">
+                <el-radio-button label="day">日</el-radio-button>
+                <el-radio-button label="week">周</el-radio-button>
+                <el-radio-button label="month">月</el-radio-button>
+              </el-radio-group>
+            </div>
+          </template>
+          <div id="revenueChart" class="chart-container"></div>
+        </el-card>
+      </el-col>
+    </el-row>
+
+    <!-- 信息区域 -->
+    <el-row :gutter="20" class="info-section">
+      <el-col :xs="24" :lg="12">
+        <el-card class="info-card">
+          <template #header>
+            <h3 class="info-title">系统信息</h3>
+          </template>
+          <div class="system-info">
+            <div class="info-item" v-for="item in systemInfo" :key="item.label">
+              <div class="info-label">
+                <i :class="item.icon" class="info-icon"></i>
+                {{ item.label }}:
               </div>
-            </el-card>
-          </el-col>
-          
-          <el-col :span="6">
-            <el-card shadow="hover" class="stat-card">
-              <div class="stat-item">
-                <div class="stat-icon active-icon">
-                  <el-icon size="24"><Check /></el-icon>
-                </div>
-                <div class="stat-content">
-                  <div class="stat-title">已激活卡密</div>
-                  <div class="stat-value">{{ stats.activeCardCount }}</div>
-                  <div class="stat-trend">
-                    <span :class="['trend-indicator', stats.activeRate >= 0 ? 'up' : 'down']">
-                      {{ stats.activeRate >= 0 ? '+' : '' }}{{ stats.activeRate }}%
-                    </span>
-                    <span class="trend-text">激活率</span>
-                  </div>
-                </div>
+              <div class="info-value">{{ item.value }}</div>
+            </div>
+          </div>
+        </el-card>
+      </el-col>
+      <el-col :xs="24" :lg="12">
+        <el-card class="info-card">
+          <template #header>
+            <h3 class="info-title">产品分类统计</h3>
+          </template>
+          <div class="category-stats">
+            <div class="category-item" v-for="category in categories" :key="category.name">
+              <div class="category-info">
+                <span class="category-name">{{ category.name }}</span>
+                <el-progress 
+                  :percentage="category.percentage" 
+                  :show-text="false" 
+                  :stroke-width="8"
+                  :color="category.color">
+                </el-progress>
               </div>
-            </el-card>
-          </el-col>
-          
-          <el-col :span="6">
-            <el-card shadow="hover" class="stat-card">
-              <div class="stat-item">
-                <div class="stat-icon revenue-icon">
-                  <el-icon size="24"><Money /></el-icon>
-                </div>
-                <div class="stat-content">
-                  <div class="stat-title">总收入</div>
-                  <div class="stat-value">¥{{ formatMoney(stats.totalRevenue) }}</div>
-                  <div class="stat-trend">
-                    <span :class="['trend-indicator', stats.revenueGrowth >= 0 ? 'up' : 'down']">
-                      {{ stats.revenueGrowth >= 0 ? '+' : '' }}{{ stats.revenueGrowth }}%
-                    </span>
-                    <span class="trend-text">较上月</span>
-                  </div>
-                </div>
-              </div>
-            </el-card>
-          </el-col>
-        </el-row>
-        
-        <el-row :gutter="20" style="margin-top: 20px">
-          <el-col :span="12">
-            <el-card shadow="hover">
-              <template #header>
-                <div class="card-header">
-                  <span>卡密激活趋势</span>
-                  <el-radio-group v-model="activationPeriod" size="small">
-                    <el-radio-button label="week">本周</el-radio-button>
-                    <el-radio-button label="month">本月</el-radio-button>
-                    <el-radio-button label="year">本年</el-radio-button>
-                  </el-radio-group>
-                </div>
-              </template>
-              <div class="chart-container">
-                <div id="activationChart" class="chart"></div>
-              </div>
-            </el-card>
-          </el-col>
-          
-          <el-col :span="12">
-            <el-card shadow="hover">
-              <template #header>
-                <div class="card-header">
-                  <span>收入趋势</span>
-                  <el-radio-group v-model="revenuePeriod" size="small">
-                    <el-radio-button label="week">本周</el-radio-button>
-                    <el-radio-button label="month">本月</el-radio-button>
-                    <el-radio-button label="year">本年</el-radio-button>
-                  </el-radio-group>
-                </div>
-              </template>
-              <div class="chart-container">
-                <div id="revenueChart" class="chart"></div>
-              </div>
-            </el-card>
-          </el-col>
-        </el-row>
-        
-        <el-row :gutter="20" style="margin-top: 20px">
-          <el-col :span="8">
-            <el-card shadow="hover" class="stat-card">
-              <div class="stat-item">
-                <div class="stat-icon spec-icon">
-                  <el-icon size="24"><List /></el-icon>
-                </div>
-                <div class="stat-content">
-                  <div class="stat-title">产品规格</div>
-                  <div class="stat-value">{{ stats.specCount }}</div>
-                  <div class="stat-trend">
-                    <span class="trend-indicator neutral">{{ stats.activeSpecCount }} 激活</span>
-                  </div>
-                </div>
-              </div>
-            </el-card>
-          </el-col>
-          
-          <el-col :span="8">
-            <el-card shadow="hover" class="stat-card">
-              <div class="stat-item">
-                <div class="stat-icon category-icon">
-                  <el-icon size="24"><FolderOpened /></el-icon>
-                </div>
-                <div class="stat-content">
-                  <div class="stat-title">产品分类</div>
-                  <div class="stat-value">{{ stats.categoryCount }}</div>
-                  <div class="stat-trend">
-                    <span class="trend-indicator neutral">{{ stats.activeCategoryCount }} 激活</span>
-                  </div>
-                </div>
-              </div>
-            </el-card>
-          </el-col>
-          
-          <el-col :span="8">
-            <el-card shadow="hover" class="stat-card">
-              <div class="stat-item">
-                <div class="stat-icon today-icon">
-                  <el-icon size="24"><Calendar /></el-icon>
-                </div>
-                <div class="stat-content">
-                  <div class="stat-title">今日激活</div>
-                  <div class="stat-value">{{ stats.todayActiveCount }}</div>
-                  <div class="stat-trend">
-                    <span :class="['trend-indicator', stats.todayGrowth >= 0 ? 'up' : 'down']">
-                      {{ stats.todayGrowth >= 0 ? '+' : '' }}{{ stats.todayGrowth }}%
-                    </span>
-                    <span class="trend-text">较昨日</span>
-                  </div>
-                </div>
-              </div>
-            </el-card>
-          </el-col>
-        </el-row>
-        
-        <el-row :gutter="20" style="margin-top: 20px">
-          <el-col :span="24">
-            <el-card shadow="hover">
-              <template #header>
-                <div class="card-header">
-                  <span>系统信息</span>
-                </div>
-              </template>
-              <div class="system-info">
-                <div class="info-item">
-                  <span class="info-label">系统版本：</span>
-                  <span class="info-value">LeafPan v1.0.0</span>
-                </div>
-                <div class="info-item">
-                  <span class="info-label">运行时间：</span>
-                  <span class="info-value">{{ uptime }}</span>
-                </div>
-                <div class="info-item">
-                  <span class="info-label">存储状态：</span>
-                  <span class="info-value">正常</span>
-                </div>
-              </div>
-            </el-card>
-          </el-col>
-        </el-row>
-      </div>
-    </el-card>
+              <span class="category-count">{{ category.count }}</span>
+            </div>
+          </div>
+        </el-card>
+      </el-col>
+    </el-row>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, nextTick, watch } from 'vue'
-import { User, CreditCard, Check, Money, List, FolderOpened, Calendar } from '@element-plus/icons-vue'
-import { ElMessage } from 'element-plus'
-import api from '@/api/index.js'
+import { ref, reactive, onMounted, watch, computed, nextTick } from 'vue'
 import * as echarts from 'echarts'
+import { ElMessage } from 'element-plus'
+import api from '@/api'
 
-// 统计数据
-const stats = ref({
-  userCount: 0,
-  userGrowth: 0,
-  cardCount: 0,
-  cardGrowth: 0,
-  activeCardCount: 0,
-  activeRate: 0,
-  totalRevenue: 0,
-  revenueGrowth: 0,
-  specCount: 0,
-  activeSpecCount: 0,
-  categoryCount: 0,
-  activeCategoryCount: 0,
-  todayActiveCount: 0,
-  todayGrowth: 0
-})
+// 响应式数据
+const stats = reactive([
+  {
+    title: '用户总数',
+    value: '1,524',
+    icon: 'el-icon-user',
+    iconClass: 'user-icon',
+    trend: 12.5
+  },
+  {
+    title: '卡密总数',
+    value: '8,923',
+    icon: 'el-icon-credit-card',
+    iconClass: 'card-icon',
+    trend: 8.3
+  },
+  {
+    title: '已激活卡密',
+    value: '6,542',
+    icon: 'el-icon-check',
+    iconClass: 'active-icon',
+    trend: 73.2
+  },
+  {
+    title: '总收入',
+    value: '¥152,400',
+    icon: 'el-icon-money',
+    iconClass: 'revenue-icon',
+    trend: 15.8
+  }
+])
 
-// 系统运行时间
-const uptime = ref('')
-
-// 图表周期选择
 const activationPeriod = ref('week')
 const revenuePeriod = ref('week')
+
+// 系统信息
+const systemInfo = reactive([
+  { label: '系统版本', value: 'v1.0.0', icon: 'el-icon-monitor' },
+  { label: '运行时间', value: '15天8小时32分钟', icon: 'el-icon-time' },
+  { label: '存储状态', value: '正常', icon: 'el-icon-folder-checked' },
+  { label: '最后更新', value: '2024-01-15 14:30', icon: 'el-icon-refresh' }
+])
+
+// 产品分类统计
+const categories = reactive([
+  { name: '软件授权', count: '2,345', percentage: 65, color: '#409EFF' },
+  { name: '游戏道具', count: '1,892', percentage: 52, color: '#67C23A' },
+  { name: '会员服务', count: '1,567', percentage: 43, color: '#E6A23C' },
+  { name: '其他产品', count: '876', percentage: 24, color: '#909399' }
+])
 
 // 图表实例
 let activationChart = null
 let revenueChart = null
 
-// 格式化存储大小（字节转换为可读格式）
-const formatStorageSize = (bytes) => {
-  if (bytes === 0) return '0 Bytes'
-  
-  const k = 1024
-  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB']
-  const i = Math.floor(Math.log(bytes) / Math.log(k))
-  
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
-}
-
 // 格式化金额
 const formatMoney = (amount) => {
-  if (!amount) return '0'
-  return amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+  return amount.toLocaleString('zh-CN', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  })
 }
 
 // 初始化激活趋势图表
@@ -684,218 +584,359 @@ watch(revenuePeriod, () => {
 </script>
 
 <style scoped>
-.admin-dashboard {
-  padding: 0;
+.dashboard {
+  padding: 24px;
+  background-color: var(--bg-secondary);
+  min-height: calc(100vh - 64px);
 }
 
-.dashboard-card {
-  margin-bottom: 20px;
+/* 统计卡片区域 */
+.stats-grid {
+  margin-bottom: 32px;
 }
 
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-weight: 600;
-}
-
-/* 统计卡片样式 - 朴素专业风格 */
 .stat-card {
-  height: 100%;
-  border-radius: 4px;
-  border: 1px solid #e6e6e6;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-radius: var(--border-radius-large);
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow-light);
+  transition: all 0.3s ease;
+  overflow: hidden;
 }
 
-.stat-item {
-  display: flex;
-  align-items: center;
-  padding: 16px;
-}
-
-.stat-icon {
-  margin-right: 12px;
-  width: 40px;
-  height: 40px;
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* 不同类型图标的背景色 */
-.user-icon {
-  background-color: rgba(64, 158, 255, 0.1);
-}
-
-.user-icon .el-icon {
-  color: #409EFF;
-}
-
-.card-icon {
-  background-color: rgba(103, 194, 58, 0.1);
-}
-
-.card-icon .el-icon {
-  color: #67C23A;
-}
-
-.active-icon {
-  background-color: rgba(230, 162, 60, 0.1);
-}
-
-.active-icon .el-icon {
-  color: #E6A23C;
-}
-
-.revenue-icon {
-  background-color: rgba(245, 108, 108, 0.1);
-}
-
-.revenue-icon .el-icon {
-  color: #F56C6C;
-}
-
-.spec-icon {
-  background-color: rgba(144, 147, 153, 0.1);
-}
-
-.spec-icon .el-icon {
-  color: #909399;
-}
-
-.category-icon {
-  background-color: rgba(121, 87, 213, 0.1);
-}
-
-.category-icon .el-icon {
-  color: #7957D5;
-}
-
-.today-icon {
-  background-color: rgba(255, 156, 110, 0.1);
-}
-
-.today-icon .el-icon {
-  color: #FF9C6E;
-}
-
-.stat-icon .el-icon {
-  font-size: 20px;
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-dark);
+  border-color: var(--primary-light);
 }
 
 .stat-content {
-  flex: 1;
+  display: flex;
+  align-items: center;
+  padding: var(--spacing-lg);
 }
 
-.stat-title {
-  font-size: 14px;
-  color: #909399;
-  margin-bottom: 4px;
-  font-weight: 400;
+.stat-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--border-radius-large);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: var(--spacing-lg);
+  font-size: 28px;
+  color: white;
+  flex-shrink: 0;
+}
+
+.user-icon { 
+  background: linear-gradient(135deg, #409EFF, #66b1ff); 
+  box-shadow: 0 4px 12px rgba(64, 158, 255, 0.3);
+}
+
+.card-icon { 
+  background: linear-gradient(135deg, #67C23A, #85ce61); 
+  box-shadow: 0 4px 12px rgba(103, 194, 58, 0.3);
+}
+
+.active-icon { 
+  background: linear-gradient(135deg, #E6A23C, #ebb563); 
+  box-shadow: 0 4px 12px rgba(230, 162, 60, 0.3);
+}
+
+.revenue-icon { 
+  background: linear-gradient(135deg, #F56C6C, #f78989); 
+  box-shadow: 0 4px 12px rgba(245, 108, 108, 0.3);
+}
+
+.stat-info {
+  flex: 1;
+  min-width: 0;
 }
 
 .stat-value {
-  font-size: 24px;
-  font-weight: 600;
-  color: #303133;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-xs);
+  line-height: 1.2;
 }
 
-.stat-trend {
-  display: flex;
-  align-items: center;
-  margin-top: 4px;
-  font-size: 12px;
-}
-
-.trend-indicator {
-  margin-right: 4px;
+.stat-title {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-sm);
   font-weight: 500;
 }
 
-.trend-indicator.up {
-  color: #67C23A;
+.stat-trend {
+  display: inline-flex;
+  align-items: center;
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: var(--border-radius-small);
+  background-color: rgba(103, 194, 58, 0.1);
 }
 
-.trend-indicator.down {
-  color: #F56C6C;
+.trend-up {
+  color: var(--success-color);
+  background-color: rgba(103, 194, 58, 0.1);
 }
 
-.trend-indicator.neutral {
-  color: #909399;
+.trend-down {
+  color: var(--danger-color);
+  background-color: rgba(245, 108, 108, 0.1);
 }
 
-.trend-text {
-  color: #C0C4CC;
+/* 图表区域 */
+.charts-section {
+  margin-bottom: 32px;
 }
 
-/* 图表样式 */
+.chart-card {
+  border-radius: var(--border-radius-large);
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow-light);
+  transition: all 0.3s ease;
+}
+
+.chart-card:hover {
+  box-shadow: var(--shadow-base);
+}
+
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-lg) var(--spacing-lg) 0;
+}
+
+.chart-title {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
 .chart-container {
-  height: 300px;
+  height: 320px;
   width: 100%;
+  padding: var(--spacing-lg);
 }
 
-.chart {
-  height: 100%;
-  width: 100%;
+/* 信息区域 */
+.info-section {
+  margin-bottom: 32px;
 }
 
-/* 系统信息卡片样式 */
+.info-card {
+  border-radius: var(--border-radius-large);
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow-light);
+  transition: all 0.3s ease;
+}
+
+.info-card:hover {
+  box-shadow: var(--shadow-base);
+}
+
+.info-title {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
 .system-info {
-  padding: 12px 0;
+  padding: var(--spacing-sm) 0;
 }
 
 .info-item {
-  margin-bottom: 12px;
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  padding: 6px 0;
-  border-bottom: 1px solid #f0f0f0;
+  padding: var(--spacing-base) 0;
+  border-bottom: 1px solid var(--border-light);
 }
 
 .info-item:last-child {
   border-bottom: none;
-  margin-bottom: 0;
 }
 
 .info-label {
-  width: 100px;
-  color: #909399;
-  font-weight: 400;
-  font-size: 14px;
+  display: flex;
+  align-items: center;
+  font-size: var(--font-size-sm);
+  color: var(--text-regular);
+  font-weight: 500;
+}
+
+.info-icon {
+  margin-right: var(--spacing-sm);
+  font-size: var(--font-size-base);
+  color: var(--primary-color);
 }
 
 .info-value {
-  color: #303133;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.category-stats {
+  padding: var(--spacing-sm) 0;
+}
+
+.category-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-base) 0;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.category-item:last-child {
+  border-bottom: none;
+}
+
+.category-info {
+  flex: 1;
+  margin-right: var(--spacing-lg);
+}
+
+.category-name {
+  display: block;
+  font-size: var(--font-size-sm);
+  color: var(--text-regular);
+  margin-bottom: var(--spacing-xs);
   font-weight: 500;
-  font-size: 14px;
+}
+
+.category-count {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--text-primary);
+  min-width: 60px;
+  text-align: right;
 }
 
 /* 响应式设计 */
+@media (max-width: 1200px) {
+  .stat-value {
+    font-size: 24px;
+  }
+  
+  .chart-container {
+    height: 280px;
+  }
+}
+
 @media (max-width: 768px) {
-  .stat-item {
-    flex-direction: column;
-    text-align: center;
-    padding: 12px;
+  .dashboard {
+    padding: var(--spacing-lg);
+  }
+  
+  .stats-grid {
+    margin-bottom: var(--spacing-lg);
+  }
+  
+  .stat-content {
+    padding: var(--spacing-base);
   }
   
   .stat-icon {
-    margin-right: 0;
-    margin-bottom: 8px;
+    width: 48px;
+    height: 48px;
+    font-size: 24px;
+    margin-right: var(--spacing-base);
   }
   
   .stat-value {
     font-size: 20px;
   }
   
-  .info-item {
-    flex-direction: column;
-    align-items: flex-start;
+  .chart-container {
+    height: 240px;
+    padding: var(--spacing-base);
   }
   
-  .info-label {
-    width: auto;
-    margin-bottom: 4px;
+  .chart-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-base);
+    padding: var(--spacing-base) var(--spacing-base) 0;
   }
+  
+  .info-item, .category-item {
+    padding: var(--spacing-sm) 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard {
+    padding: var(--spacing-base);
+  }
+  
+  .stat-content {
+    flex-direction: column;
+    text-align: center;
+    padding: var(--spacing-lg);
+  }
+  
+  .stat-icon {
+    margin-right: 0;
+    margin-bottom: var(--spacing-base);
+  }
+  
+  .stat-value {
+    font-size: 18px;
+  }
+  
+  .chart-container {
+    height: 200px;
+    padding: var(--spacing-sm);
+  }
+  
+  .category-info {
+    margin-right: var(--spacing-base);
+  }
+}
+
+/* 动画效果 */
+.stat-card,
+.chart-card,
+.info-card {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 滚动条样式 */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-base);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--border-dark);
 }
 </style>

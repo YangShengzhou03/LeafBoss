@@ -1,48 +1,90 @@
 <template>
   <div class="spec-container">
-    <!-- 搜索和筛选 -->
-    <div class="card-header">
-      <span>规格管理</span>
-      <el-button type="primary" @click="showAddDialog = true">
-        <el-icon><Plus /></el-icon>
-        添加规格
-      </el-button>
+    <!-- 页面标题和操作区域 -->
+    <div class="page-header">
+      <div class="header-content">
+        <h1 class="page-title">规格管理</h1>
+        <p class="page-description">管理系统中的商品规格信息，包括规格代码、价格和状态等</p>
+      </div>
+      <div class="header-actions">
+        <el-button type="primary" @click="handleAdd" size="large">
+          <el-icon><Plus /></el-icon>
+          添加规格
+        </el-button>
+      </div>
     </div>
 
-    <div class="filter-container">
-      <el-input
-        v-model="searchKeyword"
-        placeholder="搜索规格名称"
-        style="width: 200px"
-        clearable
-      />
-      <el-select v-model="filterGoods" placeholder="商品" clearable>
-        <el-option 
-          v-for="goods in goodsList" 
-          :key="goods.id" 
-          :label="goods.name" 
-          :value="goods.id" 
-        />
-      </el-select>
-      <el-select v-model="filterStatus" placeholder="状态" clearable>
-        <el-option label="启用" value="active" />
-        <el-option label="禁用" value="inactive" />
-      </el-select>
-    </div>
+    <!-- 搜索筛选区域 -->
+    <el-card class="filter-card" shadow="never">
+      <template #header>
+        <div class="filter-header">
+          <el-icon><Search /></el-icon>
+          <span>筛选条件</span>
+        </div>
+      </template>
+      
+      <div class="filter-content">
+        <el-input
+          v-model="searchKeyword"
+          placeholder="搜索规格名称或代码"
+          style="width: 240px"
+          clearable
+          size="large"
+        >
+          <template #prefix>
+            <el-icon><Search /></el-icon>
+          </template>
+        </el-input>
+        
+        <el-select v-model="filterStatus" placeholder="状态筛选" clearable size="large">
+          <el-option label="全部" value="" />
+          <el-option label="启用" value="active" />
+          <el-option label="停用" value="inactive" />
+        </el-select>
+        
+        <el-button type="primary" @click="handleSearch" size="large">
+          <el-icon><Search /></el-icon>
+          搜索
+        </el-button>
+        
+        <el-button @click="handleReset" size="large">
+          <el-icon><Refresh /></el-icon>
+          重置
+        </el-button>
+      </div>
+    </el-card>
 
-    <!-- 规格表格 -->
-    <div class="table-container">
-      <el-table :data="filteredSpecs" v-loading="loading">
-        <el-table-column prop="name" label="规格名称" width="150" />
-        <el-table-column prop="goodsName" label="商品" width="120" />
-        <el-table-column prop="description" label="描述" />
-        <el-table-column prop="spec_code" label="规格代码" width="120" />
-        <el-table-column prop="price" label="价格" width="120">
+    <!-- 规格表格区域 -->
+    <el-card class="table-card" shadow="never">
+      <template #header>
+        <div class="table-header">
+          <div class="table-title">
+            <el-icon><List /></el-icon>
+            <span>规格列表</span>
+          </div>
+          <div class="table-stats">
+            共 {{ filteredSpecs.length }} 条规格信息
+          </div>
+        </div>
+      </template>
+      
+      <el-table
+        v-loading="loading"
+        :data="filteredSpecs"
+        border
+        style="width: 100%"
+        :header-cell-style="{ background: '#f8f9fa', color: '#606266', fontWeight: '600' }"
+      >
+        <el-table-column prop="name" label="规格名称" min-width="140" align="center" />
+        <el-table-column prop="goodsName" label="所属商品" min-width="140" align="center" />
+        <el-table-column prop="description" label="规格描述" min-width="180" show-overflow-tooltip align="center" />
+        <el-table-column prop="spec_code" label="规格代码" min-width="120" align="center" />
+        <el-table-column prop="price" label="价格" min-width="120" align="center">
           <template #default="{ row }">
-            ¥{{ row.price.toFixed(2) }}
+            <span class="price-text">¥{{ row.price.toFixed(2) }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="status" label="状态" width="100">
+        <el-table-column prop="status" label="状态" min-width="100" align="center">
           <template #default="{ row }">
             <el-switch
               v-model="row.status"
@@ -50,39 +92,76 @@
               inactive-value="inactive"
               @change="toggleSpecStatus(row)"
             />
+            <span :class="['status-text', row.status === 'active' ? 'active' : 'inactive']">
+              {{ row.status === 'active' ? '启用' : '停用' }}
+            </span>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="200">
+        <el-table-column label="操作" width="220" fixed="right" align="center">
           <template #default="{ row }">
-            <el-button size="small" @click="editSpec(row)">编辑</el-button>
-            <el-button size="small" type="danger" @click="deleteSpec(row)">删除</el-button>
+            <el-button type="primary" size="small" @click="editSpec(row)" link>
+              <el-icon><Edit /></el-icon>
+              编辑
+            </el-button>
+            <el-button 
+              type="danger" 
+              size="small" 
+              @click="deleteSpec(row)" 
+              link
+              class="delete-btn"
+            >
+              <el-icon><Delete /></el-icon>
+              删除
+            </el-button>
           </template>
         </el-table-column>
       </el-table>
-
-      <!-- 分页 -->
+      
+      <!-- 分页控件 -->
       <div class="pagination-container">
         <el-pagination
           v-model:current-page="currentPage"
           v-model:page-size="pageSize"
-          :total="total"
+          :page-sizes="[10, 20, 50, 100]"
+          :total="filteredSpecs.length"
           layout="total, sizes, prev, pager, next, jumper"
+          background
         />
       </div>
-    </div>
+    </el-card>
 
     <!-- 添加/编辑规格弹窗 -->
     <el-dialog 
       v-model="showAddDialog" 
       :title="isEditing ? '编辑规格' : '添加规格'" 
-      width="500px"
+      width="600px"
+      @close="resetForm"
+      class="spec-dialog"
     >
-      <el-form :model="currentSpec" label-width="80px" :rules="formRules" ref="specForm">
+      <el-form
+        ref="specForm"
+        :model="currentSpec"
+        :rules="formRules"
+        label-width="120px"
+        label-position="right"
+        size="large"
+      >
         <el-form-item label="规格名称" prop="name">
-          <el-input v-model="currentSpec.name" placeholder="请输入规格名称" />
+          <el-input 
+            v-model="currentSpec.name" 
+            placeholder="请输入规格名称" 
+            maxlength="50"
+            show-word-limit
+          />
         </el-form-item>
-        <el-form-item label="商品" prop="goodsId">
-          <el-select v-model="currentSpec.goodsId" placeholder="请选择商品">
+        
+        <el-form-item label="所属商品" prop="goodsId">
+          <el-select 
+            v-model="currentSpec.goodsId" 
+            placeholder="请选择商品" 
+            style="width: 100%"
+            filterable
+          >
             <el-option 
               v-for="goods in goodsList" 
               :key="goods.id" 
@@ -91,57 +170,80 @@
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="描述">
-          <el-input 
-            v-model="currentSpec.description" 
-            type="textarea" 
-            :rows="2"
-            placeholder="请输入规格描述" 
-          />
-        </el-form-item>
-        <el-form-item label="规格代码" prop="spec_code">
-          <el-input 
-            v-model="currentSpec.spec_code" 
-            placeholder="请输入规格代码"
-            maxlength="50"
+        
+        <el-form-item label="规格描述" prop="description">
+          <el-input
+            v-model="currentSpec.description"
+            type="textarea"
+            :rows="3"
+            placeholder="请输入规格描述"
+            maxlength="200"
             show-word-limit
           />
         </el-form-item>
-        <el-form-item label="价格" prop="price">
-          <el-input-number 
-            v-model="currentSpec.price" 
-            :min="0" 
-            :max="99999" 
-            :precision="2"
-            placeholder="请输入价格"
-            style="width: 100%"
+        
+        <el-form-item label="规格代码" prop="spec_code">
+          <el-input 
+            v-model="currentSpec.spec_code" 
+            placeholder="请输入规格代码" 
+            maxlength="20"
+            show-word-limit
           />
         </el-form-item>
+        
+        <el-form-item label="价格" prop="price">
+          <el-input-number
+            v-model="currentSpec.price"
+            :min="0"
+            :precision="2"
+            :step="0.1"
+            style="width: 100%"
+            controls-position="right"
+          />
+        </el-form-item>
+        
+        <el-form-item label="状态" prop="status">
+          <el-radio-group v-model="currentSpec.status">
+            <el-radio label="active">启用</el-radio>
+            <el-radio label="inactive">停用</el-radio>
+          </el-radio-group>
+        </el-form-item>
       </el-form>
+      
       <template #footer>
-        <el-button @click="showAddDialog = false">取消</el-button>
-        <el-button type="primary" @click="saveSpec">保存</el-button>
+        <div class="dialog-footer">
+          <el-button @click="showAddDialog = false" size="large">取消</el-button>
+          <el-button 
+            type="primary" 
+            @click="saveSpec" 
+            size="large"
+            :loading="loading"
+          >
+            {{ isEditing ? '更新规格' : '添加规格' }}
+          </el-button>
+        </div>
       </template>
     </el-dialog>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, reactive, onMounted, watch } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { Plus, Search, Refresh, List, Edit, Delete } from '@element-plus/icons-vue'
 
+// 响应式数据
 const loading = ref(false)
 const searchKeyword = ref('')
-const filterGoods = ref('')
 const filterStatus = ref('')
 const currentPage = ref(1)
-const pageSize = ref(20)
-const total = ref(100)
+const pageSize = ref(10)
 const showAddDialog = ref(false)
 const isEditing = ref(false)
-const specForm = ref(null)
+const specForm = ref()
 
-const currentSpec = ref({
+// 当前编辑的规格数据
+const currentSpec = reactive({
   id: '',
   name: '',
   goodsId: '',
@@ -151,43 +253,6 @@ const currentSpec = ref({
   status: 'active'
 })
 
-// 规格代码验证函数
-const validateSpecCode = (rule, value, callback) => {
-  if (!value || value.trim() === '') {
-    callback(new Error('请输入规格代码'))
-  } else if (value.length < 1 || value.length > 50) {
-    callback(new Error('规格代码长度在 1 到 50 个字符之间'))
-  } else {
-    // 检查规格代码是否唯一
-    const existingSpec = specifications.value.find(spec => 
-      spec.spec_code === value && spec.id !== currentSpec.value.id
-    )
-    if (existingSpec) {
-      callback(new Error(`规格代码 "${value}" 已被规格 "${existingSpec.name}" 使用`))
-    } else {
-      callback()
-    }
-  }
-}
-
-const formRules = {
-  name: [
-    { required: true, message: '请输入规格名称', trigger: 'blur' },
-    { min: 2, max: 20, message: '规格名称长度在 2 到 20 个字符', trigger: 'blur' }
-  ],
-  goodsId: [
-    { required: true, message: '请选择商品', trigger: 'change' }
-  ],
-  spec_code: [
-    { required: true, message: '请输入规格代码', trigger: 'blur' },
-    { min: 1, max: 50, message: '规格代码长度在 1 到 50 个字符', trigger: 'blur' },
-    { validator: validateSpecCode, trigger: 'blur' }
-  ],
-  price: [
-    { required: true, message: '请输入价格', trigger: 'blur' },
-    { type: 'number', min: 0, max: 99999, message: '价格范围在 0 到 99999 之间', trigger: 'blur' }
-  ]
-}
 
 // 模拟商品数据
 const goodsList = ref([
@@ -276,25 +341,6 @@ const specifications = ref([
     status: 'active'
   }
 ])
-
-const filteredSpecs = computed(() => {
-  const keyword = searchKeyword.value?.toLowerCase() || ''
-  const goodsFilter = filterGoods.value
-  const statusFilter = filterStatus.value
-  
-  return specifications.value.filter(spec => {
-    const matchesKeyword = !keyword || spec.name.toLowerCase().includes(keyword)
-    const matchesGoods = !goodsFilter || spec.goodsId === goodsFilter
-    const matchesStatus = !statusFilter || spec.status === statusFilter
-    return matchesKeyword && matchesGoods && matchesStatus
-  })
-})
-
-
-
-
-
-
 
 const editSpec = (spec) => {
   isEditing.value = true
@@ -410,6 +456,16 @@ const resetForm = () => {
   isEditing.value = false
 }
 
+// 监听筛选条件变化
+watch([filterStatus], () => {
+  currentPage.value = 1
+})
+
+// 监听搜索关键词变化
+watch(searchKeyword, () => {
+  currentPage.value = 1
+})
+
 onMounted(() => {
   loading.value = true
   // 模拟加载数据
@@ -420,48 +476,137 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.spec-container {
-  padding: 16px;
-  background-color: #f5f7fa;
-  min-height: calc(100vh - 60px);
+:root {
+  --primary-color: #3b82f6;
+  --success-color: #10b981;
+  --danger-color: #ef4444;
+  --warning-color: #f59e0b;
+  --text-primary: #1f2937;
+  --text-secondary: #6b7280;
+  --border-color: #e5e7eb;
+  --bg-color: #f5f7fa;
+  --card-bg: #ffffff;
 }
 
-.card-header {
+.spec-container {
+  padding: 24px;
+  background: var(--bg-color);
+  min-height: calc(100vh - 64px);
+  animation: fadeInUp 0.6s ease-out;
+}
+
+/* 页面标题区域 */
+.page-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
+  align-items: flex-start;
+  margin-bottom: 24px;
+  background: var(--card-bg);
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-.filter-container {
-  margin-bottom: 16px;
-  padding: 16px;
-  background-color: #fff;
-  border-radius: 4px;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+.header-content {
+  flex: 1;
+}
+
+.page-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 8px 0;
+  line-height: 1.2;
+}
+
+.page-description {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.header-actions .el-button {
+  background: linear-gradient(135deg, var(--primary-color), #1d4ed8);
+  border: none;
+  border-radius: 8px;
+  padding: 12px 24px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.header-actions .el-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+/* 筛选卡片区域 */
+.filter-card {
+  margin-bottom: 24px;
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+}
+
+.filter-header {
   display: flex;
-  gap: 12px;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.filter-content {
+  display: flex;
+  gap: 16px;
+  align-items: center;
   flex-wrap: wrap;
 }
 
-.table-container {
-  background-color: #fff;
-  border-radius: 4px;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
-  padding: 16px;
+.filter-content .el-input,
+.filter-content .el-select {
+  flex: 0 0 auto;
+}
+
+/* 表格卡片区域 */
+.table-card {
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+}
+
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background: var(--card-bg);
+}
+
+.table-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.table-stats {
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 500;
 }
 
 .pagination-container {
-  margin-top: 16px;
+  padding: 20px;
+  background: var(--card-bg);
+  border-top: 1px solid var(--border-color);
   display: flex;
   justify-content: flex-end;
-  padding: 0 16px;
 }
 
-/* 表格样式优化 - 使用更柔和的色彩 */
+/* 表格样式 */
 :deep(.el-table) {
-  border-radius: 4px;
-  overflow: hidden;
+  border-radius: 0;
   font-size: 14px;
 }
 
@@ -472,132 +617,204 @@ onMounted(() => {
 }
 
 :deep(.el-table th) {
-  background-color: #f8f9fa;
-  color: #606266;
+  background: #f8f9fa;
+  color: var(--text-primary);
+  font-weight: 600;
+  border-bottom: 1px solid var(--border-color);
+}
+
+:deep(.el-table td) {
+  border-bottom: 1px solid var(--border-color);
+}
+
+:deep(.el-table__row:hover) {
+  background-color: #f8fafc;
+}
+
+/* 价格文本样式 */
+.price-text {
+  font-weight: 600;
+  color: var(--primary-color);
+}
+
+/* 状态文本样式 */
+.status-text {
+  font-size: 12px;
   font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 4px;
 }
 
-:deep(.el-table--border) {
-  border-color: #ebeef5;
+.status-text.active {
+  color: var(--success-color);
+  background-color: #ecfdf5;
 }
 
-:deep(.el-table--border::after),
-:deep(.el-table--group::after),
-:deep(.el-table::before) {
-  background-color: #ebeef5;
+.status-text.inactive {
+  color: var(--text-secondary);
+  background-color: #f9fafb;
 }
 
-:deep(.el-table td),
-:deep(.el-table th.is-leaf) {
-  border-bottom: 1px solid #ebeef5;
-}
-
-/* 按钮样式优化 - 使用更柔和的色彩 */
+/* 操作按钮样式 */
 :deep(.el-button--small) {
-  padding: 5px 10px;
-}
-
-:deep(.el-button--primary) {
-  background-color: #5b8dee;
-  border-color: #5b8dee;
-}
-
-:deep(.el-button--primary:hover) {
-  background-color: #4b7ed8;
-  border-color: #4b7ed8;
-}
-
-:deep(.el-button--success) {
-  background-color: #67c23a;
-  border-color: #67c23a;
-}
-
-:deep(.el-button--success:hover) {
-  background-color: #5cb32e;
-  border-color: #5cb32e;
-}
-
-:deep(.el-button--danger) {
-  background-color: #f56c6c;
-  border-color: #f56c6c;
-}
-
-:deep(.el-button--danger:hover) {
-  background-color: #e45c5c;
-  border-color: #e45c5c;
-}
-
-/* 对话框样式优化 */
-:deep(.el-dialog) {
-  border-radius: 4px;
-}
-
-:deep(.el-dialog__header) {
-  padding: 16px 16px 8px;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-:deep(.el-dialog__body) {
-  padding: 16px;
-}
-
-:deep(.el-dialog__footer) {
-  padding: 8px 16px 16px;
-  border-top: 1px solid #f0f0f0;
-}
-
-/* 表单样式优化 */
-:deep(.el-form-item__label) {
+  padding: 6px 12px;
+  border-radius: 6px;
   font-weight: 500;
-  color: #606266;
 }
 
-:deep(.el-input__wrapper) {
-  border-radius: 4px;
+.delete-btn {
+  color: var(--danger-color) !important;
 }
 
-:deep(.el-input__wrapper:focus) {
-  border-color: #5b8dee;
+.delete-btn:hover {
+  color: #dc2626 !important;
 }
 
-:deep(.el-select .el-input__wrapper) {
-  border-radius: 4px;
+/* 弹窗样式 */
+.spec-dialog :deep(.el-dialog) {
+  border-radius: 12px;
+  overflow: hidden;
 }
 
-:deep(.el-textarea__inner) {
-  border-radius: 4px;
+.spec-dialog :deep(.el-dialog__header) {
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--card-bg);
 }
 
-/* 标签样式优化 */
-:deep(.el-tag--success) {
-  background-color: #f0f9ff;
-  border-color: #b3d8ff;
-  color: #409eff;
+.spec-dialog :deep(.el-dialog__body) {
+  padding: 24px;
+  background: var(--card-bg);
 }
 
-:deep(.el-tag--danger) {
-  background-color: #fef0f0;
-  border-color: #fbc4c4;
-  color: #f56c6c;
+.spec-dialog :deep(.el-dialog__footer) {
+  padding: 16px 24px 20px;
+  border-top: 1px solid var(--border-color);
+  background: var(--card-bg);
 }
 
-/* 分页样式优化 */
-:deep(.el-pagination) {
-  color: #606266;
+.spec-dialog :deep(.el-form-item__label) {
+  font-weight: 500;
+  color: var(--text-primary);
 }
 
-:deep(.el-pagination .el-select .el-input) {
-  width: 110px;
+.spec-dialog :deep(.el-input__wrapper),
+.spec-dialog :deep(.el-textarea__inner) {
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+
+.spec-dialog :deep(.el-input__wrapper:hover),
+.spec-dialog :deep(.el-textarea__inner:hover) {
+  border-color: var(--primary-color);
+}
+
+.spec-dialog :deep(.el-input__wrapper.is-focus),
+.spec-dialog :deep(.el-textarea__inner.is-focus) {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* 动画效果 */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 滚动条样式 */
+:deep(.el-table__body-wrapper)::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+:deep(.el-table__body-wrapper)::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+:deep(.el-table__body-wrapper)::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+:deep(.el-table__body-wrapper)::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
 }
 
 /* 响应式设计 */
+@media (max-width: 1200px) {
+  .filter-content {
+    gap: 12px;
+  }
+  
+  .filter-content .el-input {
+    width: 200px !important;
+  }
+}
+
 @media (max-width: 768px) {
-  .filter-container {
+  .spec-container {
+    padding: 16px;
+  }
+  
+  .page-header {
+    flex-direction: column;
+    gap: 16px;
+    padding: 20px;
+  }
+  
+  .filter-content {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  
+  .filter-content .el-input,
+  .filter-content .el-select {
+    width: 100% !important;
+  }
+  
+  .table-header {
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  
+  .pagination-container {
+    justify-content: center;
+  }
+  
+  .spec-dialog :deep(.el-dialog) {
+    width: 95% !important;
+    margin: 20px auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .spec-container {
     padding: 12px;
   }
   
-  .table-container {
-    padding: 12px;
+  .page-header {
+    padding: 16px;
+  }
+  
+  .page-title {
+    font-size: 20px;
+  }
+  
+  .table-header {
+    padding: 12px 16px;
+  }
+  
+  .pagination-container {
+    padding: 16px;
   }
 }
 </style>
