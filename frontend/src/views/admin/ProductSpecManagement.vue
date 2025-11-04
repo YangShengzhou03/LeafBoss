@@ -10,7 +10,7 @@
       <div class="product-spec-content">
         <!-- 搜索和筛选 -->
         <div class="search-bar">
-          <el-row :gutter="16">
+          <el-row :gutter="20">
             <el-col :span="6">
               <el-input
                 v-model="searchQuery"
@@ -26,15 +26,17 @@
                 </template>
               </el-input>
             </el-col>
-            <el-col :span="3">
-              <el-select v-model="statusFilter" placeholder="状态" clearable @change="handleSearch">
+            <el-col :span="4">
+              <el-select v-model="statusFilter" placeholder="规格状态" clearable @change="handleSearch">
                 <el-option label="全部" value="" />
                 <el-option label="发放中" value="active" />
                 <el-option label="已停用" value="disabled" />
               </el-select>
             </el-col>
-            <el-col :span="6" style="display: flex; justify-content: flex-end; gap: 8px;">
+            <el-col :span="14" class="button-group">
+              <el-button type="primary" @click="handleSearch">查询</el-button>
               <el-button @click="resetFilters">重置</el-button>
+              <div style="flex: 1;"></div>
               <el-button type="primary" @click="showAddDialog = true">添加规格</el-button>
             </el-col>
           </el-row>
@@ -68,7 +70,7 @@
                 </span>
               </template>
             </el-table-column>
-            <el-table-column prop="status" label="状态" width="120" align="center">
+            <el-table-column prop="status" label="规格状态" width="120" align="center">
               <template #default="scope">
                 <el-tag :type="scope.row.status === 'active' ? 'success' : 'danger'">
                   {{ scope.row.status === 'active' ? '发放中' : '已停用' }}
@@ -123,7 +125,7 @@
         <el-form-item label="价格" prop="price">
           <el-input-number v-model="specForm.price" :min="0" :precision="2" style="width: 100%" />
         </el-form-item>
-        <el-form-item label="状态" prop="status">
+        <el-form-item label="规格状态" prop="status">
           <el-radio-group v-model="specForm.status">
               <el-radio label="active">发放中</el-radio>
               <el-radio label="disabled">停用中</el-radio>
@@ -388,36 +390,65 @@ onMounted(() => {
 }
 
 .search-bar {
-  margin-bottom: 16px;
+  margin-bottom: 12px;
   padding: 16px;
   background-color: #fafafa;
   border-bottom: 1px solid #e6e8eb;
 }
 
+.search-bar :deep(.el-col) {
+  display: flex;
+  align-items: center;
+}
+
+.search-bar :deep(.el-input) {
+  flex: 1;
+}
+
+.search-bar :deep(.button-group) {
+  justify-content: flex-end;
+}
+
+.search-bar :deep(.button-group .el-button) {
+  margin-left: 8px;
+}
+
 .table-container {
   width: 100%;
-  overflow-x: auto;
-  min-height: 400px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .table-container :deep(.el-table) {
-  width: 100% !important;
+  border-radius: 8px;
+  border: 1px solid #ebeef5;
 }
 
-.table-container :deep(.el-table__header-wrapper),
-.table-container :deep(.el-table__body-wrapper) {
-  width: 100% !important;
+.table-container :deep(.el-table__header-wrapper) {
+  background-color: #f5f7fa;
 }
 
-.table-container :deep(.el-table th),
+.table-container :deep(.el-table th) {
+  background-color: #f5f7fa !important;
+  color: #606266;
+  font-weight: 600;
+  padding: 12px 0;
+}
+
 .table-container :deep(.el-table td) {
-  white-space: nowrap;
+  padding: 12px 0;
+}
+
+.table-container :deep(.el-table .cell) {
+  padding: 0 12px;
+  word-break: break-word;
 }
 
 .pagination-container {
   display: flex;
   justify-content: flex-end;
-  margin-top: 16px;
+  margin-top: 12px;
   padding: 16px;
   background-color: #fafafa;
   border-top: 1px solid #e6e8eb;
