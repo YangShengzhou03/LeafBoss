@@ -36,14 +36,14 @@
             <div class="stat-card success">
               <div class="stat-item">
                 <div class="stat-icon">
-                  <el-icon><Check /></el-icon>
+                  <el-icon><Goods /></el-icon>
                 </div>
                 <div class="stat-content">
-                  <div class="stat-title">已使用卡密</div>
-                  <div class="stat-value">{{ stats.usedCardKeys }}</div>
+                  <div class="stat-title">商品总数</div>
+                  <div class="stat-value">{{ stats.productCount }}</div>
                   <div class="stat-trend">
-                    <span class="trend-text">使用率</span>
-                    <span class="trend-value">{{ stats.usageRate }}%</span>
+                    <span class="trend-text">较上月</span>
+                    <span class="trend-value positive">+{{ stats.productGrowth }}%</span>
                   </div>
                 </div>
               </div>
@@ -54,14 +54,14 @@
             <div class="stat-card warning">
               <div class="stat-item">
                 <div class="stat-icon">
-                  <el-icon><Document /></el-icon>
+                  <el-icon><Money /></el-icon>
                 </div>
                 <div class="stat-content">
-                  <div class="stat-title">操作日志</div>
-                  <div class="stat-value">{{ stats.logCount }}</div>
+                  <div class="stat-title">日销售数量</div>
+                  <div class="stat-value">{{ stats.dailySales }}</div>
                   <div class="stat-trend">
-                    <span class="trend-text">今日新增</span>
-                    <span class="trend-value">{{ stats.todayLogs }}</span>
+                    <span class="trend-text">较昨日</span>
+                    <span class="trend-value positive">+{{ stats.dailySalesGrowth }}%</span>
                   </div>
                 </div>
               </div>
@@ -72,14 +72,14 @@
             <div class="stat-card info">
               <div class="stat-item">
                 <div class="stat-icon">
-                  <el-icon><User /></el-icon>
+                  <el-icon><Coin /></el-icon>
                 </div>
                 <div class="stat-content">
-                  <div class="stat-title">活跃用户</div>
-                  <div class="stat-value">{{ stats.activeUsers }}</div>
+                  <div class="stat-title">日收入</div>
+                  <div class="stat-value">¥{{ stats.dailyRevenue }}</div>
                   <div class="stat-trend">
-                    <span class="trend-text">本月新增</span>
-                    <span class="trend-value">{{ stats.newUsers }}</span>
+                    <span class="trend-text">较昨日</span>
+                    <span class="trend-value positive">+{{ stats.dailyGrowth }}%</span>
                   </div>
                 </div>
               </div>
@@ -89,46 +89,32 @@
 
         <!-- 第二行：图表和详细数据 -->
         <el-row :gutter="20" class="charts-row">
-          <el-col :span="12">
-            <el-card class="chart-card">
-              <template #header>
-                <div class="chart-header">
-                  <span>卡密使用趋势</span>
-                </div>
-              </template>
-              <div class="chart-container">
-                <div class="trend-chart">
-                  <div class="trend-item" v-for="(item, index) in usageTrend" :key="index">
-                    <div class="trend-label">{{ item.date }}</div>
-                    <div class="trend-bar">
-                      <div 
-                        class="trend-fill" 
-                        :style="{ width: (item.usage / maxUsage) * 100 + '%' }"
-                        :class="{ increasing: item.trend === 'up', decreasing: item.trend === 'down' }"
-                      ></div>
-                    </div>
-                    <div class="trend-value">{{ item.usage }}</div>
-                  </div>
-                </div>
-              </div>
-            </el-card>
-          </el-col>
-          
-          <el-col :span="12">
+          <el-col :span="24">
             <el-card class="chart-card">
               <template #header>
                 <div class="chart-header">
                   <span>销量前五的商品-规格</span>
                 </div>
               </template>
-              <div class="top-products">
-                <div class="product-item" v-for="(product, index) in topProducts" :key="index">
-                  <div class="product-rank">{{ index + 1 }}</div>
-                  <div class="product-info">
-                    <div class="product-name">{{ product.name }}</div>
-                    <div class="product-spec">{{ product.spec }}</div>
+              <div class="products-container">
+                <div class="product-list">
+                  <div 
+                    class="product-row" 
+                    v-for="(product, index) in topProducts" 
+                    :key="index"
+                  >
+                    <div class="product-rank">
+                      <span class="rank-number">{{ index + 1 }}</span>
+                    </div>
+                    <div class="product-details">
+                      <div class="product-name">{{ product.name }}</div>
+                      <div class="product-spec">{{ product.spec }}</div>
+                    </div>
+                    <div class="product-sales">
+                      <span class="sales-count">{{ product.sales }}</span>
+                      <span class="sales-unit">张</span>
+                    </div>
                   </div>
-                  <div class="product-sales">{{ product.sales }} 张</div>
                 </div>
               </div>
             </el-card>
@@ -145,34 +131,27 @@
 import { ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { 
-  Refresh, Key, Check, Document, User, Plus, List 
+  Refresh, Key, Money, Goods, Coin
 } from '@element-plus/icons-vue'
 
 // 统计数据
 const stats = ref({
   cardKeyCount: 0,
-  usedCardKeys: 0,
-  logCount: 0,
-  activeUsers: 0,
-  newUsers: 0,
+  productCount: 0,
+  dailySales: 0,
+  dailyRevenue: 0,
   cardKeyGrowth: 0,
-  usageRate: 0,
-  todayLogs: 0,
-  apiResponseTime: 0
+  productGrowth: 0,
+  dailySalesGrowth: 0,
+  dailyGrowth: 0
 })
 
 // 系统运行时间
 const uptime = ref('0天0小时0分钟')
 const loading = ref(false)
 
-// 使用趋势数据
-const usageTrend = ref([])
-
 // 销量前五的商品数据
 const topProducts = ref([])
-
-// 计算最大使用量用于图表显示
-const maxUsage = ref(100)
 
 // 刷新数据
 const refreshData = async () => {
@@ -183,33 +162,19 @@ const refreshData = async () => {
 const loadDashboardData = async () => {
   try {
     loading.value = true
-    // 模拟数据加载
+    // 模拟数据加载 - 使用更有实际意义的数据
     stats.value = {
       cardKeyCount: 1568,
-      usedCardKeys: 892,
-      logCount: 3421,
-      activeUsers: 156,
-      newUsers: 45,
+      productCount: 28,
+      dailySales: 156,
+      dailyRevenue: 5680,
       cardKeyGrowth: 12.5,
-      usageRate: 56.9,
-      todayLogs: 45,
-      apiResponseTime: 128
+      productGrowth: 8.3,
+      dailySalesGrowth: 15.2,
+      dailyGrowth: 6.8
     }
     
-    // 模拟使用趋势数据（实际使用数量）
-    usageTrend.value = [
-      { date: '周一', usage: 156, trend: 'up' },
-      { date: '周二', usage: 189, trend: 'up' },
-      { date: '周三', usage: 142, trend: 'down' },
-      { date: '周四', usage: 201, trend: 'up' },
-      { date: '周五', usage: 234, trend: 'up' },
-      { date: '周六', usage: 278, trend: 'up' },
-      { date: '周日', usage: 195, trend: 'down' }
-    ]
-    
-    // 计算最大使用量
-    maxUsage.value = Math.max(...usageTrend.value.map(item => item.usage))
-    
+
     // 模拟销量前五的商品数据
     topProducts.value = [
       { name: 'VIP会员月卡', spec: '月卡', sales: 568 },
@@ -362,52 +327,81 @@ onMounted(() => {
   padding: 16px 0;
 }
 
-/* 趋势图表样式 */
-.trend-chart {
+
+
+/* 商品列表样式 */
+.products-container {
+  padding: 16px 0;
+  min-height: 200px;
+}
+
+.product-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  height: auto;
 }
 
-.trend-item {
+.product-row {
   display: flex;
   align-items: center;
-  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+  min-height: 56px;
+  flex: none;
 }
 
-.trend-label {
-  width: 40px;
-  font-size: 12px;
-  color: #606266;
+.product-row:last-child {
+  border-bottom: none;
 }
 
-.trend-bar {
+.product-rank {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #409eff, #79bbff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+}
+
+.rank-number {
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.product-details {
   flex: 1;
-  height: 8px;
-  background-color: #ebeef5;
-  border-radius: 4px;
-  overflow: hidden;
 }
 
-.trend-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #409eff, #79bbff);
-  transition: width 0.3s ease;
-}
-
-.trend-fill.increasing {
-  background: linear-gradient(90deg, #67c23a, #95d475);
-}
-
-.trend-fill.decreasing {
-  background: linear-gradient(90deg, #e6a23c, #eebe77);
-}
-
-.trend-value {
-  width: 40px;
-  font-size: 12px;
+.product-name {
+  font-size: 14px;
   font-weight: 500;
-  text-align: right;
+  color: #303133;
+  margin-bottom: 2px;
+}
+
+.product-spec {
+  font-size: 12px;
+  color: #909399;
+}
+
+.product-sales {
+  display: flex;
+  align-items: baseline;
+}
+
+.sales-count {
+  font-size: 16px;
+  font-weight: 600;
+  color: #67c23a;
+  margin-right: 4px;
+}
+
+.sales-unit {
+  font-size: 12px;
+  color: #909399;
 }
 
 /* 系统状态样式 */
@@ -505,57 +499,26 @@ onMounted(() => {
   }
 }
 
-/* 销量前五的商品样式 */
-.top-products {
-  padding: 16px 0;
-}
-
-.product-item {
+/* 确保两个卡片高度自适应 */
+.chart-card {
+  margin-top: 20px;
+  border-radius: 4px;
+  min-height: 200px;
   display: flex;
-  align-items: center;
-  padding: 12px 0;
-  border-bottom: 1px solid #f0f0f0;
+  flex-direction: column;
 }
 
-.product-item:last-child {
-  border-bottom: none;
-}
-
-.product-rank {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background-color: #409eff;
-  color: white;
+.chart-card :deep(.el-card__body) {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  font-weight: 600;
-  margin-right: 12px;
+  flex-direction: column;
 }
 
-.product-info {
+.chart-container {
   flex: 1;
+  min-height: 200px;
 }
 
-.product-name {
-  font-size: 14px;
-  font-weight: 500;
-  color: #303133;
-  margin-bottom: 4px;
-}
 
-.product-spec {
-  font-size: 12px;
-  color: #909399;
-}
-
-.product-sales {
-  font-size: 14px;
-  font-weight: 600;
-  color: #67c23a;
-}
 
 @media (max-width: 480px) {
   .stat-item {
