@@ -11,83 +11,77 @@
       <div class="search-bar">
         <el-row :gutter="16">
           <el-col :span="6">
-            <el-input
-              v-model="searchQuery"
-              placeholder="搜索卡密代码或用户邮箱"
-              clearable
-              @keyup.enter="handleSearch"
-            >
-              <template #prefix>
-                <el-icon><Search /></el-icon>
+            <el-input v-model="searchQuery" placeholder="搜索卡密或邮箱" clearable @keyup.enter="handleSearch">
+              <template #append>
+                <el-button @click="handleSearch">
+                  <el-icon><Search /></el-icon>
+                </el-button>
               </template>
             </el-input>
           </el-col>
-          <el-col :span="6">
-            <el-select v-model="statusFilter" placeholder="卡密状态" clearable>
+          <el-col :span="4">
+            <el-select v-model="statusFilter" placeholder="卡密状态" clearable @change="handleSearch">
+              <el-option label="全部" value="" />
               <el-option label="未使用" value="unused" />
               <el-option label="已使用" value="used" />
               <el-option label="已禁用" value="disabled" />
             </el-select>
           </el-col>
-          <el-col :span="12">
+          <el-col :span="14" class="button-group">
             <el-button type="primary" @click="handleSearch">查询</el-button>
             <el-button @click="resetFilter">重置</el-button>
+            <div style="flex: 1;"></div>
             <el-button type="danger" @click="handleClearUsed">清空已使用</el-button>
-                      <el-button type="primary" @click="handleAddCardKey">
-            <el-icon><Plus /></el-icon>
-            生成卡密
-          </el-button>
           </el-col>
         </el-row>
       </div>
 
       <!-- 卡密列表 -->
       <div class="table-container">
-        <el-table 
-          :data="filteredCardKeys" 
-          v-loading="loading" 
-          stripe
-          style="width: 100%"
-          :scroll="{ x: 800 }"
-        >
-          <el-table-column prop="cardKey" label="卡密代码" width="180" align="center" :show-overflow-tooltip="true">
-            <template #default="{ row }">
-              <span class="cardkey-code" @click="copyCardKey(row.cardKey)" style="cursor: pointer;">{{ row.cardKey }}</span>
+        <el-table :data="filteredCardKeys" style="width: 100%" v-loading="loading" :scroll="{ x: 1200 }">
+          <el-table-column prop="id" label="ID" width="80" align="center" />
+          <el-table-column prop="cardKey" label="卡密代码" min-width="200" align="left" :show-overflow-tooltip="true">
+            <template #default="scope">
+              <span class="cardkey-code" @click="copyCardKey(scope.row.cardKey)" style="cursor: pointer;">{{ scope.row.cardKey }}</span>
             </template>
           </el-table-column>
-          <el-table-column prop="status" label="状态" width="100" align="center">
-            <template #default="{ row }">
-              <el-tag :type="getStatusTagType(row.status)">
-                {{ getStatusText(row.status) }}
+          <el-table-column prop="status" label="状态" width="120" align="center">
+            <template #default="scope">
+              <el-tag :type="getStatusTagType(scope.row.status)">
+                {{ getStatusText(scope.row.status) }}
               </el-tag>
             </template>
           </el-table-column>
-          <el-table-column prop="productSpec" label="商品规格" width="140" align="center" :show-overflow-tooltip="true">
-            <template #default="{ row }">
-              {{ row.productSpec || '未设置' }}
+          <el-table-column prop="productSpec" label="商品规格" min-width="160" align="left" :show-overflow-tooltip="true">
+            <template #default="scope">
+              <span class="product-spec">{{ scope.row.productSpec || '未设置' }}</span>
             </template>
           </el-table-column>
-          <el-table-column prop="activateTime" label="使用时间" width="160" align="center" :show-overflow-tooltip="true">
-            <template #default="{ row }">
-              {{ row.activateTime || '未使用' }}
+          <el-table-column prop="activateTime" label="使用时间" width="180" align="center" :show-overflow-tooltip="true">
+            <template #default="scope">
+              <span class="time-text">{{ scope.row.activateTime || '未使用' }}</span>
             </template>
           </el-table-column>
-          <el-table-column prop="createTime" label="创建时间" width="160" align="center" :show-overflow-tooltip="true" />
-          <el-table-column label="操作" width="180" fixed="right" align="center">
-            <template #default="{ row }">
+          <el-table-column prop="createTime" label="创建时间" width="180" align="center" :show-overflow-tooltip="true">
+            <template #default="scope">
+              <span class="time-text">{{ scope.row.createTime }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="操作" width="200" fixed="right" align="center">
+            <template #default="scope">
               <el-button 
                 size="small" 
                 type="warning" 
-                @click="handleDisableCardKey(row)"
-                :disabled="row.status === 'used' || row.status === 'disabled'"
+                @click="handleDisableCardKey(scope.row)"
+                :disabled="scope.row.status === 'used' || scope.row.status === 'disabled'"
               >
                 禁用
               </el-button>
               <el-button 
                 size="small" 
                 type="danger" 
-                @click="handleDeleteCardKey(row)"
-                :disabled="row.status === 'used'"
+                @click="handleDeleteCardKey(scope.row)"
+                :disabled="scope.row.status === 'used'"
               >
                 删除
               </el-button>
@@ -110,31 +104,14 @@
       </div>
     </el-card>
 
-    <!-- 生成卡密对话框 -->
-    <el-dialog
-      v-model="showAddDialog"
-      title="生成卡密"
-      width="500px"
-    >
-      <el-form :model="cardKeyForm" :rules="cardKeyRules" ref="cardKeyFormRef" label-width="100px">
-        <el-form-item label="生成数量" prop="count">
-          <el-input-number v-model="cardKeyForm.count" :min="1" :max="1000" />
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <span class="dialog-footer">
-          <el-button @click="showAddDialog = false">取消</el-button>
-          <el-button type="primary" @click="generateCardKeys">生成</el-button>
-        </span>
-      </template>
-    </el-dialog>
+
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Plus, Search } from '@element-plus/icons-vue'
+import { Search } from '@element-plus/icons-vue'
 
 // 加载状态
 const loading = ref(false)
@@ -151,22 +128,7 @@ const currentPage = ref(1)
 const pageSize = ref(20)
 const total = ref(0)
 
-// 对话框状态
-const showAddDialog = ref(false)
-const cardKeyFormRef = ref(null)
 
-// 卡密表单数据
-const cardKeyForm = ref({
-  count: 10
-})
-
-// 表单验证规则
-const cardKeyRules = {
-  count: [
-    { required: true, message: '请输入生成数量', trigger: 'blur' },
-    { type: 'number', min: 1, max: 1000, message: '数量必须在1-1000之间', trigger: 'blur' }
-  ]
-}
 
 // 计算属性：筛选后的卡密列表
 const filteredCardKeys = computed(() => {
@@ -327,28 +289,7 @@ const handleClearUsed = () => {
   })
 }
 
-// 生成卡密
-const handleAddCardKey = () => {
-  showAddDialog.value = true
-}
 
-// 生成卡密
-const generateCardKeys = async () => {
-  if (!cardKeyFormRef.value) return
-  
-  try {
-    await cardKeyFormRef.value.validate()
-    
-    // 模拟生成卡密
-    ElMessage.success(`成功生成 ${cardKeyForm.value.count} 张卡密`)
-    showAddDialog.value = false
-    loadCardKeys()
-  } catch (error) {
-    if (error !== false) {
-      ElMessage.error('生成卡密失败')
-    }
-  }
-}
 
 // 禁用卡密
 const handleDisableCardKey = (row) => {
@@ -412,7 +353,6 @@ onMounted(() => {
 
 .cardkey-card {
   margin-bottom: 16px;
-  border: 1px solid #e6e6e6;
   border-radius: 8px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
@@ -431,24 +371,69 @@ onMounted(() => {
 }
 
 .search-bar {
-  padding: 16px;
-  background-color: #fafafa;
-  border-bottom: 1px solid #e6e6e6;
+  margin-bottom: 16px;
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.search-bar :deep(.el-col) {
+  display: flex;
+  align-items: center;
+}
+
+.search-bar :deep(.el-input) {
+  flex: 1;
+}
+
+.search-bar :deep(.button-group) {
+  justify-content: flex-end;
+}
+
+.search-bar :deep(.button-group .el-button) {
+  margin-left: 8px;
 }
 
 .table-container {
-  padding: 16px;
   width: 100%;
-  overflow-x: auto;
-  min-height: 400px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.table-container :deep(.el-table) {
+  border-radius: 8px;
+  border: 1px solid #ebeef5;
+}
+
+.table-container :deep(.el-table__header-wrapper) {
+  background-color: #f5f7fa;
+}
+
+.table-container :deep(.el-table th) {
+  background-color: #f5f7fa !important;
+  color: #606266;
+  font-weight: 600;
+  padding: 12px 0;
+}
+
+.table-container :deep(.el-table td) {
+  padding: 12px 0;
+}
+
+.table-container :deep(.el-table .cell) {
+  padding: 0 12px;
+  word-break: break-word;
 }
 
 .pagination-container {
-  padding: 16px;
-  background-color: #fafafa;
-  border-top: 1px solid #e6e6e6;
   display: flex;
   justify-content: flex-end;
+  margin-top: 12px;
+  padding: 16px;
+  background-color: #fafafa;
+  border-top: 1px solid #e6e8eb;
 }
 
 .cardkey-code {
@@ -456,31 +441,27 @@ onMounted(() => {
   font-weight: bold;
   color: #409EFF;
   letter-spacing: 1px;
+  font-size: 13px;
 }
 
-:deep(.el-table) {
-  width: 100% !important;
+.product-spec {
+  font-size: 13px;
+  color: #606266;
 }
 
-:deep(.el-table__header) {
-  width: 100% !important;
+.time-text {
+  font-size: 13px;
+  color: #909399;
 }
 
-:deep(.el-table__body) {
-  width: 100% !important;
+.action-buttons {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
 }
 
-:deep(.el-table .cell) {
-  white-space: nowrap;
-  text-align: center;
-}
-
-:deep(.el-table th) {
-  text-align: center !important;
-  background-color: #f5f7fa !important;
-}
-
-:deep(.el-table td) {
-  text-align: center !important;
+.action-btn {
+  min-width: 60px;
 }
 </style>

@@ -253,10 +253,11 @@ onMounted(() => {
 }
 
 .search-bar {
-  margin-bottom: 12px;
-  padding: 16px;
-  background-color: #fafafa;
-  border-bottom: 1px solid #e6e8eb;
+  margin-bottom: 16px;
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .search-bar :deep(.el-col) {

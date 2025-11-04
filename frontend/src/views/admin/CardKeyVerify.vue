@@ -7,89 +7,8 @@
         </div>
       </template>
 
-      <!-- 搜索栏 -->
-      <div class="search-bar">
-        <el-row :gutter="16">
-          <el-col :span="6">
-            <el-input
-              v-model="searchQuery"
-              placeholder="卡密名称"
-              clearable
-              @keyup.enter="handleSearch"
-            >
-              <template #prefix>
-                <el-icon><Search /></el-icon>
-              </template>
-            </el-input>
-          </el-col>
-          <el-col :span="6">
-            <el-select v-model="categoryFilter" placeholder="卡密分类" clearable>
-              <el-option label="虚拟卡密" value="virtual" />
-              <el-option label="实体卡密" value="physical" />
-              <el-option label="服务类" value="service" />
-            </el-select>
-          </el-col>
-          <el-col :span="6">
-            <el-select v-model="statusFilter" placeholder="卡密状态" clearable>
-              <el-option label="使用中" value="active" />
-              <el-option label="未使用" value="inactive" />
-            </el-select>
-          </el-col>
-          <el-col :span="6">
-            <el-button type="primary" @click="handleSearch">查询</el-button>
-            <el-button @click="resetFilters">重置</el-button>
-          </el-col>
-        </el-row>
-      </div>
-
-      <!-- 卡密列表 -->
-      <div class="table-container">
-        <el-table :data="filteredProducts" v-loading="loading" stripe>
-          <el-table-column prop="id" label="ID" width="80" />
-          <el-table-column prop="name" label="卡密名称" min-width="200" />
-          <el-table-column prop="category" label="分类" width="100">
-            <template #default="{ row }">
-              <el-tag :type="getCategoryTagType(row.category)">
-                {{ getCategoryText(row.category) }}
-              </el-tag>
-            </template>
-          </el-table-column>
-          <el-table-column prop="price" label="价格" width="120">
-            <template #default="{ row }">
-              ¥{{ row.price }}
-            </template>
-          </el-table-column>
-          <el-table-column prop="stock" label="库存" width="100" />
-          <el-table-column prop="status" label="状态" width="100">
-            <template #default="{ row }">
-              <el-tag :type="row.status === 'active' ? 'success' : 'info'">
-                {{ row.status === 'active' ? '使用中' : '未使用' }}
-              </el-tag>
-            </template>
-          </el-table-column>
-          <el-table-column prop="createTime" label="创建时间" width="160" />
-          <el-table-column label="操作" width="150" fixed="right">
-            <template #default="{ row }">
-              <el-button size="small" @click="handleEditProduct(row)">编辑</el-button>
-              <el-button size="small" type="danger" @click="handleDeleteProduct(row)">删除</el-button>
-            </template>
-          </el-table-column>
-        </el-table>
-      </div>
-
-      <!-- 分页 -->
-      <div class="pagination-container">
-        <el-pagination
-          v-model:current-page="currentPage"
-          v-model:page-size="pageSize"
-          :page-sizes="[10, 20, 50, 100]"
-          :total="total"
-          layout="total, sizes, prev, pager, next, jumper"
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-        />
-      </div>
     </el-card>
+
   </div>
 </template>
 
@@ -262,12 +181,13 @@ onMounted(() => {
 
 .product-card {
   margin-bottom: 16px;
+  border: 1px solid #e6e6e6;
   border-radius: 8px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .product-card :deep(.el-card__body) {
-  padding: 16px;
+  padding: 0;
 }
 
 .card-header {
@@ -280,16 +200,109 @@ onMounted(() => {
 }
 
 .search-bar {
-  margin-bottom: 16px;
+  padding: 16px;
+  background-color: #fafafa;
+  border-bottom: 1px solid #e6e6e6;
+}
+
+.search-bar .el-row {
+  align-items: center;
+}
+
+.search-bar .el-col {
+  display: flex;
+  align-items: center;
+}
+
+.search-bar .el-button {
+  margin-left: 8px;
 }
 
 .table-container {
-  margin-bottom: 16px;
+  width: 100%;
+  overflow-x: auto;
+  min-height: 400px;
+  margin: 0;
 }
 
 .pagination-container {
+  padding: 16px;
+  background-color: #fafafa;
+  border-top: 1px solid #e6e6e6;
   display: flex;
   justify-content: flex-end;
-  margin-top: 16px;
+}
+
+.product-name {
+  font-size: 13px;
+  color: #303133;
+  font-weight: 500;
+}
+
+.price-text {
+  font-size: 13px;
+  color: #e6a23c;
+  font-weight: 600;
+}
+
+.stock-text {
+  font-size: 13px;
+  color: #606266;
+}
+
+.time-text {
+  font-size: 13px;
+  color: #909399;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+}
+
+.action-btn {
+  min-width: 60px;
+}
+
+:deep(.el-table) {
+  width: 100% !important;
+  border-radius: 4px;
+  border: 1px solid #ebeef5;
+}
+
+:deep(.el-table__header) {
+  width: 100% !important;
+}
+
+:deep(.el-table__body) {
+  width: 100% !important;
+}
+
+:deep(.el-table .cell) {
+  white-space: nowrap;
+  text-align: center;
+  font-size: 13px;
+}
+
+:deep(.el-table th) {
+  text-align: center !important;
+  background-color: #f8f9fa !important;
+  border-bottom: 1px solid #ebeef5;
+  padding: 12px 8px;
+}
+
+:deep(.el-table td) {
+  text-align: center !important;
+  border-bottom: 1px solid #ebeef5;
+}
+
+:deep(.el-table--striped .el-table__body tr.el-table__row--striped td) {
+  background-color: #fafafa;
+}
+
+:deep(.el-table .el-table__row:hover td) {
+  background-color: #f5f7fa;
 }
 </style>

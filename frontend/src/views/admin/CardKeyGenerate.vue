@@ -19,6 +19,7 @@
                   :max="10000" 
                   controls-position="right"
                   placeholder="请输入生成数量"
+                  class="form-input"
                 />
               </el-form-item>
             </el-col>
@@ -30,12 +31,13 @@
                   :max="32" 
                   controls-position="right"
                   placeholder="请输入卡密长度"
+                  class="form-input"
                 />
               </el-form-item>
             </el-col>
             <el-col :span="8">
               <el-form-item label="商品规格">
-                <el-select v-model="generateForm.productId" placeholder="请选择商品规格" clearable>
+                <el-select v-model="generateForm.productId" placeholder="请选择商品规格" clearable class="form-input">
                   <el-option 
                     v-for="product in productList" 
                     :key="product.id" 
@@ -50,76 +52,66 @@
           <el-row :gutter="20">
             <el-col :span="8">
               <el-form-item label="前缀">
-                <el-input v-model="generateForm.prefix" placeholder="卡密前缀（可选）" />
+                <el-input v-model="generateForm.prefix" placeholder="卡密前缀（可选）" class="form-input" />
               </el-form-item>
             </el-col>
             <el-col :span="8">
               <el-form-item label="后缀">
-                <el-input v-model="generateForm.suffix" placeholder="卡密后缀（可选）" />
+                <el-input v-model="generateForm.suffix" placeholder="卡密后缀（可选）" class="form-input" />
               </el-form-item>
             </el-col>
             <el-col :span="8">
               <el-form-item label="分隔符">
-                <el-input v-model="generateForm.separator" placeholder="分隔符（默认无）" />
+                <el-input v-model="generateForm.separator" placeholder="分隔符（默认无）" class="form-input" />
               </el-form-item>
             </el-col>
           </el-row>
           
           <el-form-item label="字符集">
-            <el-checkbox-group v-model="generateForm.charset">
-              <el-checkbox label="numbers">数字 (0-9)</el-checkbox>
-              <el-checkbox label="uppercase">大写字母 (A-Z)</el-checkbox>
-              <el-checkbox label="lowercase">小写字母 (a-z)</el-checkbox>
+            <el-checkbox-group v-model="generateForm.charset" class="charset-group">
+              <el-checkbox label="numbers" class="charset-checkbox">数字 (0-9)</el-checkbox>
+              <el-checkbox label="uppercase" class="charset-checkbox">大写字母 (A-Z)</el-checkbox>
+              <el-checkbox label="lowercase" class="charset-checkbox">小写字母 (a-z)</el-checkbox>
             </el-checkbox-group>
           </el-form-item>
           
           <el-form-item>
-            <el-button type="primary" @click="generateCardKeys" :loading="generating">
-              <el-icon><Plus /></el-icon>
-              生成卡密
-            </el-button>
-            <el-button @click="resetForm">重置</el-button>
+            <div class="form-actions">
+              <el-button type="primary" @click="generateCardKeys" :loading="generating" class="action-btn">
+                <el-icon><Plus /></el-icon>
+                生成卡密
+              </el-button>
+              <el-button @click="resetForm" class="action-btn">重置</el-button>
+            </div>
           </el-form-item>
         </el-form>
       </div>
 
       <!-- 生成结果 -->
-      <div class="result-section" v-if="generatedKeys.length > 0">
+      <div v-if="generatedKeys.length > 0" class="result-section">
         <div class="result-header">
-          <span>生成结果（共 {{ generatedKeys.length }} 个卡密）</span>
-          <div class="action-buttons">
-            <el-button size="small" @click="copyAllKeys">
-              <el-icon><CopyDocument /></el-icon>
-              复制全部
-            </el-button>
-            <el-button size="small" type="success" @click="exportToTxt">
-              <el-icon><Download /></el-icon>
-              导出TXT
-            </el-button>
-            <el-button size="small" type="primary" @click="importToSystem" :disabled="!generateForm.productId">
-              <el-icon><Upload /></el-icon>
-              导入系统
-            </el-button>
-          </div>
+          <span class="result-title">生成结果 ({{ generatedKeys.length }} 条)</span>
+          <el-button type="success" @click="exportCardKeys" class="export-btn">
+            <el-icon><Download /></el-icon>
+            导出卡密
+          </el-button>
         </div>
         
-        <div class="keys-container">
-          <div 
-            v-for="(key, index) in generatedKeys" 
-            :key="index" 
-            class="key-item"
-          >
-            <span class="key-text">{{ key }}</span>
-            <el-button 
-              size="small" 
-              type="text" 
-              @click="copySingleKey(key)"
-              class="copy-btn"
-            >
-              <el-icon><CopyDocument /></el-icon>
-            </el-button>
-          </div>
-        </div>
+        <el-table :data="generatedKeys" border stripe class="result-table">
+          <el-table-column type="index" label="序号" width="80" align="center" />
+          <el-table-column prop="key" label="卡密代码" min-width="220" align="center" />
+          <el-table-column prop="productName" label="商品规格" width="160" align="center" />
+          <el-table-column label="操作" width="140" align="center">
+            <template #default="{ row }">
+              <div class="action-buttons">
+                <el-button type="text" @click="copyCardKey(row.key)" class="copy-btn">
+                  <el-icon><CopyDocument /></el-icon>
+                  复制
+                </el-button>
+              </div>
+            </template>
+          </el-table-column>
+        </el-table>
       </div>
     </el-card>
   </div>

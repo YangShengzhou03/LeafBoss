@@ -11,8 +11,8 @@
       <div class="users-content">
         <!-- 搜索和筛选 -->
         <div class="search-bar">
-          <el-row :gutter="20">
-            <el-col :span="5">
+          <el-row :gutter="16">
+            <el-col :span="6">
               <el-input
                 v-model="searchQuery"
                 placeholder="搜索邮箱"
@@ -27,14 +27,14 @@
                 </template>
               </el-input>
             </el-col>
-            <el-col :span="3">
+            <el-col :span="4">
               <el-select v-model="statusFilter" placeholder="用户状态" clearable @change="handleSearch">
                 <el-option label="全部" value="" />
                 <el-option label="正常" value="active" />
                 <el-option label="禁用" value="disabled" />
               </el-select>
             </el-col>
-            <el-col :span="16" class="button-group">
+            <el-col :span="14" class="button-group">
               <el-button type="primary" @click="showAddUserDialog = true">
                 添加用户
               </el-button>
@@ -368,9 +368,10 @@ onMounted(() => {
 
 .search-bar {
   margin-bottom: 16px;
-  padding: 16px;
-  background-color: #fafafa;
-  border-bottom: 1px solid #e6e8eb;
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .search-bar :deep(.el-col) {
