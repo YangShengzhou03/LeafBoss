@@ -109,23 +109,24 @@ body {
   color: #909399;
 }
 
-/* 统一的颜色变量 */
+/* 统一的颜色变量 - 与LoginPage.vue保持一致 */
 :root {
-  --primary-color: #409EFF;
+  --primary-color: #667eea;
+  --primary-gradient: linear-gradient(135deg, #667eea, #764ba2);
   --success-color: #67C23A;
   --warning-color: #E6A23C;
   --danger-color: #F56C6C;
   --info-color: #909399;
   
-  --text-primary: #303133;
-  --text-regular: #606266;
-  --text-secondary: #909399;
-  --text-placeholder: #C0C4CC;
+  --text-primary: #2c3e50;
+  --text-regular: #5a6c7d;
+  --text-secondary: #7f8c8d;
+  --text-placeholder: #aab7c4;
   
-  --border-base: #DCDFE6;
-  --border-light: #E4E7ED;
-  --border-lighter: #EBEEF5;
-  --border-extra-light: #F2F6FC;
+  --border-base: #e1e8ed;
+  --border-light: #e4e7ed;
+  --border-lighter: #ebeeF5;
+  --border-extra-light: #f2f6fc;
 }
 
 /* 统一的间距系统 */
@@ -140,11 +141,19 @@ body {
 
 /* 统一的阴影系统 */
 :root {
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
-  --shadow-base: 0 2px 4px rgba(0, 0, 0, 0.08);
-  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.12);
-  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.16);
-  --shadow-xl: 0 16px 32px rgba(0, 0, 0, 0.16);
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.04);
+  --shadow-base: 0 4px 8px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 8px 16px rgba(0, 0, 0, 0.12);
+  --shadow-lg: 0 16px 32px rgba(0, 0, 0, 0.16);
+  --shadow-xl: 0 24px 48px rgba(0, 0, 0, 0.2);
+}
+
+/* 统一的圆角系统 */
+:root {
+  --radius-sm: 4px;
+  --radius-base: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
 }
 
 /* 响应式断点 */
@@ -153,5 +162,15 @@ body {
   --breakpoint-md: 768px;
   --breakpoint-lg: 992px;
   --breakpoint-xl: 1200px;
+}
+
+/* 深色模式支持 */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --text-primary: #e2e8f0;
+    --text-regular: #cbd5e0;
+    --text-secondary: #a0aec0;
+    --text-placeholder: #718096;
+  }
 }
 </style>
