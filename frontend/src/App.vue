@@ -28,15 +28,13 @@ const isLoading = ref(true)
 const hasError = ref(false)
 const errorMessage = ref('')
 
-// 捕获子组件错误
 onErrorCaptured((err) => {
   console.error('应用错误:', err)
   hasError.value = true
   errorMessage.value = err.message || '未知错误'
-  return false // 阻止错误继续向上传播
+  return false
 })
 
-// 重试加载
 const retryLoading = async () => {
   hasError.value = false
   isLoading.value = true
@@ -51,10 +49,8 @@ const retryLoading = async () => {
   }
 }
 
-// 应用初始化
 onMounted(async () => {
   try {
-    // 检查store是否有init方法，如果没有则直接设置加载完成
     if (typeof store.init === 'function') {
       await store.init()
     }
@@ -69,7 +65,6 @@ onMounted(async () => {
 </script>
 
 <style>
-/* 全局样式重置和基础样式 */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -109,7 +104,6 @@ body {
   color: #909399;
 }
 
-/* 统一的颜色变量 - 与LoginPage.vue保持一致 */
 :root {
   --primary-color: #667eea;
   --primary-gradient: linear-gradient(135deg, #667eea, #764ba2);
@@ -129,7 +123,6 @@ body {
   --border-extra-light: #f2f6fc;
 }
 
-/* 统一的间距系统 */
 :root {
   --space-xs: 4px;
   --space-sm: 8px;
@@ -139,7 +132,6 @@ body {
   --space-xxl: 48px;
 }
 
-/* 统一的阴影系统 */
 :root {
   --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.04);
   --shadow-base: 0 4px 8px rgba(0, 0, 0, 0.08);
@@ -148,7 +140,6 @@ body {
   --shadow-xl: 0 24px 48px rgba(0, 0, 0, 0.2);
 }
 
-/* 统一的圆角系统 */
 :root {
   --radius-sm: 4px;
   --radius-base: 8px;
@@ -156,7 +147,6 @@ body {
   --radius-xl: 16px;
 }
 
-/* 响应式断点 */
 :root {
   --breakpoint-sm: 576px;
   --breakpoint-md: 768px;
@@ -164,7 +154,6 @@ body {
   --breakpoint-xl: 1200px;
 }
 
-/* 深色模式支持 */
 @media (prefers-color-scheme: dark) {
   :root {
     --text-primary: #e2e8f0;

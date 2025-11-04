@@ -8,7 +8,6 @@ const Server = axios.create({
   timeout: 10000
 })
 
-// 请求拦截器
 Server.interceptors.request.use(config => {
   const token = getToken()
   if (token) {
@@ -17,21 +16,17 @@ Server.interceptors.request.use(config => {
   return config
 })
 
-// 响应拦截器
 Server.interceptors.response.use(
   response => {
-    // 检查响应数据是否为null或undefined
     if (response.data === null || response.data === undefined) {
       console.warn('响应数据为空:', response)
       return { data: null, code: 500, message: '响应数据为空' }
     }
     
-    // 如果是blob响应（文件下载），直接返回原始响应
     if (response.config.responseType === 'blob') {
       return response
     }
     
-    // 统一处理响应数据格式
     if (response.data && response.data.code !== undefined) {
       if (response.data.code === 200) {
         return response.data
@@ -43,11 +38,18 @@ Server.interceptors.response.use(
     return response
   },
   error => {
-    // 尝试使用模拟数据的辅助函数
     const tryMockData = (error) => {
       const url = error.config?.url || ''
       const method = error.config?.method?.toUpperCase() || 'GET'
+      const data = error.config?.data ? JSON.parse(error.config.data) : {}
       
+      // 首先尝试使用getMockResponse方法
+      const mockResponse = mockDataService.getMockResponse(url, method, data)
+      if (mockResponse) {
+        return Promise.resolve(mockResponse)
+      }
+      
+      // 如果没有匹配的mock响应，尝试特定的路由
       if (url.includes('/admin/stats') && method === 'GET') {
         return Promise.resolve(mockDataService.getDashboardStats())
       } else if (url.includes('/admin/user/list') && method === 'GET') {
@@ -60,19 +62,14 @@ Server.interceptors.response.use(
         return Promise.resolve(mockDataService.getLogList(page, size))
       } else if (url.includes('/admin/config') && method === 'GET') {
         return Promise.resolve(mockDataService.getSystemConfig())
-
       }
       return null
     }
     
-    // 网络错误处理
     if (!error.response) {
-      // 静默处理网络连接错误，避免控制台错误
       console.log('网络连接失败，使用模拟数据')
-      // 添加一个标记，表示这是一个网络错误
       error.isNetworkError = true
       
-      // 尝试使用模拟数据
       const mockResult = tryMockData(error)
       if (mockResult) {
         return mockResult
@@ -88,7 +85,6 @@ Server.interceptors.response.use(
       case 401:
         ElMessage.error('登录已过期，请重新登录')
         removeToken()
-        // 触发路由跳转到登录页
         if (window.location.pathname !== '/login') {
           window.location.href = '/login'
         }
@@ -97,36 +93,27 @@ Server.interceptors.response.use(
         ElMessage.error('权限不足，无法访问该资源')
         break
       case 404:
-        // 静默处理404错误，避免控制台错误
         console.log('请求的资源不存在，使用模拟数据')
-        // 添加一个标记，表示这是一个404错误
         error.isNotFoundError = true
         
-        // 尝试使用模拟数据
         mockResult = tryMockData(error)
         if (mockResult) {
           return mockResult
         }
         break
       case 500:
-        // 静默处理500错误，避免控制台错误
         console.log('服务器内部错误，使用模拟数据')
-        // 添加一个标记，表示这是一个服务器错误
         error.isServerError = true
         
-        // 尝试使用模拟数据
         mockResult = tryMockData(error)
         if (mockResult) {
           return mockResult
         }
         break
       default:
-        // 静默处理其他错误，避免控制台错误
         console.log('请求失败，使用模拟数据')
-        // 添加一个标记，表示这是一个通用错误
         error.isGenericError = true
         
-        // 尝试使用模拟数据
         mockResult = tryMockData(error)
         if (mockResult) {
           return mockResult
@@ -137,7 +124,6 @@ Server.interceptors.response.use(
   }
 )
 
-// 导出常用的HTTP方法
 const http = {
   get: (url, params = {}) => Server.get(url, { params }),
   post: (url, data = {}) => Server.post(url, data),
@@ -148,9 +134,7 @@ const http = {
       onUploadProgress
     })
   },
-  // 添加支持完整配置的请求方法，特别是用于文件下载
   request: (url, config = {}) => Server.get(url, config),
-  // 专门的下载方法，自动设置responseType为blob
   download: (url, config = {}) => {
     return Server.get(url, {
       ...config,

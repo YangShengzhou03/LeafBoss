@@ -471,11 +471,19 @@ const handleLogin = async () => {
       }
       
       ElMessage.success('登录成功')
+      
       // 确保store中的用户信息已更新
-      await new Promise(resolve => setTimeout(resolve, 100))
-      // 使用replace而不是push，确保不会保留登录页在历史记录中
-      // 直接跳转到管理员控制台
-      router.replace('/admin')
+      await new Promise(resolve => setTimeout(resolve, 200))
+      
+      // 检查store状态是否已更新
+      if (store.state.isAuthenticated && store.state.user) {
+        // 使用replace而不是push，确保不会保留登录页在历史记录中
+        // 直接跳转到管理员控制台
+        router.replace('/admin')
+      } else {
+        // 如果状态未更新，强制刷新页面
+        window.location.href = '/admin'
+      }
     } else {
       ElMessage.error(result.message || '登录失败，请检查用户名和密码')
     }

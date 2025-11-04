@@ -1,226 +1,220 @@
-// 模拟数据服务
-// 当后端API不可用时，提供模拟数据以保持前端功能可用
-
-/**
- * 生成随机日期
- * @param {number} daysAgo 多少天前
- * @returns {string} 格式化的日期字符串
- */
-const generateRandomDate = (daysAgo = 0) => {
-  const date = new Date()
-  date.setDate(date.getDate() - daysAgo)
-  return date.toLocaleString('zh-CN')
+function generateRandomDate() {
+  const now = new Date()
+  const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
+  const randomTime = thirtyDaysAgo.getTime() + Math.random() * (now.getTime() - thirtyDaysAgo.getTime())
+  return new Date(randomTime)
 }
 
-/**
- * 生成随机存储大小（字节）
- * @param {number} maxGB 最大GB数
- * @returns {number} 字节数
- */
-const generateRandomStorage = (maxGB = 10) => {
-  return Math.floor(Math.random() * maxGB * 1024 * 1024 * 1024)
+function generateRandomStorageSize() {
+  return Math.floor(Math.random() * 99) + 1
 }
 
-/**
- * 获取仪表板模拟数据
- * @returns {Object} 仪表板统计数据
- */
-export const getDashboardStats = () => {
-  return {
-    userCount: Math.floor(Math.random() * 100) + 10,
-    fileCount: Math.floor(Math.random() * 500) + 50,
-    usedStorage: generateRandomStorage(50),
-    shareCount: Math.floor(Math.random() * 50) + 5,
-    uptime: '2天 14小时 32分钟'
-  }
-}
-
-/**
- * 获取用户列表模拟数据
- * @param {number} page 页码
- * @param {number} size 每页大小
- * @returns {Object} 用户列表数据
- */
-export const getUserList = (page = 0, size = 20) => {
-  const users = [
-    {
-      id: 'admin-001',
-      email: 'admin@example.com',
-      avatar: null,
-      gender: 'NOT_SET',
-      phone: '13800138000',
-      role: 'admin',
-      storageQuota: 10737418240, // 10GB
-      storageUsed: generateRandomStorage(5),
-      status: 'active',
-      lastLoginTime: generateRandomDate(0),
-      createdAt: '2023-01-01 00:00:00'
-    },
-    {
-      id: 'user-001',
-      email: 'user@example.com',
-      avatar: null,
-      gender: 'MALE',
-      phone: '13900139000',
-      role: 'user',
-      storageQuota: 1073741824, // 1GB
-      storageUsed: generateRandomStorage(1),
-      status: 'active',
-      lastLoginTime: generateRandomDate(1),
-      createdAt: '2023-06-15 00:00:00'
-    },
-    {
-      id: 'user-002',
-      email: 'test@example.com',
-      avatar: null,
-      gender: 'FEMALE',
-      phone: '13700137000',
-      role: 'user',
-      storageQuota: 2147483648, // 2GB
-      storageUsed: generateRandomStorage(2),
-      status: 'active',
-      lastLoginTime: generateRandomDate(2),
-      createdAt: '2023-08-20 00:00:00'
+const mockData = {
+  getDashboardStats() {
+    return {
+      totalUsers: 1500,
+      activeUsers: 342,
+      totalStorage: 1024,
+      usedStorage: 256,
+      todayUploads: 23,
+      todayDownloads: 45
     }
-  ]
+  },
 
-  // 模拟分页
-  const startIndex = page * size
-  const endIndex = startIndex + size
-  const content = users.slice(startIndex, endIndex)
-
-  return {
-    content,
-    totalElements: users.length,
-    totalPages: Math.ceil(users.length / size),
-    size,
-    number: page
-  }
-}
-
-/**
- * 获取日志列表模拟数据
- * @param {number} page 页码
- * @param {number} size 每页大小
- * @returns {Object} 日志列表数据
- */
-export const getLogList = (page = 0, size = 20) => {
-  const logs = [
-    {
-      id: 1,
-      operationType: 'LOGIN',
-      description: '管理员登录系统',
-      ipAddress: '192.168.1.100',
-      createTime: generateRandomDate(0),
-      userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-    },
-    {
-      id: 2,
-      operationType: 'CARD_KEY_GENERATE',
-      description: '生成卡密: 10张VIP会员卡密',
-      ipAddress: '192.168.1.101',
-      createTime: generateRandomDate(1),
-      userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-    },
-    {
-      id: 3,
-      operationType: 'CARD_KEY_VERIFY',
-      description: '验证卡密: VIP会员卡密验证成功',
-      ipAddress: '192.168.1.102',
-      createTime: generateRandomDate(2),
-      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36'
-    },
-    {
-      id: 4,
-      operationType: 'CARD_KEY_EDIT',
-      description: '编辑卡密: 修改卡密状态为已使用',
-      ipAddress: '192.168.1.103',
-      createTime: generateRandomDate(3),
-      userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-    },
-    {
-      id: 5,
-      operationType: 'CARD_KEY_DELETE',
-      description: '删除卡密: 删除过期的测试卡密',
-      ipAddress: '192.168.1.104',
-      createTime: generateRandomDate(4),
-      userAgent: 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36'
-    },
-    {
-      id: 6,
-      operationType: 'CARD_KEY_EXPORT',
-      description: '导出卡密: 导出VIP会员卡密列表',
-      ipAddress: '192.168.1.105',
-      createTime: generateRandomDate(5),
-      userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-    },
-    {
-      id: 7,
-      operationType: 'PRODUCT_MANAGE',
-      description: '商品管理: 添加新商品"VIP会员套餐"',
-      ipAddress: '192.168.1.106',
-      createTime: generateRandomDate(6),
-      userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-    },
-    {
-      id: 8,
-      operationType: 'SPEC_MANAGE',
-      description: '规格管理: 编辑商品规格信息',
-      ipAddress: '192.168.1.107',
-      createTime: generateRandomDate(7),
-      userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-    },
-    {
-      id: 9,
-      operationType: 'SYSTEM_SETTING',
-      description: '系统设置: 更新系统配置参数',
-      ipAddress: '192.168.1.108',
-      createTime: generateRandomDate(8),
-      userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-    },
-    {
-      id: 10,
-      operationType: 'CLEAR_LOGS',
-      description: '清空日志: 清理30天前的操作日志',
-      ipAddress: '192.168.1.109',
-      createTime: generateRandomDate(9),
-      userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+  getUserList(page = 1, pageSize = 10) {
+    const total = 1500
+    const totalPages = Math.ceil(total / pageSize)
+    
+    const users = Array.from({ length: pageSize }, (_, index) => {
+      const id = (page - 1) * pageSize + index + 1
+      return {
+        id,
+        username: `user${id}`,
+        nickname: `用户${id}`,
+        email: `user${id}@example.com`,
+        role: id % 5 === 0 ? 1 : 0,
+        status: id % 10 === 0 ? 0 : 1,
+        createTime: generateRandomDate().toISOString(),
+        lastLoginTime: generateRandomDate().toISOString(),
+        storageUsed: generateRandomStorageSize(),
+        storageQuota: 100
+      }
+    })
+    
+    return {
+      list: users,
+      total,
+      page,
+      pageSize,
+      totalPages
     }
-  ]
+  },
 
-  // 模拟分页
-  const startIndex = page * size
-  const endIndex = startIndex + size
-  const content = logs.slice(startIndex, endIndex)
+  getLogList(page = 1, pageSize = 10) {
+    const total = 500
+    const totalPages = Math.ceil(total / pageSize)
+    
+    const logTypes = ['login', 'upload', 'download', 'delete', 'modify']
+    const logLevels = ['info', 'warning', 'error']
+    
+    const logs = Array.from({ length: pageSize }, (_, index) => {
+      const id = (page - 1) * pageSize + index + 1
+      const type = logTypes[Math.floor(Math.random() * logTypes.length)]
+      const level = logLevels[Math.floor(Math.random() * logLevels.length)]
+      
+      return {
+        id,
+        userId: Math.floor(Math.random() * 100) + 1,
+        username: `user${Math.floor(Math.random() * 100) + 1}`,
+        type,
+        level,
+        description: `${type}操作日志描述 ${id}`,
+        ip: `192.168.1.${Math.floor(Math.random() * 255)}`,
+        createTime: generateRandomDate().toISOString()
+      }
+    })
+    
+    return {
+      list: logs,
+      total,
+      page,
+      pageSize,
+      totalPages
+    }
+  },
 
-  return {
-    content,
-    totalElements: logs.length,
-    totalPages: Math.ceil(logs.length / size),
-    size,
-    number: page
+  getSystemConfig() {
+    return {
+      siteName: 'Leaf Card',
+      siteDescription: '一个简单的文件分享平台',
+      maxFileSize: 100,
+      allowedFileTypes: ['.jpg', '.png', '.pdf', '.doc', '.docx', '.xls', '.xlsx'],
+      userStorageQuota: 100,
+      enableRegistration: true,
+      enableEmailVerification: false,
+      maintenanceMode: false
+    }
+  },
+
+  getMockResponse(url, method, params) {
+    if ((url.includes('/auth/login') || url.includes('/admin/login')) && method === 'POST') {
+      const { username, password } = params
+      if (username && password) {
+        return {
+          code: 200,
+          message: '登录成功',
+          data: {
+            token: 'mock-token-' + Date.now(),
+            user: {
+              id: 1,
+              username: username,
+              nickname: username === 'admin' ? '管理员' : '用户',
+              email: `${username}@example.com`,
+              role: username === 'admin' ? 1 : 0,
+              avatar: 'https://picsum.photos/id/1005/200/200'
+            }
+          }
+        }
+      }
+    }
+
+    if (url.includes('/auth/register') && method === 'POST') {
+      const { username, email, password } = params
+      if (username && email && password) {
+        return {
+          code: 200,
+          message: '注册成功',
+          data: {
+            token: 'mock-token-' + Date.now(),
+            user: {
+              id: Math.floor(Math.random() * 1000) + 1,
+              username: username,
+              nickname: username,
+              email: email,
+              role: 0,
+              avatar: 'https://picsum.photos/id/1005/200/200'
+            }
+          }
+        }
+      }
+    }
+
+    if (url.includes('/auth/me') && method === 'GET') {
+      return {
+        code: 200,
+        message: '获取成功',
+        data: {
+          id: 1,
+          username: 'testuser',
+          nickname: '测试用户',
+          email: 'test@example.com',
+          role: 0,
+          avatar: 'https://picsum.photos/id/1005/200/200',
+          storageInfo: {
+            totalStorageGB: 10,
+            usedStorageGB: 3,
+            availableStorageGB: 7,
+            usagePercentage: 30
+          }
+        }
+      }
+    }
+
+    if (url.includes('/admin/dashboard') && method === 'GET') {
+      return {
+        code: 200,
+        message: '获取成功',
+        data: this.getDashboardStats()
+      }
+    }
+
+    if (url.includes('/admin/users') && method === 'GET') {
+      const page = params.page || 1
+      const pageSize = params.pageSize || 10
+      return {
+        code: 200,
+        message: '获取成功',
+        data: this.getUserList(page, pageSize)
+      }
+    }
+
+    if (url.includes('/admin/logs') && method === 'GET') {
+      const page = params.page || 1
+      const pageSize = params.pageSize || 10
+      return {
+        code: 200,
+        message: '获取成功',
+        data: this.getLogList(page, pageSize)
+      }
+    }
+
+    if (url.includes('/admin/config') && method === 'GET') {
+      return {
+        code: 200,
+        message: '获取成功',
+        data: this.getSystemConfig()
+      }
+    }
+
+    if (url.includes('/user/storage') && method === 'GET') {
+      return {
+        code: 200,
+        message: '获取成功',
+        data: {
+          storageQuota: 10737418240,
+          usedStorage: 3221225472,
+          availableStorage: 7516192768,
+          usagePercentage: 30
+        }
+      }
+    }
+
+    return {
+      code: 200,
+      message: '操作成功（模拟数据）',
+      data: {}
+    }
   }
 }
 
-/**
- * 获取系统配置模拟数据
- * @returns {Object} 系统配置数据
- */
-export const getSystemConfig = () => {
-  return {
-    maxFileSize: 5120, // MB (5GB)
-    appName: 'LeafCard枫叶卡管系统',
-    apiVersion: 'v1',
-    allowRegistration: true,
-    defaultUserQuota: 1073741824, // 1GB
-    adminEmail: 'admin@example.com',
-    systemVersion: '1.0.0'
-  }
-}
-
-export default {
-  getDashboardStats,
-  getUserList,
-  getLogList,
-  getSystemConfig
-}
+export default mockData

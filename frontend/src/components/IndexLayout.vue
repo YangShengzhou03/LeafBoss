@@ -1,7 +1,5 @@
-<!-- 首页展示页 -->
 <template>
   <div class="index-layout">
-    <!-- 简约精致的顶部导航 -->
     <header class="header">
       <div class="container">
         <div class="logo-area">
@@ -33,7 +31,6 @@
       </div>
     </header>
 
-    <!-- 简约美观的主内容区域 -->
     <main class="main-content">
       <section class="hero-section">
         <div class="container">

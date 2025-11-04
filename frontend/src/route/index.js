@@ -3,7 +3,6 @@ import store from '@/utils/store.js';
 import * as utils from '@/utils/utils.js';
 
 const routes = [
-  // 登录页面
   {
     path: '/login',
     name: 'Login',
@@ -14,7 +13,6 @@ const routes = [
     }
   },
   
-  // 首页
   {
     path: '/',
     name: 'HomePage',
@@ -25,7 +23,6 @@ const routes = [
     }
   },
 
-  // 管理员布局
   {
     path: '/admin',
     component: () => import('@/components/AdminLayout.vue'),
@@ -116,7 +113,6 @@ const routes = [
     ]
   },
   
-  // 首页/分享链接
   {
     path: '/share/:id?',
     name: 'SharePage',
@@ -127,7 +123,6 @@ const routes = [
     }
   },
 
-  // 帮助支持页面
   {
     path: '/user-guide',
     name: 'UserGuidePage',
@@ -156,7 +151,6 @@ const routes = [
     }
   },
 
-  // 法律信息页面
   {
     path: '/author-info',
     name: 'AuthorInfoPage',
@@ -176,7 +170,6 @@ const routes = [
     }
   },
 
-  // 卡密验证页面
   {
     path: '/verify',
     name: 'CardKeyVerify',
@@ -187,7 +180,6 @@ const routes = [
     }
   },
   
-  // 错误路径重定向（仅保留这一条）
   { path: '/:pathMatch(.*)*', redirect: '/' }
 ];
 
@@ -196,26 +188,20 @@ const router = createRouter({
   routes
 });
 
-// 全局前置守卫
 router.beforeEach((to, from, next) => {
-  // 设置页面标题
   if (to.meta.title) {
     document.title = to.meta.title;
   }
 
-  // 检查是否需要认证
   if (to.meta.requiresAuth) {
-    // 检查是否已登录
     const token = localStorage.getItem('token');
     if (!token) {
-      // 未登录，重定向到登录页
       next('/login');
       return;
     }
     
-    // 开发环境：跳过token验证（后端未就绪）
     if (process.env.NODE_ENV === 'development') {
-      // 直接设置用户为管理员（开发环境）
+      // 开发环境下，如果用户状态为空，设置模拟用户
       if (store.state.user === null) {
         store.setUser({
           id: 1,
@@ -229,18 +215,14 @@ router.beforeEach((to, from, next) => {
       return;
     }
     
-    // 生产环境：验证token是否有效
     try {
       const decoded = utils.parseJWT(token);
-      // 检查token是否过期
       if (decoded.exp * 1000 < Date.now()) {
-        // token已过期，清除并重定向到登录页
         localStorage.removeItem('token');
         next('/login');
         return;
       }
       
-      // 更新store中的用户信息
       if (store.state.user === null) {
         store.setUser({
           id: decoded.id,
@@ -249,23 +231,20 @@ router.beforeEach((to, from, next) => {
         });
       }
       
-      // 检查用户角色权限（管理员页面需要admin角色）
       if (to.meta.requiresAdmin && decoded.role !== 'admin') {
-        // 权限不足，重定向到首页
         next('/');
         return;
       }
     } catch (error) {
-      // token无效，清除并重定向到登录页
       localStorage.removeItem('token');
       next('/login');
       return;
     }
   }
   
-  // 如果已登录且访问登录页，重定向到首页
   if (to.path === '/login' && localStorage.getItem('token')) {
-    next('/');
+    // 如果已登录，跳转到管理页面
+    next('/admin');
     return;
   }
 

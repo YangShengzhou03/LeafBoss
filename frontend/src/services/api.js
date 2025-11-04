@@ -1,213 +1,142 @@
 import Server from '../utils/Server'
-import { ErrorHandler } from './errorHandler.js'
 
-// 管理员API服务
-export const AdminService = {
-  // 获取仪表板统计数据
-  async getDashboardStats() {
-    return await Server.get('/admin/stats').catch(error => {
-      ErrorHandler.handleApiError(error, '获取统计数据失败')
-      throw error
-    })
+const AdminService = {
+  getDashboardStats() {
+    return Server.get('/admin/dashboard')
   },
-  
-  // 获取用户列表
-  async getUserList(params) {
-    return await Server.get('/admin/user/list', { params }).catch(error => {
-      ErrorHandler.handleApiError(error, '获取用户列表失败')
-      throw error
-    })
+
+  getUserList(params) {
+    return Server.get('/admin/users', params)
   },
-  
-  // 创建用户
-  async createUser(userData) {
-    return await Server.post('/admin/user/create', userData).catch(error => {
-      ErrorHandler.handleValidationError(error, '创建用户失败')
-      throw error
-    })
+
+  getLogList(params) {
+    return Server.get('/admin/logs', params)
   },
-  
-  // 更新用户
-  async updateUser(userId, userData) {
-    return await Server.put(`/admin/user/${userId}`, userData).catch(error => {
-      ErrorHandler.handleValidationError(error, '更新用户失败')
-      throw error
-    })
+
+  getSystemConfig() {
+    return Server.get('/admin/config')
   },
-  
-  // 删除用户
-  async deleteUser(userId) {
-    return await Server.delete(`/admin/user/${userId}`).catch(error => {
-      ErrorHandler.handleApiError(error, '删除用户失败')
-      throw error
-    })
+
+  updateSystemConfig(data) {
+    return Server.put('/admin/config', data)
   },
-  
-  // 重置用户密码
-  async resetUserPassword(userId, newPassword) {
-    return await Server.post(`/admin/user/${userId}/reset-password`, { password: newPassword }).catch(error => {
-      ErrorHandler.handleApiError(error, '重置密码失败')
-      throw error
-    })
+
+  getCardKeyList(params) {
+    return Server.get('/admin/card-keys', params)
   },
-  
-  // 切换用户状态
-  async toggleUserStatus(userId, status) {
-    return await Server.put(`/admin/user/${userId}/status`, { status }).catch(error => {
-      ErrorHandler.handleApiError(error, '切换用户状态失败')
-      throw error
-    })
+
+  generateCardKey(data) {
+    return Server.post('/admin/card-keys/generate', data)
   },
-  
-  // 获取日志列表
-  async getLogList(params) {
-    return await Server.get('/admin/log', { params }).catch(error => {
-      ErrorHandler.handleApiError(error, '获取日志列表失败')
-      throw error
-    })
+
+  editCardKey(id, data) {
+    return Server.put(`/admin/card-keys/${id}`, data)
   },
-  
-  // 获取系统配置
-  async getSystemConfig() {
-    return await Server.get('/admin/config').catch(error => {
-      ErrorHandler.handleApiError(error, '获取系统配置失败')
-      throw error
-    })
+
+  deleteCardKey(id) {
+    return Server.delete(`/admin/card-keys/${id}`)
   },
-  
-  // 更新系统配置
-  async updateSystemConfig(config) {
-    return await Server.put('/admin/config', config).catch(error => {
-      ErrorHandler.handleApiError(error, '更新系统配置失败')
-      throw error
-    })
+
+  exportCardKeys(params) {
+    return Server.get('/admin/card-keys/export', params, { responseType: 'blob' })
   },
-  
-  // 获取卡密列表
-  async getCardKeyList(params) {
-    return await Server.get('/admin/cardkey/list', { params }).catch(error => {
-      ErrorHandler.handleApiError(error, '获取卡密列表失败')
-      throw error
-    })
+
+  getProductList(params) {
+    return Server.get('/admin/products', params)
   },
-  
-  // 创建卡密
-  async createCardKey(cardKeyData) {
-    return await Server.post('/admin/cardkey/create', cardKeyData).catch(error => {
-      ErrorHandler.handleValidationError(error, '创建卡密失败')
-      throw error
-    })
+
+  createProduct(data) {
+    return Server.post('/admin/products', data)
   },
-  
-  // 删除卡密
-  async deleteCardKey(keyId) {
-    return await Server.delete(`/admin/cardkey/${keyId}`).catch(error => {
-      ErrorHandler.handleApiError(error, '删除卡密失败')
-      throw error
-    })
+
+  editProduct(id, data) {
+    return Server.put(`/admin/products/${id}`, data)
   },
-  
-  // 验证卡密
-  async verifyCardKey(key) {
-    return await Server.post('/admin/cardkey/verify', { key }).catch(error => {
-      ErrorHandler.handleApiError(error, '验证卡密失败')
-      throw error
-    })
+
+  deleteProduct(id) {
+    return Server.delete(`/admin/products/${id}`)
   },
-  
-  // 导出卡密
-  async exportCardKeys(params) {
-    return await Server.get('/admin/cardkey/export', { params, responseType: 'blob' }).catch(error => {
-      ErrorHandler.handleApiError(error, '导出卡密失败')
-      throw error
-    })
+
+  getSpecList(params) {
+    return Server.get('/admin/specs', params)
+  },
+
+  createSpec(data) {
+    return Server.post('/admin/specs', data)
+  },
+
+  editSpec(id, data) {
+    return Server.put(`/admin/specs/${id}`, data)
+  },
+
+  deleteSpec(id) {
+    return Server.delete(`/admin/specs/${id}`)
   }
 }
 
-// 用户API服务
-export const UserService = {
-  // 用户登录
-  async login(credentials) {
-    try {
-      return await Server.post('/user/login', credentials)
-    } catch (error) {
-      ErrorHandler.handleApiError(error, '登录失败')
-      throw error
-    }
+const UserService = {
+  login(data) {
+    return Server.post('/auth/login', data)
   },
-  
-  // 用户注册
-  async register(userData) {
-    try {
-      return await Server.post('/user/register', userData)
-    } catch (error) {
-      ErrorHandler.handleValidationError(error, '注册失败')
-      throw error
-    }
+
+  register(data) {
+    return Server.post('/auth/register', data)
   },
-  
-  // 发送注册验证码
-  async sendRegisterCode(email) {
-    try {
-      return await Server.post('/user/send-register-code', { email })
-    } catch (error) {
-      ErrorHandler.handleApiError(error, '发送验证码失败')
-      throw error
-    }
+
+  getCaptcha() {
+    return Server.get('/auth/captcha')
   },
-  
-  // 发送重置密码验证码
-  async sendResetCode(email) {
-    try {
-      return await Server.post('/user/send-reset-code', { email })
-    } catch (error) {
-      ErrorHandler.handleApiError(error, '发送验证码失败')
-      throw error
-    }
+
+  getCurrentUser() {
+    return Server.get('/auth/me')
   },
-  
-  // 重置密码
-  async resetPassword(resetData) {
-    try {
-      return await Server.post('/user/reset-password', resetData)
-    } catch (error) {
-      ErrorHandler.handleApiError(error, '重置密码失败')
-      throw error
-    }
+
+  updateUserInfo(data) {
+    return Server.put('/auth/me', data)
   },
-  
-  // 获取当前用户信息
-  async getCurrentUser() {
-    try {
-      return await Server.get('/user/me')
-    } catch (error) {
-      ErrorHandler.handleApiError(error, '获取用户信息失败')
-      throw error
-    }
+
+  changePassword(data) {
+    return Server.put('/auth/password', data)
   },
-  
-  // 更新用户信息
-  async updateProfile(userData) {
-    try {
-      return await Server.put('/user/profile', userData)
-    } catch (error) {
-      ErrorHandler.handleValidationError(error, '更新用户信息失败')
-      throw error
-    }
+
+  getStorageInfo() {
+    return Server.get('/user/storage')
   },
-  
-  // 修改密码
-  async changePassword(passwordData) {
-    try {
-      return await Server.put('/user/password', passwordData)
-    } catch (error) {
-      ErrorHandler.handleValidationError(error, '修改密码失败')
-      throw error
-    }
+
+  getFileList(params) {
+    return Server.get('/user/files', params)
+  },
+
+  uploadFile(data) {
+    return Server.upload('/user/files/upload', data)
+  },
+
+  downloadFile(id) {
+    return Server.get(`/user/files/${id}/download`, {}, { responseType: 'blob' })
+  },
+
+  deleteFile(id) {
+    return Server.delete(`/user/files/${id}`)
+  },
+
+  getShareList(params) {
+    return Server.get('/user/shares', params)
+  },
+
+  createShare(data) {
+    return Server.post('/user/shares', data)
+  },
+
+  deleteShare(id) {
+    return Server.delete(`/user/shares/${id}`)
+  },
+
+  verifyCardKey(data) {
+    return Server.post('/user/card-keys/verify', data)
   }
 }
 
 export default {
-  AdminService,
-  UserService
+  admin: AdminService,
+  user: UserService
 }

@@ -7,7 +7,6 @@
     :gap="[100, 100]"
   >
     <div class="admin-layout">
-      <!-- 顶部导航栏 -->
       <header class="admin-header">
         <div class="header-left">
           <h1 class="logo">LeafCard - 枫叶卡管系统</h1>
@@ -34,7 +33,6 @@
       </header>
 
       <div class="admin-container">
-        <!-- 侧边栏 -->
         <aside class="admin-sidebar">
           <el-menu :default-active="activeMenu" class="admin-menu" router unique-opened>
             <el-menu-item index="/admin">
@@ -51,7 +49,6 @@
               <template #title>用户管理</template>
             </el-menu-item>
 
-            <!-- 商品管理展开菜单 -->
             <el-sub-menu index="product-management">
               <template #title>
                 <el-icon>
@@ -73,7 +70,6 @@
               </el-menu-item>
             </el-sub-menu>
 
-            <!-- 卡密管理展开菜单 -->
             <el-sub-menu index="card-management">
               <template #title>
                 <el-icon>
@@ -101,8 +97,6 @@
               </el-menu-item>
             </el-sub-menu>
 
-
-
             <el-menu-item index="/admin/logs">
               <el-icon>
                 <Document />
@@ -112,7 +106,6 @@
           </el-menu>
         </aside>
 
-        <!-- 主内容区域 -->
         <main class="admin-main">
           <router-view v-slot="{ Component }">
             <transition name="fade" mode="out-in">
@@ -135,15 +128,12 @@ import store from '@/utils/store.js'
 const router = useRouter()
 const route = useRoute()
 
-// 当前使用的菜单项
 const activeMenu = computed(() => route.path)
 
-// 用户头像
 const userAvatar = computed(() => {
   return store.state.user?.avatar || ''
 })
 
-// 水印文本 - 优先使用邮箱，如果邮箱为空就显示"LeafCard"
 const watermarkText = computed(() => {
   const user = store.state.user
   if (user?.email) {
@@ -152,11 +142,9 @@ const watermarkText = computed(() => {
   return 'LeafCard'
 })
 
-// 处理下拉菜单命令
 const handleCommand = async (command) => {
   try {
     if (command === 'logout') {
-      // 确认退出登录
       await ElMessageBox.confirm(
         '确定要退出登录吗？',
         '提示',
@@ -171,11 +159,9 @@ const handleCommand = async (command) => {
       ElMessage.success('已退出登录')
       router.push('/login')
     } else if (command === 'profile') {
-      // 跳转到个人资料页面
       router.push('/admin/profile')
     }
   } catch (error) {
-    // 用户取消操作或发生错误
     if (error !== 'cancel') {
       console.error('操作失败:', error)
       ElMessage.error('操作失败，请重试')
@@ -183,15 +169,12 @@ const handleCommand = async (command) => {
   }
 }
 
-// 组件挂载时初始化
 onMounted(async () => {
   try {
-    // 确保用户信息已加载
     if (!store.state.user) {
       await store.fetchCurrentUser()
     }
 
-    // 等待用户信息加载完成
     await nextTick()
   } catch (error) {
     console.error('初始化失败:', error)
