@@ -99,7 +99,6 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { User, Key, CircleCheck, Share } from '@element-plus/icons-vue'
-import { ElMessage } from 'element-plus'
 import { AdminService } from '@/services/api.js'
 
 // 统计数据
@@ -112,24 +111,6 @@ const stats = ref({
 
 // 系统运行时间
 const uptime = ref('')
-
-// 格式化存储大小（字节转换为可读格式）
-const formatStorageSize = (bytes) => {
-  if (bytes === 0) return '0 Bytes'
-  
-  const k = 1024
-  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB']
-  const i = Math.floor(Math.log(bytes) / Math.log(k))
-  
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
-}
-
-// 格式化日期
-const formatDate = (dateString) => {
-  if (!dateString) return ''
-  const date = new Date(dateString)
-  return date.toLocaleString('zh-CN')
-}
 
 // 加载仪表盘数据
 const loadDashboardData = async () => {

@@ -6,26 +6,25 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "dev": "vue-cli-service serve",
-    "preview": "vite preview --port 4173"
+    "dev": "vue-cli-service serve"
   },
   "dependencies": {
-    "@element-plus/icons-vue": "^2.3.0",
-    "axios": "^1.6.0",
-    "element-plus": "^2.4.0",
-    "vue": "^3.4.0",
-    "vue-router": "^4.2.0"
+    "@element-plus/icons-vue": "2.3.0",
+    "axios": "1.6.0",
+    "element-plus": "2.4.0",
+    "vue": "3.4.0",
+    "vue-router": "4.2.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.22.0",
-    "@babel/eslint-parser": "^7.22.0",
-    "@vue/cli-plugin-babel": "~5.0.0",
-    "@vue/cli-plugin-eslint": "~5.0.0",
-    "@vue/cli-service": "~5.0.0",
-    "eslint": "^8.52.0",
-    "eslint-plugin-vue": "^9.18.0",
-    "sass": "^1.69.0",
-    "sass-loader": "^13.3.0"
+    "@babel/core": "7.22.0",
+    "@babel/eslint-parser": "7.22.0",
+    "@vue/cli-plugin-babel": "5.0.0",
+    "@vue/cli-plugin-eslint": "5.0.0",
+    "@vue/cli-service": "5.0.0",
+    "eslint": "8.52.0",
+    "eslint-plugin-vue": "9.18.0",
+    "sass": "1.69.0",
+    "sass-loader": "13.3.0"
   },
   "eslintConfig": {
     "root": true,

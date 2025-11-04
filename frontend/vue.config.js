@@ -20,6 +20,6 @@ module.exports = defineConfig({
       }
     }
   },
-  // 禁用ESLint检查
-  lintOnSave: false
+  // 启用ESLint检查，保存时检查
+  lintOnSave: true
 })

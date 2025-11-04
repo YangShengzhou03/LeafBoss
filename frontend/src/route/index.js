@@ -26,7 +26,7 @@ const routes = [
   {
     path: '/',
     component: AdminLayout,
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true, requiresAdmin: true },
     children: [
       {
         path: '',
@@ -192,6 +192,13 @@ router.beforeEach((to, from, next) => {
           username: decoded.username,
           role: decoded.role
         });
+      }
+      
+      // 检查用户角色权限（管理员页面需要admin角色）
+      if (to.meta.requiresAdmin && decoded.role !== 'admin') {
+        // 权限不足，重定向到首页
+        next('/');
+        return;
       }
     } catch (error) {
       // token无效，清除并重定向到登录页

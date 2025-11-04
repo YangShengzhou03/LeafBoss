@@ -26,14 +26,19 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
 app.config.globalProperties.$store = store;
 
 // 初始化应用状态
-store.init().then(() => {
-}).catch(error => {
-});
+store.init()
+  .catch(error => {
+    console.error('应用状态初始化失败:', error);
+  });
 
 // 立即挂载应用，不等待配置加载
 app.mount('#app');
 
 // 异步加载配置（不影响页面渲染）
-loadConfig().then(config => {
-}).catch(error => {
-});
+loadConfig()
+  .then(config => {
+    console.log('配置加载成功:', config);
+  })
+  .catch(error => {
+    console.error('配置加载失败:', error);
+  });

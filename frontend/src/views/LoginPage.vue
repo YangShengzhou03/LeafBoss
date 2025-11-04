@@ -506,15 +506,6 @@ const handleRegister = async () => {
   }
 }
 
-// 显示忘记密码对话框
-const showForgotPasswordDialog = () => {
-  forgotPasswordDialogVisible.value = true
-  // 重置表单
-  if (forgotFormRef.value) {
-    forgotFormRef.value.resetFields()
-  }
-}
-
 // 处理忘记密码
 const handleForgotPassword = async () => {
   if (!forgotFormRef.value) return
