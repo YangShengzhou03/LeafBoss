@@ -1,12 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import AdminLayout from '@/components/AdminLayout.vue';
-import IndexLayout from '@/components/IndexLayout.vue';
-import LoginPage from '@/views/LoginPage.vue';
-import UserGuidePage from '@/views/index/UserGuidePage.vue';
-import ContactUsPage from '@/views/index/ContactUsPage.vue';
-import FAQPage from '@/views/index/FaqPage.vue';
-import AuthorInfoPage from '@/views/index/AuthorInfoPage.vue';
-import PrivacyPolicyPage from '@/views/index/PrivacyPolicyPage.vue';
 import store from '@/utils/store.js';
 import * as utils from '@/utils/utils.js';
 
@@ -15,7 +7,7 @@ const routes = [
   {
     path: '/login',
     name: 'Login',
-    component: LoginPage,
+    component: () => import('@/views/LoginPage.vue'),
     meta: {
       title: '管理员登录 - 枫叶卡管',
       requiresAuth: false
@@ -26,7 +18,7 @@ const routes = [
   {
     path: '/',
     name: 'HomePage',
-    component: IndexLayout,
+    component: () => import('@/components/IndexLayout.vue'),
     meta: {
       title: '枫叶卡管 - 企业级卡密管理系统',
       requiresAuth: false
@@ -36,7 +28,7 @@ const routes = [
   // 管理员布局
   {
     path: '/admin',
-    component: AdminLayout,
+    component: () => import('@/components/AdminLayout.vue'),
     meta: { requiresAuth: true, requiresAdmin: true },
     children: [
       {
@@ -91,7 +83,7 @@ const routes = [
   {
     path: '/share/:id?',
     name: 'SharePage',
-    component: IndexLayout,
+    component: () => import('@/components/IndexLayout.vue'),
     meta: {
       title: '枫叶卡管 - 企业级卡密管理系统',
       requiresAuth: false
@@ -102,7 +94,7 @@ const routes = [
   {
     path: '/user-guide',
     name: 'UserGuidePage',
-    component: UserGuidePage,
+    component: () => import('@/views/index/UserGuidePage.vue'),
     meta: {
       title: '使用指南 - 枫叶卡管',
       requiresAuth: false
@@ -111,7 +103,7 @@ const routes = [
   {
     path: '/contact-us',
     name: 'ContactUsPage',
-    component: ContactUsPage,
+    component: () => import('@/views/index/ContactUsPage.vue'),
     meta: {
       title: '联系我们 - 枫叶卡管',
       requiresAuth: false
@@ -120,7 +112,7 @@ const routes = [
   {
     path: '/faq',
     name: 'FAQPage',
-    component: FAQPage,
+    component: () => import('@/views/index/FaqPage.vue'),
     meta: {
       title: '常见问题 - 枫叶卡管',
       requiresAuth: false
@@ -131,7 +123,7 @@ const routes = [
   {
     path: '/author-info',
     name: 'AuthorInfoPage',
-    component: AuthorInfoPage,
+    component: () => import('@/views/index/AuthorInfoPage.vue'),
     meta: {
       title: '作者介绍 - 枫叶卡管',
       requiresAuth: false
@@ -140,7 +132,7 @@ const routes = [
   {
     path: '/privacy-policy',
     name: 'PrivacyPolicyPage',
-    component: PrivacyPolicyPage,
+    component: () => import('@/views/index/PrivacyPolicyPage.vue'),
     meta: {
       title: '隐私保护 - 枫叶卡管',
       requiresAuth: false
@@ -173,7 +165,21 @@ router.beforeEach((to, from, next) => {
       return;
     }
     
-    // 验证token是否有效
+    // 开发环境：跳过token验证（后端未就绪）
+    if (process.env.NODE_ENV === 'development') {
+      // 直接设置用户为管理员（开发环境）
+      if (store.state.user === null) {
+        store.setUser({
+          id: 1,
+          username: 'admin',
+          role: 'admin'
+        });
+      }
+      next();
+      return;
+    }
+    
+    // 生产环境：验证token是否有效
     try {
       const decoded = utils.parseJWT(token);
       // 检查token是否过期

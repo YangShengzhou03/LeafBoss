@@ -458,7 +458,8 @@ const handleLogin = async () => {
       // 确保store中的用户信息已更新
       await new Promise(resolve => setTimeout(resolve, 100))
       // 使用replace而不是push，确保不会保留登录页在历史记录中
-      router.replace('/')
+      // 直接跳转到管理员控制台
+      router.replace('/admin')
     } else {
       ElMessage.error(result.message || '登录失败，请检查用户名和密码')
     }

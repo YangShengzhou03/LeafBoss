@@ -28,19 +28,12 @@
 
       <div class="admin-container">
         <!-- 侧边栏 -->
-        <aside class="admin-sidebar" :class="{ 'sidebar-collapsed': isCollapsed }">
-          <el-button 
-            class="collapse-btn" 
-            text 
-            @click="toggleSidebar"
-            :icon="isCollapsed ? Expand : Fold"
-          />
+        <aside class="admin-sidebar">
           <el-menu 
             :default-active="activeMenu" 
             class="admin-menu" 
             router 
             unique-opened
-            :collapse="isCollapsed"
           >
             <el-menu-item index="/admin">
               <el-icon>
@@ -56,6 +49,50 @@
               <template #title>用户管理</template>
             </el-menu-item>
 
+            <!-- 商品管理展开菜单 -->
+            <el-sub-menu index="product-management">
+              <template #title>
+                <el-icon>
+                  <Goods />
+                </el-icon>
+                <span>商品管理</span>
+              </template>
+              <el-menu-item index="/admin/products">
+                <el-icon>
+                  <List />
+                </el-icon>
+                <template #title>商品管理</template>
+              </el-menu-item>
+              <el-menu-item index="/admin/specifications">
+                <el-icon>
+                  <Operation />
+                </el-icon>
+                <template #title>规格管理</template>
+              </el-menu-item>
+            </el-sub-menu>
+
+            <!-- 卡密管理展开菜单 -->
+            <el-sub-menu index="card-key-management">
+              <template #title>
+                <el-icon>
+                  <Key />
+                </el-icon>
+                <span>卡密管理</span>
+              </template>
+              <el-menu-item index="/admin/card-keys">
+                <el-icon>
+                  <List />
+                </el-icon>
+                <template #title>卡密列表</template>
+              </el-menu-item>
+              <el-menu-item index="/admin/card-verification">
+                <el-icon>
+                  <Check />
+                </el-icon>
+                <template #title>卡密验证</template>
+              </el-menu-item>
+            </el-sub-menu>
+
             <el-menu-item index="/admin/system">
               <el-icon>
                 <Setting />
@@ -69,18 +106,11 @@
               </el-icon>
               <template #title>操作日志</template>
             </el-menu-item>
-            
-            <el-menu-item index="/admin/card-keys">
-              <el-icon>
-                <Key />
-              </el-icon>
-              <template #title>卡密管理</template>
-            </el-menu-item>
           </el-menu>
         </aside>
 
         <!-- 主内容区域 -->
-        <main class="admin-main" :class="{ 'main-expanded': isCollapsed }">
+        <main class="admin-main">
           <router-view v-slot="{ Component }">
             <transition name="fade" mode="out-in">
               <component :is="Component" />
@@ -95,14 +125,11 @@
 import { ref, computed, onMounted, reactive, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { User, ArrowDown, Monitor, Setting, Document, Key, Expand, Fold } from '@element-plus/icons-vue'
+import { User, ArrowDown, Monitor, Setting, Document, Key, Goods, List, Operation, Check } from '@element-plus/icons-vue'
 import store from '@/utils/store.js'
 
 const router = useRouter()
 const route = useRoute()
-
-// 侧边栏折叠状态
-const isCollapsed = ref(false)
 
 // 当前激活的菜单项
 const activeMenu = computed(() => route.path)
@@ -111,13 +138,6 @@ const activeMenu = computed(() => route.path)
 const userAvatar = computed(() => {
   return store.state.user?.avatar || ''
 })
-
-// 切换侧边栏折叠状态
-const toggleSidebar = () => {
-  isCollapsed.value = !isCollapsed.value
-  // 保存用户偏好
-  localStorage.setItem('admin-sidebar-collapsed', isCollapsed.value.toString())
-}
 
 // 处理下拉菜单命令
 const handleCommand = async (command) => {
@@ -153,12 +173,6 @@ const handleCommand = async (command) => {
 // 组件挂载时初始化
 onMounted(async () => {
   try {
-    // 恢复侧边栏折叠状态
-    const savedCollapsed = localStorage.getItem('admin-sidebar-collapsed')
-    if (savedCollapsed !== null) {
-      isCollapsed.value = savedCollapsed === 'true'
-    }
-    
     // 确保用户信息已加载
     if (!store.state.user) {
       await store.fetchCurrentUser()
@@ -229,72 +243,55 @@ onMounted(async () => {
 
 .admin-sidebar {
   width: 240px;
-  background-color: #304156;
-  border-right: 1px solid #ddd;
-  transition: width 0.3s;
-}
-
-.admin-sidebar.sidebar-collapsed {
-  width: 64px;
-}
-
-.collapse-btn {
-  width: 100%;
-  height: 40px;
-  color: #fff;
-  margin-bottom: 10px;
+  background-color: #2c3e50;
+  border-right: 1px solid #34495e;
 }
 
 .admin-menu {
-  height: calc(100% - 50px);
+  height: 100%;
   border-right: none;
   background-color: transparent;
-  padding-top: 16px;
 }
 
-.admin-menu :deep(.el-menu-item) {
+.admin-menu :deep(.el-menu-item),
+.admin-menu :deep(.el-sub-menu__title) {
   height: 50px;
   line-height: 50px;
   color: #bdc3c7;
-  margin: 4px 12px;
-  border-radius: 8px;
-  position: relative;
-  overflow: hidden;
-  transition: all 0.3s;
+  margin: 0;
+  border-radius: 0;
 }
 
-.admin-menu :deep(.el-menu-item::before) {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  height: 100%;
-  width: 3px;
-  background: #409EFF;
-  transform: translateX(-100%);
-  transition: transform 0.3s;
-}
-
-.admin-menu :deep(.el-menu-item:hover) {
-  background-color: rgba(255, 255, 255, 0.08);
+.admin-menu :deep(.el-menu-item:hover),
+.admin-menu :deep(.el-sub-menu__title:hover) {
+  background-color: #34495e;
   color: #fff;
 }
 
 .admin-menu :deep(.el-menu-item.is-active) {
-  background-color: rgba(64, 158, 255, 0.2);
+  background-color: #3498db;
   color: #fff;
   font-weight: 500;
 }
 
-.admin-menu :deep(.el-menu-item.is-active::before) {
-  transform: translateX(0);
+.admin-menu :deep(.el-sub-menu .el-menu-item) {
+  background-color: #2c3e50;
+  padding-left: 50px !important;
 }
 
-.admin-menu :deep(.el-menu-item .el-icon) {
+.admin-menu :deep(.el-sub-menu .el-menu-item:hover) {
+  background-color: #34495e;
+}
+
+.admin-menu :deep(.el-sub-menu .el-menu-item.is-active) {
+  background-color: #2980b9;
+}
+
+.admin-menu :deep(.el-menu-item .el-icon),
+.admin-menu :deep(.el-sub-menu__title .el-icon) {
   font-size: 18px;
   margin-right: 12px;
   color: inherit;
-  transition: all 0.3s;
 }
 
 .admin-main {
@@ -302,11 +299,6 @@ onMounted(async () => {
   padding: 24px;
   overflow-y: auto;
   background-color: #f0f2f5;
-  transition: margin-left 0.3s;
-}
-
-.admin-main.main-expanded {
-  margin-left: 0;
 }
 
 /* 路由过渡动画 */
@@ -325,29 +317,12 @@ onMounted(async () => {
   border-radius: 4px;
   border: 1px solid #e6e8eb;
   overflow: hidden;
-  transition: all 0.3s;
-}
-
-.admin-main :deep(.el-card:hover) {
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
 }
 
 .admin-main :deep(.el-card__header) {
   padding: 18px 24px;
   border-bottom: 1px solid #e6e8eb;
   background-color: #fafbfc;
-  position: relative;
-}
-
-.admin-main :deep(.el-card__header::after) {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 24px;
-  width: 40px;
-  height: 3px;
-  background-color: #409EFF;
-  border-radius: 3px;
 }
 
 .admin-main :deep(.el-card__body) {
@@ -365,12 +340,12 @@ onMounted(async () => {
 
 /* 响应式设计 */
 @media (max-width: 1024px) {
-  .admin-sidebar:not(.sidebar-collapsed) {
+  .admin-sidebar {
     width: 200px;
   }
   
   .admin-menu :deep(.el-menu-item) {
-    margin: 4px 8px;
+    margin: 0;
   }
 }
 
@@ -389,22 +364,21 @@ onMounted(async () => {
   }
   
   .admin-sidebar {
-    width: 64px;
+    width: 240px;
   }
   
   .admin-menu :deep(.el-menu-item) {
-    margin: 4px 8px;
-    padding: 0 !important;
-    justify-content: center;
+    margin: 0;
+    padding: 0 20px !important;
   }
   
   .admin-menu :deep(.el-menu-item span) {
-    display: none;
+    display: inline;
   }
   
   .admin-menu :deep(.el-menu-item .el-icon) {
-    margin: 0;
-    font-size: 20px;
+    margin-right: 12px;
+    font-size: 18px;
   }
 
   .admin-main {
@@ -413,10 +387,6 @@ onMounted(async () => {
   
   .admin-main :deep(.el-card__header) {
     padding: 14px 16px;
-  }
-  
-  .admin-main :deep(.el-card__header::after) {
-    left: 16px;
   }
   
   .admin-main :deep(.el-card__body) {
