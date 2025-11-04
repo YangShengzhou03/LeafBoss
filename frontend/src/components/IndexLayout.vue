@@ -5,7 +5,7 @@
     <header class="header">
       <div class="container">
         <div class="logo-area">
-          <h1 class="logo">枫叶卡管</h1>
+          <h1 class="logo">LeafAuto卡密系统</h1>
         </div>
         <div class="auth-section">
           <div class="auth-buttons" v-if="!isAuthenticated">
@@ -38,13 +38,12 @@
       <section class="hero-section">
         <div class="container">
           <div class="hero-content">
-            <h1 class="hero-title">企业级卡密管理系统</h1>
-            <p class="hero-description">安全可靠的卡密生成与管理，为企业内部数字产品授权提供全方位支持</p>
+            <h1 class="hero-title">LeafAuto卡密系统</h1>
+            <p class="hero-description">内部卡密管理系统，用于数字产品授权管理</p>
             <div class="cta-buttons">
               <el-button type="primary" size="large" class="start-btn" @click="handleStart">
                 {{ isAuthenticated ? '进入管理后台' : '立即开始使用' }}
               </el-button>
-              <el-button type="default" size="large" class="demo-btn" @click="handleDemo">查看演示</el-button>
             </div>
           </div>
         </div>
@@ -52,7 +51,7 @@
 
       <section id="features" class="features-section">
         <div class="container">
-          <h2>枫叶卡管的特色功能</h2>
+          <h2>LeafAuto卡密系统的特色功能</h2>
           <div class="features-grid">
             <div class="feature-card" v-for="feature in features" :key="feature.id">
               <div class="feature-icon">
@@ -70,8 +69,8 @@
       <div class="container">
         <div class="footer-content">
           <div class="footer-section">
-            <h3>关于枫叶卡管</h3>
-            <p>企业级卡密管理系统，为内部数字产品授权提供全方位支持</p>
+            <h3>关于LeafAuto卡密系统</h3>
+            <p>内部卡密管理系统</p>
           </div>
           <div class="footer-section">
             <h4>产品功能</h4>
@@ -96,7 +95,7 @@
           </div>
         </div>
         <div class="footer-bottom">
-          <p>&copy; 2024-2025 枫叶卡管 企业内部管理系统</p>
+          <p>&copy; 2024-2025 LeafAuto卡密系统 公司内部管理系统</p>
         </div>
       </div>
     </footer>
@@ -208,11 +207,6 @@ const handleStart = () => {
     console.error('Navigation error:', error)
     ElMessage.error('页面跳转失败，请重试')
   }
-}
-
-// 处理查看演示
-const handleDemo = () => {
-  window.open('https://gitee.com/Yangshengzhou/leaf-pan', '_blank')
 }
 </script>
 
@@ -336,7 +330,7 @@ const handleDemo = () => {
 }
 
 .hero-title {
-  font-size: 48px;
+  font-size: 40px;
   font-weight: 700;
   line-height: 1.1;
   margin-bottom: 24px;
@@ -345,7 +339,7 @@ const handleDemo = () => {
 }
 
 .hero-description {
-  font-size: 18px;
+  font-size: 16px;
   margin-bottom: 40px;
   color: #6b7280;
   line-height: 1.6;
@@ -379,9 +373,9 @@ const handleDemo = () => {
 }
 
 .features-section h2 {
-  font-size: 32px;
+  font-size: 28px;
   font-weight: 700;
-  margin-bottom: 48px;
+  margin-bottom: 40px;
   color: #111827;
   text-align: center;
 }
@@ -413,7 +407,7 @@ const handleDemo = () => {
 }
 
 .feature-card h3 {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 600;
   margin-bottom: 12px;
   color: #111827;
