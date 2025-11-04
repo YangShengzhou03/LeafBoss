@@ -49,30 +49,37 @@ export function getFileExtension(filename) {
 
 // 检查是否为图片文件
 export function isImageFile(filename) {
-  const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp']
+  const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg', 'ico']
   const extension = getFileExtension(filename).toLowerCase()
   return imageExtensions.includes(extension)
 }
 
 // 检查是否为视频文件
 export function isVideoFile(filename) {
-  const videoExtensions = ['mp4', 'avi', 'mov', 'wmv', 'flv', 'webm']
+  const videoExtensions = ['mp4', 'avi', 'mov', 'wmv', 'flv', 'webm', 'mkv', 'm4v']
   const extension = getFileExtension(filename).toLowerCase()
   return videoExtensions.includes(extension)
 }
 
 // 检查是否为音频文件
 export function isAudioFile(filename) {
-  const audioExtensions = ['mp3', 'wav', 'flac', 'aac', 'ogg']
+  const audioExtensions = ['mp3', 'wav', 'flac', 'aac', 'ogg', 'wma', 'm4a']
   const extension = getFileExtension(filename).toLowerCase()
   return audioExtensions.includes(extension)
 }
 
 // 检查是否为文档文件
 export function isDocumentFile(filename) {
-  const documentExtensions = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt']
+  const documentExtensions = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'rtf', 'odt', 'ods', 'odp']
   const extension = getFileExtension(filename).toLowerCase()
   return documentExtensions.includes(extension)
+}
+
+// 检查是否为压缩文件
+export function isArchiveFile(filename) {
+  const archiveExtensions = ['zip', 'rar', '7z', 'tar', 'gz', 'bz2']
+  const extension = getFileExtension(filename).toLowerCase()
+  return archiveExtensions.includes(extension)
 }
 
 // 获取文件类型图标
@@ -83,9 +90,20 @@ export function getFileIcon(filename) {
   if (isVideoFile(filename)) return 'el-icon-video-play'
   if (isAudioFile(filename)) return 'el-icon-headset'
   if (isDocumentFile(filename)) return 'el-icon-document'
+  if (isArchiveFile(filename)) return 'el-icon-folder-opened'
   
-  // 默认文件图标
-  return 'el-icon-document'
+  // 特定文件扩展名的图标
+  const iconMap = {
+    'js': 'el-icon-cpu',
+    'css': 'el-icon-brush',
+    'html': 'el-icon-monitor',
+    'json': 'el-icon-data-line',
+    'xml': 'el-icon-document-copy',
+    'exe': 'el-icon-setting',
+    'msi': 'el-icon-setting'
+  }
+  
+  return iconMap[extension] || 'el-icon-document'
 }
 
 // 生成随机字符串

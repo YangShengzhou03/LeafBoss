@@ -22,9 +22,20 @@ const routes = [
     }
   },
   
-  // 管理员布局
+  // 首页
   {
     path: '/',
+    name: 'HomePage',
+    component: IndexLayout,
+    meta: {
+      title: '枫叶卡管 - 企业级卡密管理系统',
+      requiresAuth: false
+    }
+  },
+
+  // 管理员布局
+  {
+    path: '/admin',
     component: AdminLayout,
     meta: { requiresAuth: true, requiresAdmin: true },
     children: [
@@ -75,25 +86,14 @@ const routes = [
       },
     ]
   },
-
-  // 首页
-  {
-    path: '/home',
-    name: 'HomePage',
-    component: IndexLayout,
-    meta: {
-      title: '枫叶卡管 - 专业的卡密管理系统',
-      requiresAuth: false
-    }
-  },
-
+  
   // 首页/分享链接
   {
     path: '/share/:id?',
     name: 'SharePage',
     component: IndexLayout,
     meta: {
-      title: '枫叶卡管 - 专业的卡密管理系统',
+      title: '枫叶卡管 - 企业级卡密管理系统',
       requiresAuth: false
     }
   },
@@ -146,7 +146,6 @@ const routes = [
       requiresAuth: false
     }
   },
-
 
   // 错误路径重定向（仅保留这一条）
   { path: '/:pathMatch(.*)*', redirect: '/' }

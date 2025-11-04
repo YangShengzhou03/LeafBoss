@@ -39,12 +39,15 @@ export const loadConfig = async () => {
     if (response && response.data) {
       // 合并后端配置和默认配置
       currentConfig = { ...defaultConfig, ...response.data }
+      console.log('配置加载成功:', currentConfig)
       return currentConfig
     }
   } catch (error) {
+    console.warn('从后端加载配置失败，使用默认配置:', error.message)
   }
   
   // 如果加载失败，返回默认配置
+  console.log('使用默认配置:', defaultConfig)
   return { ...defaultConfig }
 }
 

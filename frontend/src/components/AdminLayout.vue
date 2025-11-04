@@ -1,13 +1,12 @@
 <template>
-  <el-watermark v-bind="watermarkOptions">
-    <div class="admin-layout">
+  <div class="admin-layout">
       <!-- 顶部导航栏 -->
       <header class="admin-header">
         <div class="header-left">
           <h1 class="logo">枫叶卡管 - 卡密管理系统</h1>
         </div>
         <div class="header-right">
-          <el-dropdown @command="handleCommand">
+          <el-dropdown @command="handleCommand" trigger="click">
             <span class="user-info">
               <el-avatar :size="32" :src="userAvatar">
                 <el-icon>
@@ -19,7 +18,8 @@
             </span>
             <template #dropdown>
               <el-dropdown-menu>
-                <el-dropdown-item command="logout">退出登录</el-dropdown-item>
+                <el-dropdown-item command="profile">个人资料</el-dropdown-item>
+                <el-dropdown-item divided command="logout">退出登录</el-dropdown-item>
               </el-dropdown-menu>
             </template>
           </el-dropdown>
@@ -28,66 +28,81 @@
 
       <div class="admin-container">
         <!-- 侧边栏 -->
-        <aside class="admin-sidebar">
-          <el-menu :default-active="activeMenu" class="admin-menu" router unique-opened>
-            <el-menu-item index="/">
+        <aside class="admin-sidebar" :class="{ 'sidebar-collapsed': isCollapsed }">
+          <el-button 
+            class="collapse-btn" 
+            text 
+            @click="toggleSidebar"
+            :icon="isCollapsed ? Expand : Fold"
+          />
+          <el-menu 
+            :default-active="activeMenu" 
+            class="admin-menu" 
+            router 
+            unique-opened
+            :collapse="isCollapsed"
+          >
+            <el-menu-item index="/admin">
               <el-icon>
                 <Monitor />
               </el-icon>
-              <span>管理员仪表盘</span>
+              <template #title>管理员仪表盘</template>
             </el-menu-item>
 
-            <el-menu-item index="/users">
+            <el-menu-item index="/admin/users">
               <el-icon>
                 <User />
               </el-icon>
-              <span>用户管理</span>
+              <template #title>用户管理</template>
             </el-menu-item>
 
-            <el-menu-item index="/system">
+            <el-menu-item index="/admin/system">
               <el-icon>
                 <Setting />
               </el-icon>
-              <span>系统设置</span>
+              <template #title>系统设置</template>
             </el-menu-item>
 
-            <el-menu-item index="/logs">
+            <el-menu-item index="/admin/logs">
               <el-icon>
                 <Document />
               </el-icon>
-              <span>操作日志</span>
+              <template #title>操作日志</template>
             </el-menu-item>
             
-            <el-menu-item index="/card-keys">
+            <el-menu-item index="/admin/card-keys">
               <el-icon>
                 <Key />
               </el-icon>
-              <span>卡密管理</span>
+              <template #title>卡密管理</template>
             </el-menu-item>
           </el-menu>
         </aside>
 
         <!-- 主内容区域 -->
-        <main class="admin-main">
-          <router-view />
+        <main class="admin-main" :class="{ 'main-expanded': isCollapsed }">
+          <router-view v-slot="{ Component }">
+            <transition name="fade" mode="out-in">
+              <component :is="Component" />
+            </transition>
+          </router-view>
         </main>
       </div>
     </div>
-  </el-watermark>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, reactive, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { ElMessage } from 'element-plus'
-import { User, ArrowDown, Monitor, Setting, Document, Key } from '@element-plus/icons-vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { User, ArrowDown, Monitor, Setting, Document, Key, Expand, Fold } from '@element-plus/icons-vue'
 import store from '@/utils/store.js'
-
-// 控制水印显示
-const showWatermark = ref(false)
 
 const router = useRouter()
 const route = useRoute()
+
+// 侧边栏折叠状态
+const isCollapsed = ref(false)
 
 // 当前激活的菜单项
 const activeMenu = computed(() => route.path)
@@ -97,51 +112,64 @@ const userAvatar = computed(() => {
   return store.state.user?.avatar || ''
 })
 
-// 水印内容
-const watermarkContent = computed(() => {
-  const content = store.state.user?.username || '管理员'
-  return content
-})
-
-// 水印字体配置
-const watermarkFont = reactive({
-  color: 'rgba(0, 0, 0, 0.1)',
-  fontSize: 16,
-  fontWeight: 'normal'
-})
-
-// 水印配置选项
-const watermarkOptions = reactive({
-  content: watermarkContent,
-  font: watermarkFont,
-  width: 180,
-  height: 80,
-  rotate: -20,
-  gap: [60, 60],
-  offset: [30, 30],
-  zIndex: 9999
-})
+// 切换侧边栏折叠状态
+const toggleSidebar = () => {
+  isCollapsed.value = !isCollapsed.value
+  // 保存用户偏好
+  localStorage.setItem('admin-sidebar-collapsed', isCollapsed.value.toString())
+}
 
 // 处理下拉菜单命令
 const handleCommand = async (command) => {
-  if (command === 'logout') {
-    // 退出登录
-    await store.logout()
-    ElMessage.success('已退出登录')
-    router.push('/login')
+  try {
+    if (command === 'logout') {
+      // 确认退出登录
+      await ElMessageBox.confirm(
+        '确定要退出登录吗？',
+        '提示',
+        {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }
+      )
+      
+      await store.logout()
+      ElMessage.success('已退出登录')
+      router.push('/login')
+    } else if (command === 'profile') {
+      // 跳转到个人资料页面
+      router.push('/profile')
+    }
+  } catch (error) {
+    // 用户取消操作或发生错误
+    if (error !== 'cancel') {
+      console.error('操作失败:', error)
+      ElMessage.error('操作失败，请重试')
+    }
   }
 }
 
-// 组件挂载时刷新存储信息
+// 组件挂载时初始化
 onMounted(async () => {
-  // 确保用户信息已加载
-  if (!store.state.user) {
-    await store.fetchCurrentUser()
+  try {
+    // 恢复侧边栏折叠状态
+    const savedCollapsed = localStorage.getItem('admin-sidebar-collapsed')
+    if (savedCollapsed !== null) {
+      isCollapsed.value = savedCollapsed === 'true'
+    }
+    
+    // 确保用户信息已加载
+    if (!store.state.user) {
+      await store.fetchCurrentUser()
+    }
+    
+    // 等待用户信息加载完成
+    await nextTick()
+  } catch (error) {
+    console.error('初始化失败:', error)
+    ElMessage.error('初始化失败，请刷新页面重试')
   }
-  
-  // 等待用户信息加载完成后显示水印
-  await nextTick()
-  showWatermark.value = true
 })
 </script>
 
@@ -181,6 +209,11 @@ onMounted(async () => {
   color: #fff;
   padding: 8px 12px;
   border-radius: 8px;
+  transition: background-color 0.3s;
+}
+
+.header-right .user-info:hover {
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .username {
@@ -198,10 +231,22 @@ onMounted(async () => {
   width: 240px;
   background-color: #304156;
   border-right: 1px solid #ddd;
+  transition: width 0.3s;
+}
+
+.admin-sidebar.sidebar-collapsed {
+  width: 64px;
+}
+
+.collapse-btn {
+  width: 100%;
+  height: 40px;
+  color: #fff;
+  margin-bottom: 10px;
 }
 
 .admin-menu {
-  height: 100%;
+  height: calc(100% - 50px);
   border-right: none;
   background-color: transparent;
   padding-top: 16px;
@@ -215,6 +260,7 @@ onMounted(async () => {
   border-radius: 8px;
   position: relative;
   overflow: hidden;
+  transition: all 0.3s;
 }
 
 .admin-menu :deep(.el-menu-item::before) {
@@ -226,6 +272,7 @@ onMounted(async () => {
   width: 3px;
   background: #409EFF;
   transform: translateX(-100%);
+  transition: transform 0.3s;
 }
 
 .admin-menu :deep(.el-menu-item:hover) {
@@ -247,6 +294,7 @@ onMounted(async () => {
   font-size: 18px;
   margin-right: 12px;
   color: inherit;
+  transition: all 0.3s;
 }
 
 .admin-main {
@@ -254,6 +302,22 @@ onMounted(async () => {
   padding: 24px;
   overflow-y: auto;
   background-color: #f0f2f5;
+  transition: margin-left 0.3s;
+}
+
+.admin-main.main-expanded {
+  margin-left: 0;
+}
+
+/* 路由过渡动画 */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 
 /* 卡片容器统一样式 */
@@ -261,6 +325,11 @@ onMounted(async () => {
   border-radius: 4px;
   border: 1px solid #e6e8eb;
   overflow: hidden;
+  transition: all 0.3s;
+}
+
+.admin-main :deep(.el-card:hover) {
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
 }
 
 .admin-main :deep(.el-card__header) {
@@ -296,7 +365,7 @@ onMounted(async () => {
 
 /* 响应式设计 */
 @media (max-width: 1024px) {
-  .admin-sidebar {
+  .admin-sidebar:not(.sidebar-collapsed) {
     width: 200px;
   }
   

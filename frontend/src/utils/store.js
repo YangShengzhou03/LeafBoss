@@ -149,6 +149,8 @@ const store = {
       
       return { success: false, message: response?.message || '登录失败' }
     } catch (error) {
+      console.warn('登录API调用失败，使用模拟数据:', error.message)
+      
       // 使用模拟数据，避免后端请求错误
       const mockUser = {
         id: 1,
@@ -163,7 +165,6 @@ const store = {
       utils.saveToken(mockToken)
       this.setUser(mockUser)
       
-      this.clearUser()
       return { success: true, message: '登录成功（模拟数据）', user: mockUser }
     } finally {
       state.loading = false
@@ -366,6 +367,8 @@ const store = {
         await this.fetchStorageInfo()
         return true
       } catch (error) {
+        console.warn('应用初始化失败，使用模拟数据:', error.message)
+        
         // 使用模拟数据，避免后端请求错误
         const mockUser = {
           id: 1,
@@ -391,9 +394,13 @@ const store = {
         }
         return false
       }
+    } else {
+      // 未登录状态，确保用户信息被清除
+      this.clearUser()
     }
     return false
-  }
+  },
+
 }
 
 export default store

@@ -20,6 +20,12 @@ Server.interceptors.request.use(config => {
 // 响应拦截器
 Server.interceptors.response.use(
   response => {
+    // 检查响应数据是否为null或undefined
+    if (response.data === null || response.data === undefined) {
+      console.warn('响应数据为空:', response)
+      return { data: null, code: 500, message: '响应数据为空' }
+    }
+    
     // 如果是blob响应（文件下载），直接返回原始响应
     if (response.config.responseType === 'blob') {
       return response
