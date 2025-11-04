@@ -9,7 +9,7 @@ const routes = [
     name: 'Login',
     component: () => import('@/views/LoginPage.vue'),
     meta: {
-      title: '管理员登录 - 枫叶卡管',
+      title: '管理员登录 - LeafCard',
       requiresAuth: false
     }
   },
@@ -20,7 +20,7 @@ const routes = [
     name: 'HomePage',
     component: () => import('@/components/IndexLayout.vue'),
     meta: {
-      title: '枫叶卡管 - 企业级卡密管理系统',
+      title: 'LeafCard - 枫叶卡管系统',
       requiresAuth: false
     }
   },
@@ -36,7 +36,7 @@ const routes = [
         name: 'AdminDashboard',
         component: () => import('@/views/admin/DashboardPage.vue'),
         meta: {
-          title: '枫叶卡管 - 管理员仪表盘',
+          title: 'LeafCard - 管理员仪表盘',
           requiresAuth: true
         }
       },
@@ -45,7 +45,7 @@ const routes = [
         name: 'AdminUsers',
         component: () => import('@/views/admin/UsersPage.vue'),
         meta: {
-          title: '枫叶卡管 - 用户管理',
+          title: 'LeafCard - 用户管理',
           requiresAuth: true
         }
       },
@@ -55,7 +55,7 @@ const routes = [
         name: 'AdminLogs',
         component: () => import('@/views/admin/LogsPage.vue'),
         meta: {
-          title: '枫叶卡管 - 操作日志',
+          title: 'LeafCard - 操作日志',
           requiresAuth: true
         }
       },
@@ -64,7 +64,7 @@ const routes = [
         name: 'ProductManagement',
         component: () => import('@/views/admin/ProductManagement.vue'),
         meta: {
-          title: '枫叶卡管 - 商品管理',
+          title: 'LeafCard - 商品管理',
           requiresAuth: true
         }
       },
@@ -73,7 +73,7 @@ const routes = [
         name: 'CardKeyManagement',
         component: () => import('@/views/admin/CardKeyManagement.vue'),
         meta: {
-          title: '枫叶卡管 - 卡密管理',
+          title: 'LeafCard - 卡密管理',
           requiresAuth: true
         }
       },
@@ -82,7 +82,7 @@ const routes = [
         name: 'CardKeyVerifyAdmin',
         component: () => import('@/views/admin/CardKeyVerify.vue'),
         meta: {
-          title: '枫叶卡管 - 卡密验证',
+          title: 'LeafCard - 卡密验证',
           requiresAuth: true
         }
       },
@@ -91,7 +91,7 @@ const routes = [
         name: 'CardKeyGenerate',
         component: () => import('@/views/admin/CardKeyGenerate.vue'),
         meta: {
-          title: '枫叶卡管 - 卡密生成',
+          title: 'LeafCard - 卡密生成',
           requiresAuth: true
         }
       },
@@ -100,7 +100,7 @@ const routes = [
         name: 'ProfilePage',
         component: () => import('@/views/admin/ProfilePage.vue'),
         meta: {
-          title: '枫叶卡管 - 个人资料',
+          title: 'LeafCard - 个人资料',
           requiresAuth: true
         }
       },
@@ -109,7 +109,7 @@ const routes = [
         name: 'ProductSpecManagement',
         component: () => import('@/views/admin/ProductSpecManagement.vue'),
         meta: {
-          title: '枫叶卡管 - 规格管理',
+          title: 'LeafCard - 规格管理',
           requiresAuth: true
         }
       },
@@ -122,7 +122,7 @@ const routes = [
     name: 'SharePage',
     component: () => import('@/components/IndexLayout.vue'),
     meta: {
-      title: '枫叶卡管 - 企业级卡密管理系统',
+      title: 'LeafCard - 枫叶卡管系统',
       requiresAuth: false
     }
   },
@@ -133,7 +133,7 @@ const routes = [
     name: 'UserGuidePage',
     component: () => import('@/views/index/UserGuidePage.vue'),
     meta: {
-      title: '使用指南 - 枫叶卡管',
+      title: '使用指南 - LeafCard',
       requiresAuth: false
     }
   },
@@ -142,7 +142,7 @@ const routes = [
     name: 'ContactUsPage',
     component: () => import('@/views/index/ContactUsPage.vue'),
     meta: {
-      title: '联系我们 - 枫叶卡管',
+      title: '联系我们 - LeafCard',
       requiresAuth: false
     }
   },
@@ -151,7 +151,7 @@ const routes = [
     name: 'FAQPage',
     component: () => import('@/views/index/FaqPage.vue'),
     meta: {
-      title: '常见问题 - 枫叶卡管',
+      title: '常见问题 - LeafCard',
       requiresAuth: false
     }
   },
@@ -162,7 +162,7 @@ const routes = [
     name: 'AuthorInfoPage',
     component: () => import('@/views/index/AuthorInfoPage.vue'),
     meta: {
-      title: '作者介绍 - 枫叶卡管',
+      title: '作者介绍 - LeafCard',
       requiresAuth: false
     }
   },
@@ -171,7 +171,7 @@ const routes = [
     name: 'PrivacyPolicyPage',
     component: () => import('@/views/index/PrivacyPolicyPage.vue'),
     meta: {
-      title: '隐私保护 - 枫叶卡管',
+      title: '隐私保护 - LeafCard',
       requiresAuth: false
     }
   },
@@ -182,7 +182,7 @@ const routes = [
     name: 'CardKeyVerify',
     component: () => import('@/views/admin/CardKeyVerify.vue'),
     meta: {
-      title: '枫叶卡管 - 卡密验证',
+      title: 'LeafCard - 卡密验证',
       requiresAuth: false
     }
   },
@@ -220,7 +220,9 @@ router.beforeEach((to, from, next) => {
         store.setUser({
           id: 1,
           username: 'admin',
-          role: 'admin'
+          nickname: '管理员',
+          role: 'admin',
+          avatar: 'https://picsum.photos/id/1005/200/200'
         });
       }
       next();

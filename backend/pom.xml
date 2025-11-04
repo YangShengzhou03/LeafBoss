@@ -4,13 +4,13 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.cardkeeper</groupId>
-    <artifactId>card-keeper-backend</artifactId>
+    <groupId>com.leafcard</groupId>
+    <artifactId>leaf-card-backend</artifactId>
     <version>1.0.0</version>
     <packaging>jar</packaging>
 
-    <name>card-keeper-backend</name>
-    <description>卡管家后端服务 - Spring Boot</description>
+    <name>leaf-card-backend</name>
+    <description>Leaf Card 后端服务 - Spring Boot</description>
 
     <parent>
         <groupId>org.springframework.boot</groupId>

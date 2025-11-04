@@ -1,6 +1,15 @@
 import Server from '../utils/Server'
 import { ErrorHandler } from './errorHandler.js'
 
+// API响应类型定义
+const API_RESPONSE_CODES = {
+  SUCCESS: 200,
+  UNAUTHORIZED: 401,
+  FORBIDDEN: 403,
+  NOT_FOUND: 404,
+  INTERNAL_ERROR: 500
+}
+
 // 管理员API服务
 export const AdminService = {
   // 获取仪表板统计数据

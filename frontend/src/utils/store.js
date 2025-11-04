@@ -171,6 +171,115 @@ const store = {
     }
   },
 
+  // 获取当前用户信息
+  async fetchCurrentUser() {
+    try {
+      // 模拟获取用户信息
+      const mockUser = {
+        id: 1,
+        username: 'admin',
+        nickname: '管理员',
+        email: 'admin@leafcard.com',
+        role: 'admin',
+        avatar: 'https://picsum.photos/id/1005/200/200',
+        createTime: '2024-01-01 00:00:00',
+        lastLoginTime: new Date().toISOString()
+      }
+      
+      this.setUser(mockUser)
+      return mockUser
+    } catch (error) {
+      console.error('获取用户信息失败:', error)
+      throw error
+    }
+  },
+
+  // 退出登录
+  async logout() {
+    try {
+      // 清除本地存储
+      this.clearUser()
+      
+      // 调用后端退出接口（如果有）
+      await Server.post('/auth/logout')
+    } catch (error) {
+      console.warn('退出登录API调用失败:', error.message)
+    }
+  },
+
+  // 更新用户信息
+  async updateUserProfile(userData) {
+    try {
+      const response = await Server.put('/user/profile', userData)
+      
+      if (response && response.code === 200 && response.data) {
+        // 更新本地用户信息
+        this.setUser({ ...state.user, ...response.data })
+        return { success: true, message: response.message || '更新成功' }
+      }
+      
+      return { success: false, message: response?.message || '更新失败' }
+    } catch (error) {
+      console.error('更新用户信息失败:', error)
+      return { success: false, message: '更新失败，请重试' }
+    }
+  },
+
+  // 修改密码
+  async changePassword(passwordData) {
+    try {
+      const response = await Server.put('/user/password', passwordData)
+      
+      if (response && response.code === 200) {
+        return { success: true, message: response.message || '密码修改成功' }
+      }
+      
+      return { success: false, message: response?.message || '密码修改失败' }
+    } catch (error) {
+      console.error('修改密码失败:', error)
+      return { success: false, message: '密码修改失败，请重试' }
+    }
+  },
+
+  // 检查登录状态
+  checkAuthStatus() {
+    const token = utils.getToken()
+    if (!token) {
+      this.clearUser()
+      return false
+    }
+    
+    // 检查token是否过期
+    try {
+      const decoded = utils.parseJWT(token)
+      if (decoded.exp * 1000 < Date.now()) {
+        this.clearUser()
+        return false
+      }
+      
+      // 如果用户信息不存在，尝试获取
+      if (!state.user) {
+        this.fetchCurrentUser()
+      }
+      
+      return true
+    } catch (error) {
+      console.error('检查登录状态失败:', error)
+      this.clearUser()
+      return false
+    }
+  },
+
+  // 设置加载状态
+  setLoading(loading) {
+    state.loading = loading
+  },
+
+  // 获取加载状态
+  getLoading() {
+    return state.loading
+  }
+
   // 注册
   async register(userData) {
     state.loading = true

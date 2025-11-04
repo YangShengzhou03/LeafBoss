@@ -1,36 +1,219 @@
-# LeafCard
+# LeafCard - Maple Card Management System
 
 #### Description
-卡验证后台
+LeafCard is a modern card verification backend management system built with a frontend-backend separation architecture. It provides comprehensive card management, user authentication, and permission control functionalities.
+
+**Key Features:**
+- 🚀 Modern frontend interface based on Vue 3 + Element Plus
+- 🔒 Spring Boot backend framework providing stable and reliable API services
+- 📱 Responsive design supporting multi-device access
+- 🔐 Complete user authentication and permission management system
+- 📊 Data visualization and statistical analysis
+- 🛡️ Secure and reliable card verification mechanism
 
 #### Software Architecture
-Software architecture description
+
+**Technology Stack:**
+
+**Frontend Technology Stack:**
+- Vue 3.4.0 - Progressive JavaScript Framework
+- Element Plus 2.4.0 - Vue 3 based component library
+- Vue Router 4.2.0 - Official router for Vue.js
+- Axios 1.6.0 - HTTP client
+- Sass 1.69.0 - CSS preprocessor
+
+**Backend Technology Stack:**
+- Spring Boot 3.1.0 - Java enterprise development framework
+- Spring Data JPA - Data persistence layer framework
+- MySQL 8.0.33 - Relational database
+- Maven - Project build tool
+- Java 17 - Development language
+
+**Project Structure:**
+```
+leaf-card/
+├── frontend/                 # Frontend project
+│   ├── src/
+│   │   ├── components/      # Common components
+│   │   ├── views/           # Page components
+│   │   ├── route/           # Routing configuration
+│   │   ├── services/        # API services
+│   │   └── utils/           # Utility functions
+│   └── public/              # Static resources
+└── backend/                 # Backend project
+    └── src/main/java/       # Java source code
+```
 
 #### Installation
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+**Environment Requirements:**
+- Node.js 16+ (Frontend)
+- Java 17+ (Backend)
+- MySQL 8.0+ (Database)
+- Maven 3.6+ (Backend build)
+
+**Frontend Installation Steps:**
+
+1. Navigate to frontend directory
+```bash
+cd frontend
+```
+
+2. Install dependencies
+```bash
+npm install
+```
+
+3. Start development server
+```bash
+npm run serve
+# Or use development mode
+npm run dev
+```
+
+4. Build production version
+```bash
+npm run build
+```
+
+**Backend Installation Steps:**
+
+1. Configure database
+```sql
+CREATE DATABASE leaf_card CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```
+
+2. Modify database configuration
+Edit `backend/src/main/resources/application.properties`:
+```properties
+spring.datasource.url=jdbc:mysql://localhost:3306/leaf_card
+spring.datasource.username=your_username
+spring.datasource.password=your_password
+```
+
+3. Compile and run backend
+```bash
+cd backend
+mvn clean package
+java -jar target/leaf-card-backend-1.0.0.jar
+```
 
 #### Instructions
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+**Quick Start:**
+
+1. **Start Backend Service**
+   - Ensure MySQL service is running
+   - Start backend application, default port 8080
+
+2. **Start Frontend Service**
+   - Frontend development server default port 8081
+   - Access http://localhost:8081
+
+3. **System Login**
+   - Default admin account: admin / admin123
+   - Change default password on first use
+
+**Main Function Modules:**
+
+- **User Management**: User registration, login, permission management
+- **Card Management**: Card creation, verification, status management
+- **Data Statistics**: Usage statistics and report generation
+- **System Settings**: System parameter configuration and permission settings
+
+#### Development Guide
+
+**Frontend Development:**
+```bash
+# Development mode (with hot reload)
+npm run serve
+
+# Code linting
+npm run lint
+
+# Production build
+npm run build
+```
+
+**Backend Development:**
+```bash
+# Compile project
+mvn compile
+
+# Run tests
+mvn test
+
+# Package for deployment
+mvn clean package
+```
+
+#### Deployment
+
+**Production Environment Deployment:**
+
+1. **Frontend Deployment**
+   - Execute `npm run build` to generate dist directory
+   - Configure Nginx to point to dist directory
+   - Set up API proxy to backend service
+
+2. **Backend Deployment**
+   - Use `mvn clean package` to generate jar file
+   - Deploy using systemd or Docker
+   - Configure production database connection
+
+**Docker Deployment (Optional):**
+```dockerfile
+# Frontend Dockerfile
+FROM nginx:alpine
+COPY dist/ /usr/share/nginx/html/
+
+# Backend Dockerfile
+FROM openjdk:17-jre-slim
+COPY target/leaf-card-backend-1.0.0.jar /app.jar
+```
 
 #### Contribution
 
-1.  Fork the repository
-2.  Create Feat_xxx branch
-3.  Commit your code
-4.  Create Pull Request
+We welcome contributions of all kinds!
 
+1. **Fork the repository**
+2. **Create feature branch**
+   ```bash
+   git checkout -b feature/AmazingFeature
+   ```
+3. **Commit your changes**
+   ```bash
+   git commit -m 'Add some AmazingFeature'
+   ```
+4. **Push to the branch**
+   ```bash
+   git push origin feature/AmazingFeature
+   ```
+5. **Open a Pull Request**
 
-#### Gitee Feature
+**Contribution Guidelines:**
+- Follow code standards
+- Write clear commit messages
+- Add appropriate test cases
+- Update relevant documentation
 
-1.  You can use Readme\_XXX.md to support different languages, such as Readme\_en.md, Readme\_zh.md
-2.  Gitee blog [blog.gitee.com](https://blog.gitee.com)
-3.  Explore open source project [https://gitee.com/explore](https://gitee.com/explore)
-4.  The most valuable open source project [GVP](https://gitee.com/gvp)
-5.  The manual of Gitee [https://gitee.com/help](https://gitee.com/help)
-6.  The most popular members  [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
+#### Version History
+
+- **v1.0.0** (2024-01-01)
+  - Initial version release
+  - Basic card management functionality
+  - User authentication system
+
+#### License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+#### Contact
+
+- Project Homepage: https://gitee.com/your-repo/leaf-card
+- Issue Tracker: https://gitee.com/your-repo/leaf-card/issues
+- Email: dev@leafcard.com
+
+---
+
+**Thank you for using LeafCard!** 🍁

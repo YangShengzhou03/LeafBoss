@@ -38,8 +38,8 @@
       <section class="hero-section">
         <div class="container">
           <div class="hero-content">
-            <h1 class="hero-title">LeafAuto卡密系统</h1>
-            <p class="hero-description">内部卡密管理系统，用于数字产品授权管理</p>
+            <h1 class="hero-title">LeafCard</h1>
+            <p class="hero-description">枫叶卡管系统 - 企业级卡密管理系统</p>
             <div class="cta-buttons">
             <el-button type="primary" size="large" class="start-btn" @click="handleStart">
               {{ isAuthenticated ? '进入管理后台' : '立即开始使用' }}
@@ -51,7 +51,7 @@
 
       <section id="features" class="features-section">
         <div class="container">
-          <h2>LeafAuto卡密系统的特色功能</h2>
+          <h2>LeafCard - 枫叶卡管系统的特色功能</h2>
           <div class="features-grid">
             <div class="feature-card" v-for="feature in features" :key="feature.id">
               <div class="feature-icon">
@@ -69,8 +69,8 @@
       <div class="container">
         <div class="footer-content">
           <div class="footer-section">
-            <h3>关于LeafAuto卡密系统</h3>
-            <p>内部卡密管理系统</p>
+            <h3>关于LeafCard - 枫叶卡管系统</h3>
+            <p>企业级卡密管理系统</p>
           </div>
           <div class="footer-section">
             <h4>产品功能</h4>
@@ -95,7 +95,7 @@
           </div>
         </div>
         <div class="footer-bottom">
-          <p>&copy; 2024-2025 LeafAuto卡密系统 公司内部管理系统</p>
+          <p>&copy; 2024-2025 LeafCard - 枫叶卡管系统 企业级卡密管理系统</p>
         </div>
       </div>
     </footer>

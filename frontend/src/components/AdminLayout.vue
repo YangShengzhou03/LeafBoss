@@ -3,7 +3,7 @@
       <!-- 顶部导航栏 -->
       <header class="admin-header">
         <div class="header-left">
-          <h1 class="logo">枫叶卡管 - 卡密管理系统</h1>
+          <h1 class="logo">LeafCard - 枫叶卡管系统</h1>
         </div>
         <div class="header-right">
           <el-dropdown @command="handleCommand" trigger="click">

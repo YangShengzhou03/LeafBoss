@@ -2,6 +2,7 @@
   "name": "leaf-card-frontend",
   "version": "1.0.0",
   "private": true,
+  "description": "LeafCard Frontend - 枫叶卡管系统前端",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
@@ -16,11 +17,11 @@
     "vue-router": "4.2.0"
   },
   "devDependencies": {
-    "@babel/core": "7.22.0",
-    "@babel/eslint-parser": "7.22.0",
-    "@vue/cli-plugin-babel": "5.0.0",
-    "@vue/cli-plugin-eslint": "5.0.0",
-    "@vue/cli-service": "5.0.0",
+    "@babel/core": "7.23.0",
+    "@babel/eslint-parser": "7.23.3",
+    "@vue/cli-plugin-babel": "^5.0.8",
+    "@vue/cli-plugin-eslint": "^5.0.8",
+    "@vue/cli-service": "^5.0.8",
     "eslint": "8.52.0",
     "eslint-plugin-vue": "9.18.0",
     "sass": "1.69.0",
