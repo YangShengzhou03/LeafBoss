@@ -178,12 +178,9 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
 
 // 响应式数据
 const loading = ref(false)
-const exporting = ref(false)
-const clearing = ref(false)
 const searchKeyword = ref('')
 const filterAction = ref('')
 const filterStatus = ref('')
@@ -337,41 +334,6 @@ const handleCurrentChange = (page) => {
 const viewLogDetails = (log) => {
   currentLog.value = log
   showDetailDialog.value = true
-}
-
-const exportLogs = async () => {
-  exporting.value = true
-  try {
-    // 实际项目中调用API导出
-    ElMessage.success('导出功能开发中')
-  } catch (error) {
-    ElMessage.error('导出失败')
-  } finally {
-    exporting.value = false
-  }
-}
-
-const clearLogs = async () => {
-  try {
-    await ElMessageBox.confirm(
-      '确定要清理所有操作日志吗？此操作不可恢复。',
-      '确认清理',
-      {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }
-    )
-    
-    clearing.value = true
-    // 实际项目中调用API清理
-    logs.value = []
-    ElMessage.success('日志清理成功')
-  } catch {
-    // 用户取消操作
-  } finally {
-    clearing.value = false
-  }
 }
 
 onMounted(() => {

@@ -17,8 +17,11 @@
             v-model="loginForm.username"
             placeholder="用户名"
             size="large"
-            prefix-icon="User"
-          />
+          >
+            <template #prefix>
+              <el-icon><User /></el-icon>
+            </template>
+          </el-input>
         </el-form-item>
         
         <el-form-item prop="password">
@@ -27,9 +30,12 @@
             type="password"
             placeholder="密码"
             size="large"
-            prefix-icon="Lock"
             show-password
-          />
+          >
+            <template #prefix>
+              <el-icon><Lock /></el-icon>
+            </template>
+          </el-input>
         </el-form-item>
         
         <el-form-item>
@@ -69,8 +75,11 @@
             v-model="registerForm.username"
             placeholder="用户名"
             size="large"
-            prefix-icon="User"
-          />
+          >
+            <template #prefix>
+              <el-icon><User /></el-icon>
+            </template>
+          </el-input>
         </el-form-item>
         
         <el-form-item prop="email">
@@ -78,8 +87,11 @@
             v-model="registerForm.email"
             placeholder="邮箱"
             size="large"
-            prefix-icon="Message"
-          />
+          >
+            <template #prefix>
+              <el-icon><Message /></el-icon>
+            </template>
+          </el-input>
         </el-form-item>
         
         <el-form-item prop="password">
@@ -88,9 +100,12 @@
             type="password"
             placeholder="密码"
             size="large"
-            prefix-icon="Lock"
             show-password
-          />
+          >
+            <template #prefix>
+              <el-icon><Lock /></el-icon>
+            </template>
+          </el-input>
         </el-form-item>
         
         <el-form-item prop="confirmPassword">
@@ -99,9 +114,12 @@
             type="password"
             placeholder="确认密码"
             size="large"
-            prefix-icon="Lock"
             show-password
-          />
+          >
+            <template #prefix>
+              <el-icon><Lock /></el-icon>
+            </template>
+          </el-input>
         </el-form-item>
       </el-form>
       

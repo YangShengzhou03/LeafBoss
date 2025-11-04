@@ -13,60 +13,68 @@ const routes = [
     meta: { title: '登录' }
   },
   {
-    path: '/dashboard',
-    name: 'Dashboard',
-    component: () => import('@/views/Dashboard.vue'),
-    meta: { title: '仪表盘', requiresAuth: true }
-  },
-  {
-    path: '/product',
-    redirect: '/product/goods'
-  },
-  {
-    path: '/product/goods',
-    name: 'ProductGoods',
-    component: () => import('@/views/ProductGoods.vue'),
-    meta: { title: '商品管理', requiresAuth: true }
-  },
-  {
-    path: '/product/categories',
-    name: 'ProductCategories',
-    component: () => import('@/views/ProductCategories.vue'),
-    meta: { title: '商品分类', requiresAuth: true }
-  },
-  {
-    path: '/product/specifications',
-    name: 'ProductSpecifications',
-    component: () => import('@/views/ProductSpecifications.vue'),
-    meta: { title: '规格管理', requiresAuth: true }
-  },
-  {
-    path: '/cards',
-    redirect: '/cards/list'
-  },
-  {
-    path: '/cards/list',
-    name: 'CardsList',
-    component: () => import('@/views/Cards.vue'),
-    meta: { title: '卡密列表', requiresAuth: true }
-  },
-  {
-    path: '/cards/validation',
-    name: 'CardsValidation',
-    component: () => import('@/views/Validation.vue'),
-    meta: { title: '卡密验证', requiresAuth: true }
-  },
-  {
-    path: '/cards/logs',
-    name: 'CardLogs',
-    component: () => import('@/views/CardLogs.vue'),
-    meta: { title: '卡密记录', requiresAuth: true }
-  },
-  {
-    path: '/users',
-    name: 'Users',
-    component: () => import('@/views/Users.vue'),
-    meta: { title: '用户管理', requiresAuth: true }
+    path: '/admin',
+    component: () => import('@/layouts/AdminLayout.vue'),
+    redirect: '/admin/dashboard',
+    meta: { requiresAuth: true },
+    children: [
+      {
+        path: 'dashboard',
+        name: 'Dashboard',
+        component: () => import('@/views/Dashboard.vue'),
+        meta: { title: '仪表盘' }
+      },
+      {
+        path: 'product',
+        redirect: '/admin/product/goods'
+      },
+      {
+        path: 'product/goods',
+        name: 'ProductGoods',
+        component: () => import('@/views/ProductGoods.vue'),
+        meta: { title: '商品管理' }
+      },
+      {
+        path: 'product/categories',
+        name: 'ProductCategories',
+        component: () => import('@/views/ProductCategories.vue'),
+        meta: { title: '商品分类' }
+      },
+      {
+        path: 'product/specifications',
+        name: 'ProductSpecifications',
+        component: () => import('@/views/ProductSpecifications.vue'),
+        meta: { title: '规格管理' }
+      },
+      {
+        path: 'cards',
+        redirect: '/admin/cards/list'
+      },
+      {
+        path: 'cards/list',
+        name: 'CardsList',
+        component: () => import('@/views/Cards.vue'),
+        meta: { title: '卡密列表' }
+      },
+      {
+        path: 'cards/validation',
+        name: 'CardsValidation',
+        component: () => import('@/views/Validation.vue'),
+        meta: { title: '卡密验证' }
+      },
+      {
+        path: 'cards/logs',
+        name: 'CardLogs',
+        component: () => import('@/views/CardLogs.vue'),
+        meta: { title: '卡密记录' }
+      },
+      {
+        path: 'users',
+        name: 'Users',
+        component: () => import('@/views/Users.vue'),
+        meta: { title: '用户管理' }
+      }
+    ]
   }
 ]
 
@@ -90,7 +98,7 @@ router.beforeEach((to, from, next) => {
     next('/login')
   } else if (to.path === '/login' && authStore.isAuthenticated) {
     // 如果已认证但访问登录页，重定向到仪表盘
-    next('/dashboard')
+    next('/admin/dashboard')
   } else {
     next()
   }

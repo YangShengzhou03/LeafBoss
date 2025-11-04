@@ -1,7 +1,7 @@
 import { apiService } from './service'
 import { useCardStore } from '@/stores/card'
 import { useProductStore } from '@/stores/product'
-import { useNotificationStore } from '@/stores/notification'
+import { ElMessage } from 'element-plus'
 
 // 卡密API服务
 export const cardService = {
@@ -25,8 +25,7 @@ export const cardService = {
       
       return response
     } catch (error) {
-      const notificationStore = useNotificationStore()
-      notificationStore.error('加载卡密列表失败')
+      ElMessage.error('加载卡密列表失败')
       throw error
     } finally {
       cardStore.setLoading(false)
@@ -53,36 +52,32 @@ export const cardService = {
   
   // 添加卡密
   async addCard(data) {
-    const notificationStore = useNotificationStore()
-    
     try {
       const response = await apiService.post('/cards', data, {
         showLoading: true,
         loadingText: '添加卡密中...'
       })
       
-      notificationStore.success('卡密添加成功')
+      ElMessage.success('卡密添加成功')
       return response
     } catch (error) {
-      notificationStore.error('添加卡密失败')
+      ElMessage.error('添加卡密失败')
       throw error
     }
   },
   
   // 批量添加卡密
   async batchAddCards(data) {
-    const notificationStore = useNotificationStore()
-    
     try {
       const response = await apiService.post('/cards/batch', data, {
         showLoading: true,
         loadingText: '批量添加卡密中...'
       })
       
-      notificationStore.success(`成功添加 ${response.count || 0} 个卡密`)
+      ElMessage.success(`成功添加 ${response.count || 0} 个卡密`)
       return response
     } catch (error) {
-      notificationStore.error('批量添加卡密失败')
+      ElMessage.error('批量添加卡密失败')
       throw error
     }
   },
@@ -90,7 +85,6 @@ export const cardService = {
   // 更新卡密
   async updateCard(id, data) {
     const cardStore = useCardStore()
-    const notificationStore = useNotificationStore()
     
     try {
       const response = await apiService.put(`/cards/${id}`, data, {
@@ -99,10 +93,10 @@ export const cardService = {
       })
       
       cardStore.updateCard(id, response.data)
-      notificationStore.success('卡密更新成功')
+      ElMessage.success('卡密更新成功')
       return response
     } catch (error) {
-      notificationStore.error('更新卡密失败')
+      ElMessage.error('更新卡密失败')
       throw error
     }
   },
@@ -110,7 +104,6 @@ export const cardService = {
   // 删除卡密
   async deleteCard(id) {
     const cardStore = useCardStore()
-    const notificationStore = useNotificationStore()
     
     try {
       await apiService.delete(`/cards/${id}`, {
@@ -119,9 +112,9 @@ export const cardService = {
       })
       
       cardStore.deleteCard(id)
-      notificationStore.success('卡密删除成功')
+      ElMessage.success('卡密删除成功')
     } catch (error) {
-      notificationStore.error('删除卡密失败')
+      ElMessage.error('删除卡密失败')
       throw error
     }
   },
@@ -129,7 +122,6 @@ export const cardService = {
   // 批量删除卡密
   async batchDeleteCards(ids) {
     const cardStore = useCardStore()
-    const notificationStore = useNotificationStore()
     
     try {
       const response = await apiService.post('/cards/batch-delete', { ids }, {
@@ -140,17 +132,16 @@ export const cardService = {
       // 从状态中移除已删除的卡密
       ids.forEach(id => cardStore.deleteCard(id))
       
-      notificationStore.success(`成功删除 ${response.count || ids.length} 个卡密`)
+      ElMessage.success(`成功删除 ${response.count || ids.length} 个卡密`)
       return response
     } catch (error) {
-      notificationStore.error('批量删除卡密失败')
+      ElMessage.error('批量删除卡密失败')
       throw error
     }
   },
   
   // 验证卡密
   async validateCard(cardKey) {
-    const notificationStore = useNotificationStore()
     
     try {
       const response = await apiService.post('/cards/validate', { cardKey }, {
@@ -158,17 +149,16 @@ export const cardService = {
         loadingText: '验证卡密中...'
       })
       
-      notificationStore.success('卡密验证成功')
+      ElMessage.success('卡密验证成功')
       return response
     } catch (error) {
-      notificationStore.error('卡密验证失败')
+      ElMessage.error('卡密验证失败')
       throw error
     }
   },
   
   // 导出卡密
   async exportCards(params = {}) {
-    const notificationStore = useNotificationStore()
     
     try {
       await apiService.download('/cards/export', params, 'cards.xlsx', {
@@ -176,9 +166,9 @@ export const cardService = {
         loadingText: '导出卡密中...'
       })
       
-      notificationStore.success('卡密导出成功')
+      ElMessage.success('卡密导出成功')
     } catch (error) {
-      notificationStore.error('导出卡密失败')
+      ElMessage.error('导出卡密失败')
       throw error
     }
   }
@@ -206,8 +196,7 @@ export const productService = {
       
       return response
     } catch (error) {
-      const notificationStore = useNotificationStore()
-      notificationStore.error('加载商品列表失败')
+      ElMessage.error('加载商品列表失败')
       throw error
     } finally {
       productStore.setLoading(false)
@@ -217,7 +206,6 @@ export const productService = {
   // 添加商品
   async addGood(data) {
     const productStore = useProductStore()
-    const notificationStore = useNotificationStore()
     
     try {
       const response = await apiService.post('/goods', data, {
@@ -226,10 +214,10 @@ export const productService = {
       })
       
       productStore.addGood(response.data)
-      notificationStore.success('商品添加成功')
+      ElMessage.success('商品添加成功')
       return response
     } catch (error) {
-      notificationStore.error('添加商品失败')
+      ElMessage.error('添加商品失败')
       throw error
     }
   },
@@ -237,7 +225,6 @@ export const productService = {
   // 更新商品
   async updateGood(id, data) {
     const productStore = useProductStore()
-    const notificationStore = useNotificationStore()
     
     try {
       const response = await apiService.put(`/goods/${id}`, data, {
@@ -246,10 +233,10 @@ export const productService = {
       })
       
       productStore.updateGood(id, response.data)
-      notificationStore.success('商品更新成功')
+      ElMessage.success('商品更新成功')
       return response
     } catch (error) {
-      notificationStore.error('更新商品失败')
+      ElMessage.error('更新商品失败')
       throw error
     }
   },
@@ -257,7 +244,6 @@ export const productService = {
   // 删除商品
   async deleteGood(id) {
     const productStore = useProductStore()
-    const notificationStore = useNotificationStore()
     
     try {
       await apiService.delete(`/goods/${id}`, {
@@ -266,9 +252,9 @@ export const productService = {
       })
       
       productStore.deleteGood(id)
-      notificationStore.success('商品删除成功')
+      ElMessage.success('商品删除成功')
     } catch (error) {
-      notificationStore.error('删除商品失败')
+      ElMessage.error('删除商品失败')
       throw error
     }
   },
@@ -285,8 +271,7 @@ export const productService = {
       productStore.setSpecifications(response.data || [])
       return response
     } catch (error) {
-      const notificationStore = useNotificationStore()
-      notificationStore.error('加载规格列表失败')
+      ElMessage.error('加载规格列表失败')
       throw error
     }
   },
@@ -294,7 +279,6 @@ export const productService = {
   // 添加规格
   async addSpecification(data) {
     const productStore = useProductStore()
-    const notificationStore = useNotificationStore()
     
     try {
       const response = await apiService.post('/specifications', data, {
@@ -303,10 +287,10 @@ export const productService = {
       })
       
       productStore.addSpecification(response.data)
-      notificationStore.success('规格添加成功')
+      ElMessage.success('规格添加成功')
       return response
     } catch (error) {
-      notificationStore.error('添加规格失败')
+      ElMessage.error('添加规格失败')
       throw error
     }
   },
@@ -314,7 +298,6 @@ export const productService = {
   // 更新规格
   async updateSpecification(id, data) {
     const productStore = useProductStore()
-    const notificationStore = useNotificationStore()
     
     try {
       const response = await apiService.put(`/specifications/${id}`, data, {
@@ -323,10 +306,10 @@ export const productService = {
       })
       
       productStore.updateSpecification(id, response.data)
-      notificationStore.success('规格更新成功')
+      ElMessage.success('规格更新成功')
       return response
     } catch (error) {
-      notificationStore.error('更新规格失败')
+      ElMessage.error('更新规格失败')
       throw error
     }
   },
@@ -334,7 +317,6 @@ export const productService = {
   // 删除规格
   async deleteSpecification(id) {
     const productStore = useProductStore()
-    const notificationStore = useNotificationStore()
     
     try {
       await apiService.delete(`/specifications/${id}`, {
@@ -343,9 +325,9 @@ export const productService = {
       })
       
       productStore.deleteSpecification(id)
-      notificationStore.success('规格删除成功')
+      ElMessage.success('规格删除成功')
     } catch (error) {
-      notificationStore.error('删除规格失败')
+      ElMessage.error('删除规格失败')
       throw error
     }
   }
@@ -363,79 +345,70 @@ export const userService = {
       
       return response
     } catch (error) {
-      const notificationStore = useNotificationStore()
-      notificationStore.error('加载用户列表失败')
+      ElMessage.error('加载用户列表失败')
       throw error
     }
   },
   
   // 添加用户
   async addUser(data) {
-    const notificationStore = useNotificationStore()
-    
     try {
       const response = await apiService.post('/users', data, {
         showLoading: true,
         loadingText: '添加用户中...'
       })
       
-      notificationStore.success('用户添加成功')
+      ElMessage.success('用户添加成功')
       return response
     } catch (error) {
-      notificationStore.error('添加用户失败')
+      ElMessage.error('添加用户失败')
       throw error
     }
   },
   
   // 更新用户
   async updateUser(id, data) {
-    const notificationStore = useNotificationStore()
-    
     try {
       const response = await apiService.put(`/users/${id}`, data, {
         showLoading: true,
         loadingText: '更新用户中...'
       })
       
-      notificationStore.success('用户更新成功')
+      ElMessage.success('用户更新成功')
       return response
     } catch (error) {
-      notificationStore.error('更新用户失败')
+      ElMessage.error('更新用户失败')
       throw error
     }
   },
   
   // 删除用户
   async deleteUser(id) {
-    const notificationStore = useNotificationStore()
-    
     try {
       await apiService.delete(`/users/${id}`, {
         showLoading: true,
         loadingText: '删除用户中...'
       })
       
-      notificationStore.success('用户删除成功')
+      ElMessage.success('用户删除成功')
     } catch (error) {
-      notificationStore.error('删除用户失败')
+      ElMessage.error('删除用户失败')
       throw error
     }
   },
   
   // 切换用户状态
   async toggleUserStatus(id, status) {
-    const notificationStore = useNotificationStore()
-    
     try {
       const response = await apiService.patch(`/users/${id}/status`, { status }, {
         showLoading: true,
         loadingText: '更新用户状态中...'
       })
       
-      notificationStore.success(`用户已${status ? '启用' : '禁用'}`)
+      ElMessage.success(`用户已${status ? '启用' : '禁用'}`)
       return response
     } catch (error) {
-      notificationStore.error('更新用户状态失败')
+      ElMessage.error('更新用户状态失败')
       throw error
     }
   }
@@ -445,29 +418,25 @@ export const userService = {
 export const authService = {
   // 登录
   async login(credentials) {
-    const notificationStore = useNotificationStore()
-    
     try {
       const response = await apiService.post('/auth/login', credentials, {
         showLoading: true,
         loadingText: '登录中...'
       })
       
-      notificationStore.success('登录成功')
+      ElMessage.success('登录成功')
       return response
     } catch (error) {
-      notificationStore.error('登录失败，请检查用户名和密码')
+      ElMessage.error('登录失败，请检查用户名和密码')
       throw error
     }
   },
   
   // 登出
   async logout() {
-    const notificationStore = useNotificationStore()
-    
     try {
       await apiService.post('/auth/logout')
-      notificationStore.success('已退出登录')
+      ElMessage.success('已退出登录')
     } catch (error) {
       // 即使登出接口失败，也要清除本地状态
       console.error('登出接口调用失败:', error)

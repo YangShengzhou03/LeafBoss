@@ -295,33 +295,34 @@ onMounted(() => {
 
 <style scoped>
 .users-container {
-  background-color: #f5f7fa;
-  padding: 16px;
-  border-radius: 4px;
+  background-color: var(--bg-color);
+  padding: var(--page-padding);
+  min-height: 100vh;
 }
 
 .card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: var(--section-margin);
 }
 
 .filter-container {
   display: flex;
-  gap: 10px;
-  margin-bottom: 16px;
+  gap: var(--spacing-md);
+  margin-bottom: var(--section-margin);
 }
 
 .table-container {
-  background-color: #fff;
-  border-radius: 4px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  padding: 16px;
+  background-color: var(--bg-white);
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-md);
+  padding: var(--card-padding);
+  border: 1px solid var(--border-light);
 }
 
 .pagination-container {
-  margin-top: 16px;
+  margin-top: var(--section-margin);
   display: flex;
   justify-content: flex-end;
 }
@@ -332,47 +333,52 @@ onMounted(() => {
 }
 
 :deep(.el-table__header) {
-  background-color: #f8f9fa;
+  background-color: var(--bg-gray);
 }
 
 :deep(.el-table__header th) {
   font-weight: 500;
-  color: #606266;
+  color: var(--text-regular);
 }
 
 /* 对话框样式优化 */
 :deep(.el-dialog) {
-  border-radius: 4px;
+  border-radius: var(--border-radius-md);
 }
 
 :deep(.el-dialog__header) {
-  border-bottom: 1px solid #f0f0f0;
-  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-light);
+  padding: var(--spacing-lg) var(--spacing-xl);
 }
 
 :deep(.el-dialog__body) {
-  padding: 20px;
+  padding: var(--spacing-xl);
 }
 
 /* 表单样式优化 */
 :deep(.el-form-item__label) {
   font-weight: 500;
+  color: var(--text-primary);
 }
 
 :deep(.el-input__inner) {
-  border-radius: 4px;
+  border-radius: var(--border-radius-md);
 }
 
 /* 按钮样式优化 */
 :deep(.el-button) {
-  border-radius: 4px;
+  border-radius: var(--border-radius-md);
 }
 
 /* 响应式设计 */
 @media (max-width: 768px) {
+  .users-container {
+    padding: var(--spacing-md);
+  }
+  
   .filter-container {
     flex-direction: column;
-    gap: 8px;
+    gap: var(--spacing-sm);
   }
   
   .filter-container > * {

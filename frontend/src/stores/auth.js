@@ -14,31 +14,33 @@ export const useAuthStore = defineStore('auth', () => {
   const login = async (credentials) => {
     loading.value = true
     try {
-      // 这里应该调用实际的登录API
-      // const response = await api.post('/auth/login', credentials)
-      // const { token: authToken, user: userData } = response.data
-      
-      // 模拟登录成功
-      const authToken = 'mock-jwt-token'
-      const userData = {
-        id: 1,
-        username: credentials.username,
-        email: 'admin@example.com',
-        role: 'admin',
-        avatar: 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png'
+      // 测试账号：admin / admin123
+      if (credentials.username === 'admin' && credentials.password === 'admin123') {
+        // 模拟登录成功
+        const authToken = 'mock-jwt-token'
+        const userData = {
+          id: 1,
+          username: credentials.username,
+          email: 'admin@example.com',
+          role: 'admin',
+          avatar: 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png'
+        }
+        
+        token.value = authToken
+        user.value = userData
+        
+        // 保存token到本地存储
+        localStorage.setItem('token', authToken)
+        
+        // 设置HTTP默认请求头
+        http.defaults.headers.common['Authorization'] = `Bearer ${authToken}`
+        
+        ElMessage.success('登录成功')
+        return { success: true }
+      } else {
+        ElMessage.error('用户名或密码错误，请使用测试账号：admin / admin123')
+        return { success: false, error: '用户名或密码错误' }
       }
-      
-      token.value = authToken
-      user.value = userData
-      
-      // 保存token到本地存储
-      localStorage.setItem('token', authToken)
-      
-      // 设置HTTP默认请求头
-      http.defaults.headers.common['Authorization'] = `Bearer ${authToken}`
-      
-      ElMessage.success('登录成功')
-      return { success: true }
     } catch (error) {
       ElMessage.error(error.response?.data?.message || '登录失败')
       return { success: false, error: error.message }
