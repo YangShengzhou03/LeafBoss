@@ -11,23 +11,15 @@ import * as ElementPlusIconsVue from '@element-plus/icons-vue';
 
 const app = createApp(App);
 
-app.config.errorHandler = (err, vm, info) => {
-  console.error('全局错误:', err, info);
-  
+app.config.errorHandler = (err) => {
   if (process.env.NODE_ENV === 'production') {
     ElMessage.error('应用发生错误，请刷新页面重试');
   } else {
     ElMessage.error(`应用错误: ${err.message || '未知错误'}`);
   }
-  
-  if (process.env.NODE_ENV === 'production') {
-    console.log('发送错误报告:', err.message);
-  }
 };
 
-app.config.warnHandler = (msg, vm, trace) => {
-  console.warn('全局警告:', msg, trace);
-  
+app.config.warnHandler = (msg) => {
   if (process.env.NODE_ENV === 'development') {
     ElNotification({
       title: '开发警告',
@@ -39,14 +31,7 @@ app.config.warnHandler = (msg, vm, trace) => {
 };
 
 if (process.env.NODE_ENV === 'development') {
-  const startTime = performance.now();
-  
   app.config.performance = true;
-  
-  window.addEventListener('load', () => {
-    const loadTime = performance.now() - startTime;
-    console.log(`应用加载时间: ${loadTime.toFixed(2)}ms`);
-  });
 }
 
 app.use(ElementPlus, {
@@ -71,13 +56,7 @@ app.config.globalProperties.$formatFileSize = (bytes) => {
 
 try {
   app.mount('#app');
-  
-  if (process.env.NODE_ENV === 'development') {
-    console.log('Vue应用挂载成功');
-  }
 } catch (error) {
-  console.error('应用挂载失败:', error);
-  
   document.getElementById('app').innerHTML = `
     <div style="display: flex; justify-content: center; align-items: center; height: 100vh; flex-direction: column;">
       <h2 style="color: #f56c6c; margin-bottom: 20px;">应用加载失败</h2>

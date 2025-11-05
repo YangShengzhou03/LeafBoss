@@ -19,7 +19,6 @@ Server.interceptors.request.use(config => {
 Server.interceptors.response.use(
   response => {
     if (response.data === null || response.data === undefined) {
-      console.warn('响应数据为空:', response)
       return { data: null, code: 500, message: '响应数据为空' }
     }
     
@@ -39,7 +38,6 @@ Server.interceptors.response.use(
   },
   error => {
     if (!error.response) {
-      console.error('网络连接失败:', error)
       ElMessage.error('网络连接失败，请检查网络连接')
       return Promise.reject(error)
     }

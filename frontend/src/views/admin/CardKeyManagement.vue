@@ -210,7 +210,6 @@ const loadCardKeys = async () => {
       total.value = 0
     }
   } catch (error) {
-    console.error('加载卡密数据失败:', error)
     ElMessage.error('加载卡密数据失败，请检查网络连接')
     cardKeys.value = []
     total.value = 0

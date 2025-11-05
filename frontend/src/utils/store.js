@@ -75,7 +75,6 @@ const store = {
       
       return { success: false, message: response?.message || '登录失败' }
     } catch (error) {
-      console.error('管理员登录失败:', error)
       return { success: false, message: '登录失败，请检查网络连接' }
     } finally {
       state.loading = false
@@ -83,28 +82,12 @@ const store = {
   },
 
   // 管理员注册
-  async adminRegister(userData) {
-    state.loading = true
+  async adminRegister(registerData) {
     try {
-      // 构造符合后端期望的数据结构
-      const registerData = {
-        email: userData.email,
-        password: userData.password,
-        verificationCode: userData.verificationCode
-      }
-      
-      const response = await Server.post('/admin/register', registerData)
-      
-      if (response && response.code === 200) {
-        return { success: true, message: response.message || '注册成功，请登录' }
-      }
-      
-      return { success: false, message: response?.message || '注册失败' }
+      const response = await adminApi.register(registerData);
+      return { success: true, message: response.message };
     } catch (error) {
-      console.error('管理员注册失败:', error)
-      return { success: false, message: '注册失败，请检查网络连接' }
-    } finally {
-      state.loading = false
+      throw error;
     }
   },
 

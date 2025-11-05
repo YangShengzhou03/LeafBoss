@@ -36,7 +36,6 @@ export function parseJWT(token) {
   try {
     // 检查token格式
     if (!token || typeof token !== 'string' || token.split('.').length !== 3) {
-      console.warn('无效的token格式');
       return {};
     }
     
@@ -57,14 +56,12 @@ export function parseJWT(token) {
     
     // 检查token是否过期 - 使用UTC时间进行比较，避免时区差异
     if (payload.exp && payload.exp * 1000 < Date.now()) {
-      console.warn('Token已过期');
       removeToken(); // 自动清除过期token
       return {};
     }
     
     return payload;
   } catch (error) {
-    console.error('JWT解析错误:', error);
     removeToken(); // 解析失败时清除无效token
     return {};
   }

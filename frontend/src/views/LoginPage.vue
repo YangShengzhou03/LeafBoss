@@ -359,7 +359,7 @@ const sendForgotVerificationCode = async () => {
       ElMessage.error(response?.message || '验证码发送失败')
     }
   } catch (error) {
-    console.error('发送重置验证码失败:', error)
+
     ElMessage.error('验证码发送失败，请检查网络连接')
   } finally {
     forgotCodeSending.value = false
@@ -445,128 +445,48 @@ const showPrivacyPolicy = () => {
 
 // 处理登录
 const handleLogin = async () => {
-  if (!loginFormRef.value) return
-  
   try {
-    const valid = await loginFormRef.value.validate()
-    if (!valid) return
-    
-    loginLoading.value = true
-    
-    // 调用用户登录API
-    const response = await api.user.login(loginForm)
-    
-    if (response && response.code === 200 && response.data) {
-      const { token, user } = response.data
-      
-      if (token) {
-        utils.saveToken(token)
-      }
-      
-      // 设置用户信息
-      if (user) {
-        store.setUser(user)
-      }
-      
-      // 如果用户选择了记住密码，保存凭据
-      if (loginForm.rememberPassword) {
-        utils.saveCredentials(loginForm.email, loginForm.password)
-      } else {
-        // 如果用户没有选择记住密码，清除可能存在的凭据
-        utils.removeCredentials()
-      }
-      
-      ElMessage.success('登录成功')
-      
-      // 确保store中的用户信息已更新
-      await new Promise(resolve => setTimeout(resolve, 200))
-      
-      // 检查store状态是否已更新
-      if (store.state.isAuthenticated && store.state.user) {
-        // 使用replace而不是push，确保不会保留登录页在历史记录中
-        // 直接跳转到管理员控制台
-        router.replace('/admin')
-      } else {
-        // 如果状态未更新，强制刷新页面
-        window.location.href = '/admin'
-      }
+    const response = await store.login(loginForm);
+    if (response.success) {
+      ElMessage.success('登录成功');
+      router.replace('/admin/dashboard');
     } else {
-      ElMessage.error(response?.message || '登录失败，请检查用户名和密码')
+      ElMessage.error(response.message || '登录失败');
     }
   } catch (error) {
-    console.error('登录错误:', error)
-    ElMessage.error('登录失败，请检查网络连接')
-  } finally {
-    loginLoading.value = false
+    ElMessage.error('登录失败，请检查网络连接');
   }
-}
+};
 
 // 处理注册
 const handleRegister = async () => {
-  if (!registerFormRef.value) return
-  
   try {
-    const valid = await registerFormRef.value.validate()
-    if (!valid) return
-    
-    if (!registerForm.agreed) {
-      ElMessage.warning('请阅读并同意用户协议和隐私政策')
-      return
-    }
-    
-    registerLoading.value = true
-    
-    // 调用用户注册API
-    const response = await api.user.createUser({
-      username: registerForm.email,
-      email: registerForm.email,
-      passwordHash: registerForm.password  // 直接传递明文密码，不进行加密
-    })
-    
-    if (response && response.code === 200) {
-      ElMessage.success('注册成功，请登录')
-      currentView.value = 'login'
+    const response = await store.register(registerForm);
+    if (response.success) {
+      ElMessage.success('注册成功');
+      router.replace('/admin/dashboard');
     } else {
-      ElMessage.error(response?.message || '注册失败')
+      ElMessage.error(response.message || '注册失败');
     }
   } catch (error) {
-    console.error('注册错误:', error)
-    ElMessage.error('注册失败，请检查网络连接')
-  } finally {
-    registerLoading.value = false
+    ElMessage.error('注册失败，请检查网络连接');
   }
-}
+};
 
 // 处理忘记密码
 const handleForgotPassword = async () => {
-  if (!forgotFormRef.value) return
-  
   try {
-    const valid = await forgotFormRef.value.validate()
-    if (!valid) return
-    
-    forgotLoading.value = true
-    
-    // 调用重置密码API
-    const response = await api.user.resetPassword({
-      email: forgotForm.email,
-      verificationCode: forgotForm.verificationCode,
-      newPassword: forgotForm.newPassword
-    })
-    
-    if (response && response.code === 200) {
-      ElMessage.success('密码重置成功，请使用新密码登录')
-      currentView.value = 'login'
+    const response = await store.resetPassword(forgotForm);
+    if (response.success) {
+      ElMessage.success('密码重置成功');
+      currentView.value = 'login';
     } else {
-      ElMessage.error(response?.message || '密码重置失败')
+      ElMessage.error(response.message || '密码重置失败');
     }
   } catch (error) {
-    console.error('重置密码失败:', error)
-    ElMessage.error('密码重置失败，请检查网络连接')
-  } finally {
-    forgotLoading.value = false
+    ElMessage.error('密码重置失败，请检查网络连接');
   }
-}
+};
 
 // 在模板挂载后设置组件引用为markRaw
 onMounted(() => {

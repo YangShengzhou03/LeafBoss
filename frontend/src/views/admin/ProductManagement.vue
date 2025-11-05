@@ -196,7 +196,6 @@ const loadProducts = async () => {
       total.value = 0
     }
   } catch (error) {
-    console.error('加载商品数据失败:', error)
     ElMessage.error('加载商品数据失败，请检查网络连接')
     products.value = []
     total.value = 0
@@ -235,39 +234,29 @@ const handleEditProduct = (row) => {
 // 保存商品
 const saveProduct = async () => {
   try {
-    if (editingProduct.value) {
-      // 调用API更新商品
-      await api.admin.editProduct(editingProduct.value.id, productForm)
-      
-      // 更新本地数据
-      const index = products.value.findIndex(p => p.id === editingProduct.value.id)
-      if (index !== -1) {
-        products.value[index] = { ...products.value[index], ...productForm }
+    if (isEditing.value) {
+      const response = await productApi.updateProduct(productForm.id, productForm);
+      if (response && response.code === 200) {
+        ElMessage.success('商品更新成功');
+        dialogVisible.value = false;
+        loadProducts();
+      } else {
+        ElMessage.error(response?.message || '保存商品失败');
       }
     } else {
-      // 调用API添加新商品
-      const response = await api.admin.createProduct(productForm)
-      
-      // 添加新商品到本地列表
-      const newProduct = {
-        id: response.data?.id || Date.now(),
-        ...productForm,
-        createTime: new Date().toLocaleString()
+      const response = await productApi.createProduct(productForm);
+      if (response && response.code === 200) {
+        ElMessage.success('商品添加成功');
+        dialogVisible.value = false;
+        loadProducts();
+      } else {
+        ElMessage.error(response?.message || '保存商品失败');
       }
-      products.value.unshift(newProduct)
     }
-    
-    showAddDialog.value = false
-    ElMessage.success(editingProduct.value ? '更新成功' : '添加成功')
-    resetForm()
-    
-    // 重新加载数据确保数据一致性
-    loadProducts()
   } catch (error) {
-    console.error('保存商品失败:', error)
-    ElMessage.error('操作失败')
+    ElMessage.error('保存商品失败，请检查网络连接');
   }
-}
+};
 
 // 重置表单
 const resetForm = () => {

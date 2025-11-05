@@ -226,12 +226,9 @@ const loadDashboardData = async () => {
     }
     
   } catch (error) {
-    console.error('加载仪表盘数据失败:', error)
-    
     // 根据错误类型给出不同的提示
     if (error.response && error.response.status === 401) {
       // 401错误已经在拦截器中处理，这里不需要重复提示
-      console.log('Token过期，已跳转登录页面')
     } else if (error.code === 'NETWORK_ERROR' || !error.response) {
       ElMessage.error('网络连接失败，请检查网络连接')
     } else if (error.response.status === 500) {

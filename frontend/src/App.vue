@@ -29,7 +29,6 @@ const hasError = ref(false)
 const errorMessage = ref('')
 
 onErrorCaptured((err) => {
-  console.error('应用错误:', err)
   hasError.value = true
   errorMessage.value = err.message || '未知错误'
   return false
@@ -56,7 +55,6 @@ onMounted(async () => {
     }
     isLoading.value = false
   } catch (error) {
-    console.error('应用初始化失败:', error)
     hasError.value = true
     errorMessage.value = error.message || '初始化失败'
     isLoading.value = false

@@ -13,7 +13,6 @@ export const ErrorHandler = {
    * @returns {boolean} 是否处理了错误
    */
   handleApiError(error, defaultMessage = '操作失败', showMessage = true) {
-    console.error('API错误:', error)
     
     // 处理错误
     let message = defaultMessage
@@ -59,7 +58,6 @@ export const ErrorHandler = {
    * @param {string} defaultMessage 默认错误消息
    */
   handleUploadError(error, defaultMessage = '文件上传失败') {
-    console.error('文件上传错误:', error)
     
     let message = defaultMessage
     
@@ -100,7 +98,6 @@ export const ErrorHandler = {
    * @param {string} defaultMessage 默认错误消息
    */
   handleDownloadError(error, defaultMessage = '文件下载失败') {
-    console.error('文件下载错误:', error)
     
     let message = defaultMessage
     
@@ -141,7 +138,6 @@ export const ErrorHandler = {
    * @param {string} defaultMessage 默认错误消息
    */
   handleValidationError(error, defaultMessage = '表单验证失败') {
-    console.error('表单验证错误:', error)
     
     let message = defaultMessage
     
