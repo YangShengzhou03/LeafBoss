@@ -26,14 +26,14 @@ module.exports = defineConfig({
     }
   },
   devServer: {
-    port: 3000,
+    port: 8080,
     host: 'localhost',
     open: true,
     hot: true,
     compress: true,
     proxy: {
       '/api': {
-        target: 'http://localhost:8080',
+        target: 'http://localhost:8081',
         changeOrigin: true,
         secure: false,
         pathRewrite: {
