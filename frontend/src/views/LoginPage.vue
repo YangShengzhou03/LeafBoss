@@ -135,7 +135,6 @@
                       :style="{ width: passwordStrength.width + '%' }"
                     ></div>
                   </div>
-                  <div class="strength-text">{{ passwordStrength.text }}</div>
                 </div>
               </el-form-item>
               
@@ -386,7 +385,6 @@ const checkPasswordStrength = () => {
   if (!password) {
     passwordStrength.level = 'weak'
     passwordStrength.width = 0
-    passwordStrength.text = ''
     return
   }
   
@@ -412,15 +410,12 @@ const checkPasswordStrength = () => {
   if (score >= 80) {
     passwordStrength.level = 'strong'
     passwordStrength.width = 100
-    passwordStrength.text = '密码强度：强'
   } else if (score >= 50) {
     passwordStrength.level = 'medium'
     passwordStrength.width = 66
-    passwordStrength.text = '密码强度：中'
   } else {
     passwordStrength.level = 'weak'
     passwordStrength.width = 33
-    passwordStrength.text = '密码强度：弱'
   }
 }
 
@@ -607,7 +602,7 @@ onMounted(() => {
   align-items: center;
   justify-content: center;
   background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  padding: 20px;
+  padding: 24px;
   position: relative;
   overflow: hidden;
 }
@@ -638,25 +633,25 @@ onMounted(() => {
 
 .card-inner {
   background: #ffffff;
-  border-radius: 10px;
-  padding: 24px 28px;
+  border-radius: 12px;
+  padding: 32px 36px;
   box-shadow: 
-    0 6px 16px rgba(0, 0, 0, 0.05),
-    0 3px 8px rgba(0, 0, 0, 0.03),
+    0 8px 24px rgba(0, 0, 0, 0.06),
+    0 4px 12px rgba(0, 0, 0, 0.04),
     inset 0 1px 0 rgba(255, 255, 255, 0.9);
   border: 1px solid rgba(224, 224, 224, 0.6);
   display: flex;
   align-items: stretch;
-  gap: 16px;
-  backdrop-filter: blur(6px);
-  min-height: 320px;
+  gap: 24px;
+  backdrop-filter: blur(8px);
+  min-height: 360px;
 }
 
 /* Logo部分 */
 .logo-section {
   text-align: center;
-  flex: 0 0 140px;
-  padding: 20px 8px;
+  flex: 0 0 160px;
+  padding: 24px 12px;
   border-right: 1px solid rgba(224, 224, 224, 0.5);
   display: flex;
   flex-direction: column;
@@ -720,24 +715,24 @@ onMounted(() => {
 /* 表单区域 */
 .form-section {
   flex: 1;
-  padding: 8px 0;
+  padding: 12px 0;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  min-height: 340px;
+  min-height: 360px;
 }
 
 /* 视图切换标题 */
 .view-header {
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
   position: relative;
 }
 
 .view-title {
   color: #1a1a1a;
-  margin: 0 0 10px 0;
-  font-size: 22px;
+  margin: 0 0 12px 0;
+  font-size: 24px;
   font-weight: 600;
   letter-spacing: -0.4px;
   background: linear-gradient(135deg, #1a1a1a 0%, #2c5aa0 100%);
@@ -749,21 +744,21 @@ onMounted(() => {
 .view-indicator {
   display: flex;
   justify-content: center;
-  gap: 6px;
-  margin-top: 6px;
+  gap: 8px;
+  margin-top: 8px;
 }
 
 .indicator-dot {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   background: #e0e0e0;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
 }
 
 .indicator-dot.active {
   background: #2c5aa0;
-  transform: scale(1.3);
+  transform: scale(1.4);
 }
 
 /* 视图内容 */
@@ -774,7 +769,7 @@ onMounted(() => {
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(12px);
   }
   to {
     opacity: 1;
@@ -783,11 +778,11 @@ onMounted(() => {
 }
 
 .form-content {
-  margin-top: 6px;
+  margin-top: 8px;
 }
 
 .form-content .el-form-item {
-  margin-bottom: 14px;
+  margin-bottom: 16px;
 }
 
 /* 统一输入框和按钮宽度 */
@@ -828,8 +823,8 @@ onMounted(() => {
 /* 验证码输入区域样式优化 */
 .verification-code-container {
   display: flex;
-  justify-content: space-between; /* 分散对齐 */
-  gap: 8px;
+  justify-content: space-between;
+  gap: 12px;
   align-items: center;
 }
 
@@ -838,27 +833,27 @@ onMounted(() => {
 }
 
 .verification-code-container .send-code-btn {
-  min-width: 120px;
+  min-width: 132px;
   flex-shrink: 0;
 }
 
 .form-content .el-input__wrapper {
-  border-radius: 5px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
   border: 1px solid rgba(224, 224, 224, 0.7);
   background: #fcfcfc;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
   width: 100%;
 }
 
 .form-content .el-input__wrapper:hover {
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
-  border-color: rgba(44, 90, 160, 0.4);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border-color: rgba(44, 90, 160, 0.5);
   background: #ffffff;
 }
 
 .form-content .el-input__wrapper.is-focus {
-  box-shadow: 0 0 0 2px rgba(44, 90, 160, 0.08);
+  box-shadow: 0 0 0 3px rgba(44, 90, 160, 0.12);
   border-color: #2c5aa0;
   background: #ffffff;
 }
@@ -871,20 +866,18 @@ onMounted(() => {
   border-radius: 8px;
 }
 
-
-
 .submit-btn {
   width: 100%;
-  height: 36px;
-  font-size: 13px;
+  height: 40px;
+  font-size: 14px;
   font-weight: 600;
-  border-radius: 5px;
-  margin-top: 6px;
+  border-radius: 8px;
+  margin-top: 8px;
   background: linear-gradient(135deg, #2c5aa0 0%, #1e4a8c 100%);
   border: none;
   color: white;
-  box-shadow: 0 1px 4px rgba(44, 90, 160, 0.25);
-  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(44, 90, 160, 0.3);
+  transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
 }
@@ -902,7 +895,8 @@ onMounted(() => {
 
 .submit-btn:hover {
   background: linear-gradient(135deg, #1e4a8c 0%, #153a75 100%);
-  box-shadow: 0 3px 12px rgba(44, 90, 160, 0.3);
+  box-shadow: 0 4px 16px rgba(44, 90, 160, 0.4);
+  transform: translateY(-1px);
 }
 
 .submit-btn:hover::before {
@@ -912,20 +906,21 @@ onMounted(() => {
 .submit-btn:active {
   background: linear-gradient(135deg, #153a75 0%, #0f2a5a 100%);
   box-shadow: 0 1px 4px rgba(44, 90, 160, 0.25);
+  transform: translateY(0);
 }
 
 .form-footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 14px;
-  padding: 0 2px;
+  margin-top: 16px;
+  padding: 0 4px;
 }
 
 .form-footer .el-link {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 500;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
   position: relative;
 }
 
@@ -937,7 +932,7 @@ onMounted(() => {
   width: 0;
   height: 1px;
   background: #2c5aa0;
-  transition: width 0.2s ease;
+  transition: width 0.3s ease;
 }
 
 .form-footer .el-link:hover {
@@ -964,35 +959,35 @@ onMounted(() => {
 }
 
 .remember-checkbox {
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .remember-checkbox :deep(.el-checkbox__label) {
   color: #555;
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.4;
 }
 
 /* 密码强度提示样式 */
 .password-strength {
-  margin-top: 6px;
+  margin-top: 8px;
 }
 
 .strength-bar {
   width: 100%;
-  height: 4px;
+  height: 6px;
   background: linear-gradient(90deg, #e0e0e0 0%, #f0f0f0 100%);
-  border-radius: 2px;
+  border-radius: 3px;
   overflow: hidden;
-  margin-bottom: 4px;
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+  margin-bottom: 6px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .strength-level {
   height: 100%;
-  border-radius: 2px;
+  border-radius: 3px;
   transition: all 0.5s ease;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
 .strength-level.weak {
@@ -1000,17 +995,18 @@ onMounted(() => {
 }
 
 .strength-level.medium {
-  background-color: #f39c12;
+  background: linear-gradient(90deg, #f39c12 0%, #f1c40f 100%);
 }
 
 .strength-level.strong {
-  background-color: #27ae60;
+  background: linear-gradient(90deg, #27ae60 0%, #2ecc71 100%);
 }
 
 .strength-text {
-  font-size: 10px;
+  font-size: 12px;
   color: #666;
   text-align: right;
+  font-weight: 500;
 }
 
 /* 对话框样式 */

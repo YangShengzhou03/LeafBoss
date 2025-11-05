@@ -3,6 +3,7 @@ import productApi from './product'
 import specificationApi from './specification'
 import cardKeyApi from './cardKey'
 import operationLogApi from './operationLog'
+import adminApi from './admin'
 
 /**
  * API服务集合
@@ -12,7 +13,8 @@ export {
   productApi,
   specificationApi,
   cardKeyApi,
-  operationLogApi
+  operationLogApi,
+  adminApi
 }
 
 /**
@@ -23,5 +25,6 @@ export default {
   product: productApi,
   specification: specificationApi,
   cardKey: cardKeyApi,
-  operationLog: operationLogApi
+  operationLog: operationLogApi,
+  admin: adminApi
 }

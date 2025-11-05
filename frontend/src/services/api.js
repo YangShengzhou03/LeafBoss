@@ -2,6 +2,14 @@ import Server from '../utils/Server'
 import { userApi, productApi, specificationApi, cardKeyApi, operationLogApi } from '../api'
 
 const AdminService = {
+  login(data) {
+    return Server.post('/admin/login', data)
+  },
+
+  register(data) {
+    return Server.post('/admin/register', data)
+  },
+
   getDashboardStats() {
     return Server.get('/admin/dashboard')
   },
