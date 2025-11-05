@@ -24,10 +24,12 @@ CREATE TABLE products (
     id CHAR(36) PRIMARY KEY DEFAULT (UUID()) COMMENT '产品唯一标识符',
     name VARCHAR(100) NOT NULL COMMENT '产品名称',
     description TEXT COMMENT '产品描述',
+    category VARCHAR(50) DEFAULT 'default' COMMENT '产品分类',
     status ENUM('active', 'inactive') DEFAULT 'active' NOT NULL COMMENT '产品状态',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '创建时间',
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL COMMENT '最后更新时间',
     INDEX idx_name (name),
+    INDEX idx_category (category),
     INDEX idx_status (status)
 ) ENGINE=InnoDB COMMENT='产品表';
 
@@ -90,9 +92,9 @@ INSERT INTO admins (username, email, password_hash, status) VALUES
 ('admin', 'admin@leafcard.com', '123456', 'active');
 
 -- 简化产品数据，只保留核心产品
-INSERT INTO products (name, description, status) VALUES
-('VIP会员', 'VIP会员专属权益，享受高级服务', 'active'),
-('普通会员', '普通会员基础权益，满足日常需求', 'active');
+INSERT INTO products (name, description, category, status) VALUES
+('VIP会员', 'VIP会员专属权益，享受高级服务', 'vip', 'active'),
+('普通会员', '普通会员基础权益，满足日常需求', 'normal', 'active');
 
 -- 简化规格数据，每个产品保留1-2个规格
 INSERT INTO specifications (product_id, name, description, duration_days, price, stock_quantity, status) VALUES

@@ -103,7 +103,7 @@ public class UserController {
             
             // 这里应该验证旧密码是否正确（实际项目中需要加密验证）
             // 然后更新密码
-            admin.setPassword(newPassword);
+            admin.setPasswordHash(newPassword);
             boolean updated = adminService.updateById(admin);
             
             if (updated) {

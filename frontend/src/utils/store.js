@@ -277,7 +277,7 @@ const store = {
     }
 
     try {
-      const response = await Server.get('/auth/me')
+      const response = await Server.get('/api/auth/me')
       
       // 根据API响应结构，用户信息在response.data中
       // 响应结构: {code: 200, message: "操作成功", data: {用户信息}}
@@ -306,7 +306,7 @@ const store = {
     }
 
     try {
-      const response = await Server.get('/user/storage')
+      const response = await Server.get('/api/user/storage')
       // 注意：Server.js的响应拦截器已经将后端返回的完整响应包装成了response.data
       // 后端返回的数据结构是 {code: 200, message: "success", data: {storageQuota: 1073741824, usedStorage: 1048576, ...}}
       const storageData = response.data || response

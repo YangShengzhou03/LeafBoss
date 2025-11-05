@@ -208,7 +208,7 @@ const handleCurrentChange = (page) => {
 // 加载商品列表
 const loadProducts = async () => {
   try {
-    const response = await Server.get('/products')
+    const response = await Server.get('/api/products')
     if (response.data && response.data.success) {
       productList.value = response.data.data || []
     } else {
@@ -223,7 +223,7 @@ const loadProducts = async () => {
 // 加载规格列表
 const loadSpecs = async () => {
   try {
-    const response = await Server.get('/specs')
+    const response = await Server.get('/api/specifications')
     if (response.data && response.data.success) {
       specList.value = response.data.data || []
     } else {

@@ -22,11 +22,11 @@ public class CardKey {
     @TableField("status")
     private String status;
     
-    @TableField("user_id")
-    private String userId;
-    
     @TableField("user_email")
     private String userEmail;
+    
+    @TableField("user_id")
+    private String userId;
     
     @TableField("activate_time")
     private LocalDateTime activateTime;
@@ -73,20 +73,20 @@ public class CardKey {
         this.status = status;
     }
 
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
     public String getUserEmail() {
         return userEmail;
     }
 
     public void setUserEmail(String userEmail) {
         this.userEmail = userEmail;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public LocalDateTime getActivateTime() {

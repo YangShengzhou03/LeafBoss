@@ -99,7 +99,7 @@
             <!-- 空状态 -->
             <template #empty>
               <div class="empty-container" style="padding: 40px 0;">
-                <el-empty description="暂无用户数据" image-size="120" />
+                <el-empty description="暂无用户数据" :image-size="120" />
               </div>
             </template>
           </el-table>

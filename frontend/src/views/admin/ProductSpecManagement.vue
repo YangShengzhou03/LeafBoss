@@ -95,7 +95,7 @@
             <!-- 空状态 -->
             <template #empty>
               <div class="empty-container" style="padding: 40px 0;">
-                <el-empty description="暂无规格数据" image-size="120" />
+                <el-empty description="暂无规格数据" :image-size="120" />
               </div>
             </template>
           </el-table>
@@ -227,7 +227,7 @@ const loadSpecs = async () => {
   loading.value = true
   try {
     // 调用API获取商品规格列表
-    const response = await api.admin.getProductSpecList({
+    const response = await api.admin.getSpecList({
       page: currentPage.value,
       size: pageSize.value,
       keyword: searchQuery.value,
@@ -304,8 +304,7 @@ const toggleSpecStatus = async (spec) => {
     )
     
     // 调用API更新规格状态
-    await api.admin.updateProductSpec({
-      id: spec.id,
+    await api.admin.editSpec(spec.id, {
       status: spec.status === 'active' ? 0 : 1
     })
     
@@ -327,10 +326,7 @@ const saveSpec = async () => {
   try {
     if (editingSpec.value) {
       // 调用API更新规格
-      await api.admin.updateProductSpec({
-        id: editingSpec.value.id,
-        ...specForm
-      })
+      await api.admin.editSpec(editingSpec.value.id, specForm)
       
       // 更新本地数据
       const index = specs.value.findIndex(s => s.id === editingSpec.value.id)
@@ -339,7 +335,7 @@ const saveSpec = async () => {
       }
     } else {
       // 调用API添加新规格
-      const response = await api.admin.addProductSpec(specForm)
+      const response = await api.admin.createSpec(specForm)
       
       // 添加新规格到本地列表
       const newSpec = {

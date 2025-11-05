@@ -71,6 +71,15 @@ public class JwtUtil {
                 .getBody();
         return claims.get("adminId", String.class);
     }
+
+    /**
+     * 从token中获取用户ID（兼容性方法）
+     * @param token JWT token
+     * @return 用户ID
+     */
+    public String getUserIdFromToken(String token) {
+        return getAdminIdFromToken(token);
+    }
     
     /**
      * 从token中获取用户名
