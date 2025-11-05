@@ -122,7 +122,7 @@ java -jar target/leaf-card-backend-1.0.0.jar
    - Access http://localhost:8081
 
 3. **System Login**
-   - Default admin account: admin / admin123
+   - Default admin account: admin@leafcard.com / 123456
    - Change default password on first use
 
 **Main Function Modules:**

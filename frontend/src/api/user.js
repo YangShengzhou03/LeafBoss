@@ -7,12 +7,12 @@ export const userApi = {
   /**
    * 管理员登录
    * @param {Object} loginData - 登录数据
-   * @param {string} loginData.username - 用户名
+   * @param {string} loginData.email - 邮箱
    * @param {string} loginData.password - 密码
    * @returns {Promise} 登录结果
    */
   login(loginData) {
-    return Server.post('/api/admins/login', loginData)
+    return Server.post('/api/auth/login', loginData)
   },
 
   /**

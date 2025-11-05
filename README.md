@@ -122,7 +122,7 @@ java -jar target/leaf-card-backend-1.0.0.jar
    - 访问 http://localhost:8081
 
 3. **系统登录**
-   - 默认管理员账号：admin / admin123
+   - 默认管理员账号：admin@leafcard.com / 123456
    - 首次使用请修改默认密码
 
 **主要功能模块：**

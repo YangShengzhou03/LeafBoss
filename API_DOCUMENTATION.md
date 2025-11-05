@@ -35,13 +35,13 @@ Leaf Card 是一个卡密管理系统，提供用户管理、产品管理、规�
 
 ### 1. 用户登录
 
-**接口地址**: `POST /users/login`
+**接口地址**: `POST /api/auth/login`
 
 **请求参数**:
 ```json
 {
-    "username": "admin",
-    "password": "password123"
+    "email": "admin@leafcard.com",
+    "password": "123456"
 }
 ```
 
@@ -51,12 +51,14 @@ Leaf Card 是一个卡密管理系统，提供用户管理、产品管理、规�
     "code": 200,
     "message": "登录成功",
     "data": {
-        "id": "uuid-string",
-        "username": "admin",
-        "email": "admin@leafcard.com",
-        "nickname": "系统管理员",
-        "role": "admin",
-        "status": "active"
+        "token": "jwt-token-string",
+        "user": {
+            "id": "uuid-string",
+            "username": "admin",
+            "email": "admin@leafcard.com",
+            "status": "active",
+            "lastLoginTime": "2024-01-15T14:30:00"
+        }
     }
 }
 ```

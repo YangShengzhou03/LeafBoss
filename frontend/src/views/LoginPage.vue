@@ -40,12 +40,12 @@
               label-width="0"
               class="form-content"
             >
-              <el-form-item prop="username">
+              <el-form-item prop="email">
                 <div class="input-wrapper">
                   <el-input 
-                    v-model="loginForm.username" 
-                    placeholder="用户名"
-                    prefix-icon="User"
+                    v-model="loginForm.email" 
+                    placeholder="邮箱"
+                    prefix-icon="Message"
                     size="large"
                     class="custom-input"
                   />
@@ -258,7 +258,7 @@ const currentView = ref('login')
 // 登录表单
 const loginFormRef = ref()
 const loginForm = reactive({
-  username: '',
+  email: '',
   password: '',
   rememberPassword: false
 })
@@ -299,8 +299,9 @@ const forgotCountdown = ref(0)
 
 // 登录表单验证规则
 const loginRules = {
-  username: [
-    { required: true, message: '请输入用户名', trigger: 'blur' }
+  email: [
+    { required: true, message: '请输入邮箱', trigger: 'blur' },
+    { type: 'email', message: '请输入正确的邮箱格式', trigger: 'blur' }
   ],
   password: [
     { required: true, message: '请输入密码', trigger: 'blur' },
@@ -469,7 +470,7 @@ const handleLogin = async () => {
       
       // 如果用户选择了记住密码，保存凭据
       if (loginForm.rememberPassword) {
-        utils.saveCredentials(loginForm.username, loginForm.password)
+        utils.saveCredentials(loginForm.email, loginForm.password)
       } else {
         // 如果用户没有选择记住密码，清除可能存在的凭据
         utils.removeCredentials()
@@ -519,7 +520,7 @@ const handleRegister = async () => {
     const response = await api.user.createUser({
       username: registerForm.email,
       email: registerForm.email,
-      passwordHash: registerForm.password
+      passwordHash: registerForm.password  // 直接传递明文密码，不进行加密
     })
     
     if (response && response.code === 200) {
@@ -584,9 +585,14 @@ onMounted(() => {
   const savedCredentials = utils.getCredentials()
   if (savedCredentials) {
     // 自动填充保存的凭据
-    loginForm.username = savedCredentials.username
+    loginForm.email = savedCredentials.username
     loginForm.password = savedCredentials.password
     loginForm.rememberPassword = true
+    
+    // 如果保存的邮箱是admin@leaf.com，自动更正为正确的邮箱
+    if (loginForm.email === 'admin@leaf.com') {
+      loginForm.email = 'admin@leafcard.com'
+    }
   }
 })
 </script>

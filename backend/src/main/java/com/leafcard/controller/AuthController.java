@@ -7,6 +7,7 @@ import com.leafcard.utils.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 
 /**
@@ -27,23 +28,38 @@ public class AuthController {
      */
     @PostMapping("/login")
     public Result<Map<String, Object>> login(@RequestBody Map<String, String> loginRequest) {
-        String username = loginRequest.get("username");
+        String email = loginRequest.get("email");
         String password = loginRequest.get("password");
         
-        Admin admin = adminService.login(username, password);
-        if (admin != null) {
-            // 生成JWT token
-            String token = jwtUtil.generateToken(admin.getId(), admin.getUsername());
-            
-            // 创建登录响应
-            Map<String, Object> response = Map.of(
-                "token", token,
-                "user", admin
-            );
-            return Result.success("登录成功", response);
-        } else {
-            return Result.error("用户名或密码错误");
+        if (email == null || email.trim().isEmpty()) {
+            return Result.error("邮箱不能为空");
         }
+        if (password == null || password.trim().isEmpty()) {
+            return Result.error("密码不能为空");
+        }
+        
+        // 根据邮箱查找管理员
+        Admin admin = adminService.findByEmail(email);
+        if (admin != null) {
+            // 验证密码（暂时不加密，直接比较明文）
+            if (password.equals(admin.getPasswordHash())) {
+                // 更新最后登录时间
+                admin.setLastLoginTime(LocalDateTime.now());
+                adminService.updateById(admin);
+                
+                // 生成JWT token
+                String token = jwtUtil.generateToken(admin.getId(), admin.getEmail());
+                
+                // 创建登录响应
+                Map<String, Object> response = Map.of(
+                    "token", token,
+                    "user", admin
+                );
+                return Result.success("登录成功", response);
+            }
+        }
+        
+        return Result.error("邮箱或密码错误");
     }
 
     /**
