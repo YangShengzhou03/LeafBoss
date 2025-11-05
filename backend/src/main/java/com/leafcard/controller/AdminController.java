@@ -24,6 +24,16 @@ public class AdminController {
     public Result<Admin> login(@RequestBody Map<String, String> loginRequest) {
         String username = loginRequest.get("username");
         String password = loginRequest.get("password");
+        String verificationCode = loginRequest.get("verificationCode");
+        
+        // 验证码验证逻辑：只要输入"123456"就视为正确
+        if (verificationCode == null || verificationCode.trim().isEmpty()) {
+            return Result.error("请输入验证码");
+        }
+        
+        if (!"123456".equals(verificationCode.trim())) {
+            return Result.error("验证码错误，请输入123456");
+        }
         
         Admin admin = adminService.login(username, password);
         if (admin != null) {

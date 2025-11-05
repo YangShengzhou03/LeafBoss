@@ -12,8 +12,8 @@ public class OperationLog {
     @TableId(type = IdType.ASSIGN_UUID)
     private String id;
     
-    @TableField("user_id")
-    private String userId;
+    @TableField("admin_id")
+    private String adminId;
     
     @TableField("operation_type")
     private String operationType;
@@ -42,12 +42,12 @@ public class OperationLog {
         this.id = id;
     }
 
-    public String getUserId() {
-        return userId;
+    public String getAdminId() {
+        return adminId;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setAdminId(String adminId) {
+        this.adminId = adminId;
     }
 
     public String getOperationType() {

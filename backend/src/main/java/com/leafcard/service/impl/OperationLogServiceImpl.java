@@ -17,9 +17,9 @@ import java.util.List;
 public class OperationLogServiceImpl extends ServiceImpl<OperationLogMapper, OperationLog> implements OperationLogService {
 
     @Override
-    public List<OperationLog> findByUserId(Long userId) {
+    public List<OperationLog> findByAdminId(String adminId) {
         QueryWrapper<OperationLog> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("user_id", userId);
+        queryWrapper.eq("admin_id", adminId);
         queryWrapper.orderByDesc("created_at");
         return this.list(queryWrapper);
     }
@@ -42,9 +42,9 @@ public class OperationLogServiceImpl extends ServiceImpl<OperationLogMapper, Ope
     }
 
     @Override
-    public void logOperation(Long userId, String operationType, String targetType, String targetId, String description, String ipAddress) {
+    public void logOperation(String adminId, String operationType, String targetType, String targetId, String description, String ipAddress) {
         OperationLog operationLog = new OperationLog();
-        operationLog.setUserId(userId != null ? userId.toString() : null);
+        operationLog.setAdminId(adminId);
         operationLog.setOperationType(operationType);
         operationLog.setTargetType(targetType);
         operationLog.setTargetId(targetId);

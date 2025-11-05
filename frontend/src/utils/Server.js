@@ -3,7 +3,7 @@ import { getToken, removeToken } from './utils.js'
 import { ElMessage } from 'element-plus'
 
 const Server = axios.create({
-  baseURL: process.env.VUE_APP_API_URL || '/api',
+  baseURL: process.env.VITE_API_BASE_URL || 'http://localhost:8081',
   timeout: 10000
 })
 

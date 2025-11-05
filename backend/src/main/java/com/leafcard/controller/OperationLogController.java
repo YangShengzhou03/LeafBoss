@@ -36,11 +36,11 @@ public class OperationLogController {
     }
 
     /**
-     * 根据用户ID查询操作日志
+     * 根据管理员ID查询操作日志
      */
-    @GetMapping("/user/{userId}")
-    public Result<List<OperationLog>> getOperationLogsByUser(@PathVariable Long userId) {
-        List<OperationLog> logs = operationLogService.findByUserId(userId);
+    @GetMapping("/admin/{adminId}")
+    public Result<List<OperationLog>> getOperationLogsByAdmin(@PathVariable String adminId) {
+        List<OperationLog> logs = operationLogService.findByAdminId(adminId);
         return Result.success(logs);
     }
 
@@ -69,13 +69,13 @@ public class OperationLogController {
      */
     @PostMapping
     public Result<Boolean> logOperation(
-            @RequestParam Long userId,
+            @RequestParam String adminId,
             @RequestParam String operationType,
             @RequestParam String targetType,
             @RequestParam String targetId,
             @RequestParam String description,
             @RequestParam String ipAddress) {
-        operationLogService.logOperation(userId, operationType, targetType, targetId, description, ipAddress);
+        operationLogService.logOperation(adminId, operationType, targetType, targetId, description, ipAddress);
         return Result.success("操作日志记录成功", true);
     }
 }

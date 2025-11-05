@@ -452,8 +452,8 @@ const handleLogin = async () => {
     
     loginLoading.value = true
     
-    // 调用管理员登录API
-    const response = await api.admin.login(loginForm)
+    // 调用用户登录API
+    const response = await api.user.login(loginForm)
     
     if (response && response.code === 200 && response.data) {
       const { token, user } = response.data
@@ -515,10 +515,11 @@ const handleRegister = async () => {
     
     registerLoading.value = true
     
-    // 调用管理员注册API
-    const response = await api.admin.register({
+    // 调用用户注册API
+    const response = await api.user.createUser({
+      username: registerForm.email,
       email: registerForm.email,
-      password: registerForm.password
+      passwordHash: registerForm.password
     })
     
     if (response && response.code === 200) {

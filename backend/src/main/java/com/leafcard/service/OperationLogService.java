@@ -11,11 +11,11 @@ import java.util.List;
 public interface OperationLogService extends IService<OperationLog> {
     
     /**
-     * 根据用户ID查询操作日志
-     * @param userId 用户ID
+     * 根据管理员ID查询操作日志
+     * @param adminId 管理员ID
      * @return 操作日志列表
      */
-    List<OperationLog> findByUserId(Long userId);
+    List<OperationLog> findByAdminId(String adminId);
     
     /**
      * 根据操作类型查询操作日志
@@ -34,12 +34,12 @@ public interface OperationLogService extends IService<OperationLog> {
     
     /**
      * 记录操作日志
-     * @param userId 用户ID
+     * @param adminId 管理员ID
      * @param operationType 操作类型
      * @param targetType 目标类型
      * @param targetId 目标ID
      * @param description 描述
      * @param ipAddress IP地址
      */
-    void logOperation(Long userId, String operationType, String targetType, String targetId, String description, String ipAddress);
+    void logOperation(String adminId, String operationType, String targetType, String targetId, String description, String ipAddress);
 }

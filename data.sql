@@ -1,7 +1,7 @@
 -- 数据库初始化脚本
 -- 如果数据库存在则删除，然后重新创建
 DROP DATABASE IF EXISTS leaf_card;
-CREATE DATABASE leaf_card CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci COMMENT '枫叶卡管理系统数据库';
+CREATE DATABASE leaf_card CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE leaf_card;
 
 -- 管理员表（简化版，只有管理员）
