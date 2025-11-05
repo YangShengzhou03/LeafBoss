@@ -87,7 +87,7 @@
           </el-col>
         </el-row>
 
-        <!-- 第二行：图表数据 -->
+        <!-- 图表数据 -->
         <el-row :gutter="20" class="charts-row">
           <!-- 销售趋势图 -->
           <el-col :span="12">
@@ -115,36 +115,8 @@
             </el-card>
           </el-col>
           
-          <!-- 收入分布图 -->
-          <el-col :span="12">
-            <el-card class="chart-card">
-              <template #header>
-                <div class="chart-header">
-                  <span>收入分布</span>
-                </div>
-              </template>
-              <div class="chart-container">
-                <div class="revenue-distribution">
-                  <div class="distribution-item" v-for="item in revenueDistribution" :key="item.category">
-                    <div class="distribution-info">
-                      <div class="distribution-color" :style="{ backgroundColor: item.color }"></div>
-                      <span class="distribution-label">{{ item.category }}</span>
-                    </div>
-                    <div class="distribution-details">
-                      <span class="distribution-value">¥{{ item.value }}</span>
-                      <span class="distribution-percentage">{{ item.percentage }}%</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </el-card>
-          </el-col>
-        </el-row>
-
-        <!-- 第三行：详细数据 -->
-        <el-row :gutter="20" class="charts-row">
           <!-- 商品销售占比 -->
-          <el-col :span="8">
+          <el-col :span="12">
             <el-card class="chart-card">
               <template #header>
                 <div class="chart-header">
@@ -164,62 +136,6 @@
               </div>
             </el-card>
           </el-col>
-          
-          <!-- 销量前五的商品 -->
-          <el-col :span="8">
-            <el-card class="chart-card">
-              <template #header>
-                <div class="chart-header">
-                  <span>销量前五的商品</span>
-                </div>
-              </template>
-              <div class="products-container">
-                <div class="product-list">
-                  <div 
-                    class="product-row" 
-                    v-for="(product, index) in topProducts" 
-                    :key="index"
-                  >
-                    <div class="product-rank">
-                      <span class="rank-number">{{ index + 1 }}</span>
-                    </div>
-                    <div class="product-details">
-                      <div class="product-name">{{ product.name }}</div>
-                      <div class="product-spec">{{ product.spec }}</div>
-                    </div>
-                    <div class="product-sales">
-                      <span class="sales-count">{{ product.sales }}</span>
-                      <span class="sales-unit">张</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </el-card>
-          </el-col>
-          
-          <!-- 月销售统计 -->
-          <el-col :span="8">
-            <el-card class="chart-card">
-              <template #header>
-                <div class="chart-header">
-                  <span>本月销售统计</span>
-                </div>
-              </template>
-              <div class="chart-container">
-                <div class="monthly-stats">
-                  <div class="monthly-item" v-for="item in monthlyStats" :key="item.label">
-                    <div class="monthly-label">{{ item.label }}</div>
-                    <div class="monthly-value">{{ item.value }}</div>
-                    <div class="monthly-trend" :class="{ 'positive': item.trend > 0, 'negative': item.trend < 0 }">
-                      <el-icon v-if="item.trend > 0"><Top /></el-icon>
-                      <el-icon v-if="item.trend < 0"><Bottom /></el-icon>
-                      {{ Math.abs(item.trend) }}%
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </el-card>
-          </el-col>
         </el-row>
       </div>
     </el-card>
@@ -230,7 +146,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { ElMessage } from 'element-plus'
 import { 
-  Refresh, Key, Money, Goods, Coin, Top, Bottom
+  Refresh, Key, Money, Goods, Coin
 } from '@element-plus/icons-vue'
 import api from '../../services/api'
 
@@ -262,14 +178,6 @@ const salesTrend = ref([
   { date: '12-07', sales: 156 }
 ])
 
-// 收入分布数据
-const revenueDistribution = ref([
-  { category: 'VIP会员', value: 2850, percentage: 50, color: '#409eff' },
-  { category: '在线课程', value: 1425, percentage: 25, color: '#67c23a' },
-  { category: '实体礼品', value: 855, percentage: 15, color: '#e6a23c' },
-  { category: '其他', value: 570, percentage: 10, color: '#909399' }
-])
-
 // 商品销售占比数据
 const productSalesRatio = ref([
   { name: 'VIP会员月卡', percentage: 35, color: '#409eff' },
@@ -277,14 +185,6 @@ const productSalesRatio = ref([
   { name: '实体礼品卡', percentage: 20, color: '#e6a23c' },
   { name: 'VIP会员季卡', percentage: 12, color: '#f56c6c' },
   { name: '其他商品', percentage: 8, color: '#909399' }
-])
-
-// 月销售统计数据
-const monthlyStats = ref([
-  { label: '总销售额', value: '¥56,800', trend: 15.2 },
-  { label: '订单数量', value: '1,568', trend: 8.3 },
-  { label: '平均客单价', value: '¥36.2', trend: 6.8 },
-  { label: '新客户数', value: '289', trend: 12.5 }
 ])
 
 // 计算最大销售值用于趋势图
@@ -546,65 +446,7 @@ onMounted(() => {
   color: #303133;
 }
 
-/* 收入分布样式 */
-.revenue-distribution {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
 
-.distribution-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 12px;
-  background: #f8f9fa;
-  border-radius: 6px;
-  transition: all 0.3s ease;
-}
-
-.distribution-item:hover {
-  background: #f0f2f5;
-  transform: translateX(4px);
-}
-
-.distribution-info {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.distribution-color {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-}
-
-.distribution-label {
-  font-size: 14px;
-  color: #606266;
-  font-weight: 500;
-}
-
-.distribution-details {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.distribution-value {
-  font-size: 14px;
-  font-weight: 600;
-  color: #303133;
-}
-
-.distribution-percentage {
-  font-size: 12px;
-  color: #909399;
-  background: #f0f2f5;
-  padding: 2px 8px;
-  border-radius: 12px;
-}
 
 /* 商品销售占比样式 */
 .product-pie-chart {
@@ -648,140 +490,7 @@ onMounted(() => {
   color: #303133;
 }
 
-/* 商品列表样式 */
-.products-container {
-  padding: 16px 0;
-  min-height: 200px;
-}
 
-.product-list {
-  display: flex;
-  flex-direction: column;
-  height: auto;
-}
-
-.product-row {
-  display: flex;
-  align-items: center;
-  padding: 12px 0;
-  border-bottom: 1px solid #f0f0f0;
-  min-height: 56px;
-  flex: none;
-  transition: all 0.3s ease;
-}
-
-.product-row:hover {
-  background: #f8f9fa;
-  border-radius: 6px;
-  padding: 12px 8px;
-}
-
-.product-row:last-child {
-  border-bottom: none;
-}
-
-.product-rank {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #409eff, #79bbff);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-right: 12px;
-}
-
-.rank-number {
-  color: white;
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.product-details {
-  flex: 1;
-}
-
-.product-name {
-  font-size: 14px;
-  font-weight: 500;
-  color: #303133;
-  margin-bottom: 2px;
-}
-
-.product-spec {
-  font-size: 12px;
-  color: #909399;
-}
-
-.product-sales {
-  display: flex;
-  align-items: baseline;
-}
-
-.sales-count {
-  font-size: 16px;
-  font-weight: 600;
-  color: #67c23a;
-  margin-right: 4px;
-}
-
-.sales-unit {
-  font-size: 12px;
-  color: #909399;
-}
-
-/* 月销售统计样式 */
-.monthly-stats {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.monthly-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 16px;
-  background: #f8f9fa;
-  border-radius: 8px;
-  transition: all 0.3s ease;
-}
-
-.monthly-item:hover {
-  background: #f0f2f5;
-  transform: translateX(4px);
-}
-
-.monthly-label {
-  font-size: 14px;
-  color: #606266;
-}
-
-.monthly-value {
-  font-size: 16px;
-  font-weight: 600;
-  color: #303133;
-}
-
-.monthly-trend {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 12px;
-  font-weight: 500;
-  padding: 2px 8px;
-  border-radius: 12px;
-}
-
-.monthly-trend.positive {
-  color: #67c23a;
-  background: #f0f9ff;
-}
-
-.monthly-trend.negative {
-  color: #f56c6c;
-  background: #fef0f0;
-}
 
 /* 系统状态样式 */
 .system-status {
