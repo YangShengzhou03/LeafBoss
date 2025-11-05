@@ -121,6 +121,7 @@ INSERT INTO card_keys (card_key, specification_id, status, user_id, user_email, 
 ('LEAF-2024-009-MNOP-QRST', (SELECT id FROM specifications WHERE name = '年卡' AND product_id = (SELECT id FROM products WHERE name = 'VIP会员')), '已使用', (SELECT id FROM users WHERE username = 'user1'), 'user1@leafcard.com', '2024-01-20 16:45:00', '2025-01-20 16:45:00'),
 ('LEAF-2024-010-UVWX-YZAB', (SELECT id FROM specifications WHERE name = '月卡' AND product_id = (SELECT id FROM products WHERE name = '普通会员')), '未使用', NULL, NULL, NULL, NULL);
 
+
 CREATE VIEW card_key_detail_view AS
 SELECT 
     ck.*,
@@ -159,4 +160,5 @@ BEGIN
 END //
 DELIMITER ;
 
+-- 提交视图和存储过程创建操作
 COMMIT;

@@ -39,7 +39,7 @@ public class OperationLogController {
      * 根据用户ID查询操作日志
      */
     @GetMapping("/user/{userId}")
-    public Result<List<OperationLog>> getOperationLogsByUser(@PathVariable String userId) {
+    public Result<List<OperationLog>> getOperationLogsByUser(@PathVariable Long userId) {
         List<OperationLog> logs = operationLogService.findByUserId(userId);
         return Result.success(logs);
     }
@@ -69,7 +69,7 @@ public class OperationLogController {
      */
     @PostMapping
     public Result<Boolean> logOperation(
-            @RequestParam String userId,
+            @RequestParam Long userId,
             @RequestParam String operationType,
             @RequestParam String targetType,
             @RequestParam String targetId,

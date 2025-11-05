@@ -44,7 +44,7 @@ public class OperationLogServiceImpl extends ServiceImpl<OperationLogMapper, Ope
     @Override
     public void logOperation(Long userId, String operationType, String targetType, String targetId, String description, String ipAddress) {
         OperationLog operationLog = new OperationLog();
-        operationLog.setUserId(userId);
+        operationLog.setUserId(userId != null ? userId.toString() : null);
         operationLog.setOperationType(operationType);
         operationLog.setTargetType(targetType);
         operationLog.setTargetId(targetId);

@@ -1,13 +1,11 @@
 package com.leafcard.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
-import lombok.Data;
 import java.time.LocalDateTime;
 
 /**
  * 操作日志实体类
  */
-@Data
 @TableName("operation_logs")
 public class OperationLog {
     
@@ -34,4 +32,69 @@ public class OperationLog {
     
     @TableField(value = "created_at", fill = FieldFill.INSERT)
     private LocalDateTime createdAt;
+
+    // Getter and Setter methods
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public String getOperationType() {
+        return operationType;
+    }
+
+    public void setOperationType(String operationType) {
+        this.operationType = operationType;
+    }
+
+    public String getTargetId() {
+        return targetId;
+    }
+
+    public void setTargetId(String targetId) {
+        this.targetId = targetId;
+    }
+
+    public String getTargetType() {
+        return targetType;
+    }
+
+    public void setTargetType(String targetType) {
+        this.targetType = targetType;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getIpAddress() {
+        return ipAddress;
+    }
+
+    public void setIpAddress(String ipAddress) {
+        this.ipAddress = ipAddress;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
 }

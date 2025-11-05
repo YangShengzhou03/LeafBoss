@@ -49,7 +49,7 @@ public class SpecificationController {
      * 根据产品ID查询规格列表
      */
     @GetMapping("/product/{productId}")
-    public Result<List<Specification>> getSpecificationsByProduct(@PathVariable String productId) {
+    public Result<List<Specification>> getSpecificationsByProduct(@PathVariable Long productId) {
         List<Specification> specifications = specificationService.findByProductId(productId);
         return Result.success(specifications);
     }

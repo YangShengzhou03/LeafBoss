@@ -1,11 +1,8 @@
 package com.leafcard.common;
 
-import lombok.Data;
-
 /**
  * 统一响应结果类
  */
-@Data
 public class Result<T> {
     
     /**
@@ -30,6 +27,39 @@ public class Result<T> {
     
     public Result() {
         this.timestamp = System.currentTimeMillis();
+    }
+    
+    // Getter and Setter methods
+    public int getCode() {
+        return code;
+    }
+    
+    public void setCode(int code) {
+        this.code = code;
+    }
+    
+    public String getMessage() {
+        return message;
+    }
+    
+    public void setMessage(String message) {
+        this.message = message;
+    }
+    
+    public T getData() {
+        return data;
+    }
+    
+    public void setData(T data) {
+        this.data = data;
+    }
+    
+    public long getTimestamp() {
+        return timestamp;
+    }
+    
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
     }
     
     public static <T> Result<T> success() {
