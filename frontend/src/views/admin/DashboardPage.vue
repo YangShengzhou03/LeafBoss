@@ -4,7 +4,7 @@
       <template #header>
         <div class="card-header">
           <span>管理员仪表盘</span>
-          <el-button type="text" @click="refreshData" :loading="loading">
+          <el-button type="link" @click="refreshData" :loading="loading">
             <el-icon><Refresh /></el-icon>
             刷新
           </el-button>

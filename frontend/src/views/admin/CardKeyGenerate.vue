@@ -131,7 +131,7 @@
           <el-table-column label="操作" width="140" align="center">
             <template #default="{ row }">
               <div class="action-buttons">
-                <el-button type="text" @click="copyCardKey(row.key)" class="copy-btn">
+                <el-button type="link" @click="copyCardKey(row.key)" class="copy-btn">
                   <el-icon><CopyDocument /></el-icon>
                   复制
                 </el-button>

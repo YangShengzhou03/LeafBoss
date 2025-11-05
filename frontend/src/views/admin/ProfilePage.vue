@@ -370,7 +370,6 @@ onMounted(() => {
   padding: 16px;
   background: #f8fafc;
   border-radius: 6px;
-  border-left: 3px solid #3b82f6;
 }
 
 .info-label {
