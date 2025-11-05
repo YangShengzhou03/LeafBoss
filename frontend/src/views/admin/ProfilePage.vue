@@ -21,12 +21,12 @@
           </div>
           
           <div class="info-section">
-            <h2 class="user-name">{{ userInfo.nickname || '未设置昵称' }}</h2>
-            <p class="user-email">{{ userInfo.email }}</p>
+            <h2 class="user-name">{{ userInfo.nickname ? userInfo.nickname : '未设置昵称' }}</h2>
+            <p class="user-email">{{ userInfo.email || '未设置邮箱' }}</p>
             <div class="info-grid">
               <div class="info-item">
                 <span class="info-label">注册时间：</span>
-                <span class="info-value">{{ formatDate(userInfo.createTime) }}</span>
+                <span class="info-value">{{ userInfo.createTime ? formatDate(userInfo.createTime) : '未知' }}</span>
               </div>
               <div class="info-item">
                 <span class="info-label">账户状态：</span>
@@ -167,7 +167,17 @@ const loadUserInfo = async () => {
     const response = await api.user.getUserInfo()
     
     if (response && response.code === 200 && response.data) {
-      userInfo.value = response.data
+      // 确保数据字段正确映射
+      const userData = response.data
+      userInfo.value = {
+        id: userData.id || userData.userId || '',
+        nickname: userData.nickname || userData.username || userData.name || '',
+        email: userData.email || '',
+        avatar: userData.avatar || userData.profilePicture || '',
+        createTime: userData.createTime || userData.createdAt || userData.registrationTime || ''
+      }
+      
+      console.log('用户信息加载成功:', userInfo.value)
     } else {
       ElMessage.error('获取用户信息失败')
     }

@@ -55,7 +55,7 @@ export function parseJWT(token) {
     
     const payload = JSON.parse(jsonPayload);
     
-    // 检查token是否过期
+    // 检查token是否过期 - 使用UTC时间进行比较，避免时区差异
     if (payload.exp && payload.exp * 1000 < Date.now()) {
       console.warn('Token已过期');
       removeToken(); // 自动清除过期token
