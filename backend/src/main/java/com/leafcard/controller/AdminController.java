@@ -1,8 +1,10 @@
 package com.leafcard.controller;
 
 import com.leafcard.common.Result;
+import com.leafcard.dto.LoginResponse;
 import com.leafcard.entity.Admin;
 import com.leafcard.service.AdminService;
+import com.leafcard.utils.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.util.Map;
@@ -16,18 +18,26 @@ public class AdminController {
 
     @Autowired
     private AdminService adminService;
+    
+    @Autowired
+    private JwtUtil jwtUtil;
 
     /**
      * 管理员登录
      */
     @PostMapping("/login")
-    public Result<Admin> login(@RequestBody Map<String, String> loginRequest) {
+    public Result<LoginResponse> login(@RequestBody Map<String, String> loginRequest) {
         String username = loginRequest.get("username");
         String password = loginRequest.get("password");
         
         Admin admin = adminService.login(username, password);
         if (admin != null) {
-            return Result.success("登录成功", admin);
+            // 生成JWT token
+            String token = jwtUtil.generateToken(admin.getId(), admin.getUsername());
+            
+            // 创建登录响应
+            LoginResponse loginResponse = new LoginResponse(token, admin);
+            return Result.success("登录成功", loginResponse);
         } else {
             return Result.error("用户名或密码错误");
         }
