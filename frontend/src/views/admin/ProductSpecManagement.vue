@@ -30,7 +30,7 @@
               <el-select v-model="statusFilter" placeholder="规格状态" clearable @change="handleSearch">
                 <el-option label="全部" value="" />
                 <el-option label="发放中" value="active" />
-                <el-option label="已停用" value="disabled" />
+                <el-option label="已停用" value="inactive" />
               </el-select>
             </el-col>
             <el-col :span="14" class="button-group">
@@ -222,27 +222,27 @@ const specRules = {
 }
 
 // 计算属性：筛选后的规格列表
-const filteredSpecs = computed(() => {
-  let filtered = specs.value
-  
-  if (searchQuery.value) {
-    const query = searchQuery.value.toLowerCase()
-    filtered = filtered.filter(spec => 
-      spec.productName.toLowerCase().includes(query) || 
-      spec.name.toLowerCase().includes(query)
-    )
-  }
-  
-  if (statusFilter.value) {
-    filtered = filtered.filter(spec => spec.status === statusFilter.value)
-  }
-  
-  // 前端分页处理
-  const startIndex = (currentPage.value - 1) * pageSize.value
-  const endIndex = startIndex + pageSize.value
-  
-  return filtered.slice(startIndex, endIndex)
-})
+  const filteredSpecs = computed(() => {
+    let filtered = specs.value
+    
+    if (searchQuery.value) {
+      const query = searchQuery.value.toLowerCase()
+      filtered = filtered.filter(spec => 
+        spec.productName.toLowerCase().includes(query) || 
+        spec.name.toLowerCase().includes(query)
+      )
+    }
+    
+    if (statusFilter.value) {
+      filtered = filtered.filter(spec => spec.status === statusFilter.value)
+    }
+    
+    // 前端分页处理
+    const startIndex = (currentPage.value - 1) * pageSize.value
+    const endIndex = startIndex + pageSize.value
+    
+    return filtered.slice(startIndex, endIndex)
+  })
 
 // 计算属性：筛选后的总数
 const filteredTotal = computed(() => {
@@ -409,24 +409,45 @@ const editSpec = (spec) => {
 // 切换规格状态
 const toggleSpecStatus = async (spec) => {
   try {
+    console.log('切换规格状态 - 详细状态信息:', {
+      显示状态: spec.status,
+      实际状态值: spec.status,
+      状态类型: typeof spec.status
+    })
+    
     await ElMessageBox.confirm(
       `确定要${spec.status === 'active' ? '停用' : '启用'}该规格吗？`,
       '提示',
       { type: 'warning' }
     )
     
-    // 调用API更新规格状态
-    await api.admin.editSpec(spec.id, {
-      status: spec.status === 'active' ? 0 : 1
+    // 修复状态切换逻辑：使用英文状态值（数据库只接受active/inactive）
+    const newStatus = spec.status === 'active' ? 'inactive' : 'active'
+    console.log('切换规格状态 - 当前状态:', spec.status, '新状态:', newStatus)
+    
+    // 调用API更新规格状态 - 使用英文状态值
+    const response = await api.admin.editSpec(spec.id, {
+      status: newStatus
     })
     
-    // 更新本地状态
-    spec.status = spec.status === 'active' ? 'disabled' : 'active'
-    ElMessage.success('操作成功')
+    console.log('API响应:', response)
+    
+    if (response && response.code === 200) {
+      // 更新本地状态 - 使用英文状态值
+      spec.status = newStatus
+      console.log('本地状态更新成功，新状态:', spec.status)
+      ElMessage.success('操作成功')
+      
+      // 重新加载数据确保数据一致性
+      loadSpecs()
+    } else {
+      console.error('API返回失败:', response)
+      ElMessage.error('操作失败')
+    }
   } catch (error) {
     if (error !== 'cancel') {
       console.error('切换规格状态失败:', error)
-      ElMessage.error('操作失败')
+      ElMessage.error('操作失败，请检查网络连接')
     }
   }
 }

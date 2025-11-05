@@ -22,9 +22,9 @@
           <el-col :span="4">
             <el-select v-model="statusFilter" placeholder="卡密状态" clearable @change="handleSearch">
               <el-option label="全部" value="" />
-              <el-option label="未使用" value="unused" />
-              <el-option label="已使用" value="used" />
-              <el-option label="已禁用" value="disabled" />
+              <el-option label="未使用" value="未使用" />
+              <el-option label="已使用" value="已使用" />
+              <el-option label="已禁用" value="已禁用" />
             </el-select>
           </el-col>
           <el-col :span="14" class="button-group">
@@ -38,7 +38,7 @@
 
       <!-- 卡密列表 -->
       <div class="table-container">
-        <el-table :data="filteredCardKeys" style="width: 100%" v-loading="loading" :scroll="{ x: 1200 }">
+        <el-table :data="pagedCardKeys" style="width: 100%" v-loading="loading" :scroll="{ x: 1200 }">
           <template #empty>
              <div style="padding: 40px 0;">
                <el-empty description="暂无卡密数据" />
@@ -76,10 +76,10 @@
             <template #default="scope">
               <el-button 
                 size="small" 
-                :type="scope.row.status === 'disabled' ? 'success' : 'warning'"
+                :type="scope.row.status === '已禁用' ? 'success' : 'warning'"
                 @click="handleToggleCardKey(scope.row)"
               >
-                {{ scope.row.status === 'disabled' ? '启用' : '禁用' }}
+                {{ scope.row.status === '已禁用' ? '启用' : '禁用' }}
               </el-button>
               <el-button 
                 size="small" 
@@ -153,6 +153,13 @@ const filteredCardKeys = computed(() => {
   return filtered
 })
 
+// 计算属性：分页后的卡密列表
+const pagedCardKeys = computed(() => {
+  const startIndex = (currentPage.value - 1) * pageSize.value
+  const endIndex = startIndex + pageSize.value
+  return filteredCardKeys.value.slice(startIndex, endIndex)
+})
+
 // 状态标签类型映射
 const getStatusTagType = (status) => {
   const typeMap = {
@@ -184,7 +191,7 @@ const loadCardKeys = async () => {
     
     if (response && response.data) {
       // 将返回的数据转换为前端需要的格式
-      cardKeys.value = response.data.map(cardKey => ({
+      const newCardKeys = response.data.map(cardKey => ({
         id: cardKey.id,
         cardKey: cardKey.cardKey,
         status: cardKey.status,
@@ -197,7 +204,23 @@ const loadCardKeys = async () => {
         createTime: cardKey.createdAt ? formatDateTime(cardKey.createdAt) : '',
         updatedAt: cardKey.updatedAt ? formatDateTime(cardKey.updatedAt) : ''
       }))
-      total.value = cardKeys.value.length
+      
+      cardKeys.value = newCardKeys
+      
+      // 手动计算筛选后的数据数量
+      let filtered = newCardKeys
+      if (searchQuery.value) {
+        const query = searchQuery.value.toLowerCase()
+        filtered = filtered.filter(cardKey => 
+          cardKey.cardKey.toLowerCase().includes(query) ||
+          (cardKey.userEmail && cardKey.userEmail.toLowerCase().includes(query))
+        )
+      }
+      if (statusFilter.value) {
+        filtered = filtered.filter(cardKey => cardKey.status === statusFilter.value)
+      }
+      
+      total.value = filtered.length
     } else {
       cardKeys.value = []
       total.value = 0
@@ -274,15 +297,10 @@ const handleClearUsed = async () => {
       }
     )
     
-    // 调用真实API清空已使用卡密
-    const response = await api.admin.clearUsedCardKeys()
-    
-    if (response && response.data && response.data.success) {
-      ElMessage.success('已成功清空所有已使用的卡密')
-      loadCardKeys() // 重新加载数据
-    } else {
-      ElMessage.error('清空已使用卡密失败')
-    }
+    // 清空已使用卡密功能暂未实现
+    ElMessage.warning('清空已使用卡密功能正在开发中，敬请期待')
+    // 这里可以添加批量删除已使用卡密的逻辑
+    // 例如：遍历已使用卡密列表，逐个调用删除API
   } catch (error) {
     if (error !== 'cancel') {
       console.error('清空已使用卡密失败:', error)
@@ -295,7 +313,7 @@ const handleClearUsed = async () => {
 
 // 切换卡密状态（禁用/启用）
 const handleToggleCardKey = async (row) => {
-  const isDisabling = row.status !== 'disabled'
+  const isDisabling = row.status !== '已禁用'
   const actionText = isDisabling ? '禁用' : '启用'
   
   try {
@@ -310,7 +328,14 @@ const handleToggleCardKey = async (row) => {
     )
     
     // 调用真实API切换卡密状态
-    const response = await api.admin.toggleCardKeyStatus(row.id, isDisabling ? 'disabled' : 'unused')
+    let response
+    if (isDisabling) {
+      // 禁用卡密
+      response = await api.admin.disableCardKey(row.cardKey)
+    } else {
+      // 启用卡密（设置为未使用状态）
+      response = await api.admin.toggleCardKeyStatus(row.cardKey, '未使用')
+    }
     
     if (response && response.data && response.data.success) {
       ElMessage.success(`${actionText}成功`)
@@ -340,7 +365,7 @@ const handleDeleteCardKey = async (row) => {
     )
     
     // 调用真实API删除卡密
-    const response = await api.admin.deleteCardKey(row.id)
+    const response = await api.admin.deleteCardKey(row.cardKey)
     
     if (response && response.data && response.data.success) {
       ElMessage.success('删除成功')

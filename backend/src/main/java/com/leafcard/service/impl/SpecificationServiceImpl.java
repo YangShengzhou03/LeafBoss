@@ -37,7 +37,9 @@ public class SpecificationServiceImpl extends ServiceImpl<SpecificationMapper, S
     @Override
     public List<Specification> findByStatus(Integer status) {
         QueryWrapper<Specification> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("status", status);
+        // 将数字状态转换为字符串ENUM值：1=active, 0=inactive
+        String statusStr = status == 1 ? "active" : "inactive";
+        queryWrapper.eq("status", statusStr);
         return this.list(queryWrapper);
     }
 
@@ -45,7 +47,9 @@ public class SpecificationServiceImpl extends ServiceImpl<SpecificationMapper, S
     public List<Specification> findByProductIdAndStatus(Long productId, Integer status) {
         QueryWrapper<Specification> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("product_id", productId);
-        queryWrapper.eq("status", status);
+        // 将数字状态转换为字符串ENUM值：1=active, 0=inactive
+        String statusStr = status == 1 ? "active" : "inactive";
+        queryWrapper.eq("status", statusStr);
         return this.list(queryWrapper);
     }
 
@@ -59,12 +63,12 @@ public class SpecificationServiceImpl extends ServiceImpl<SpecificationMapper, S
         
         // 统计不同状态的规格数量
         QueryWrapper<Specification> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("status", 1);
+        queryWrapper.eq("status", "active");
         long activeCount = this.count(queryWrapper);
         statistics.put("activeCount", activeCount);
         
         queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("status", 0);
+        queryWrapper.eq("status", "inactive");
         long inactiveCount = this.count(queryWrapper);
         statistics.put("inactiveCount", inactiveCount);
         
@@ -87,7 +91,8 @@ public class SpecificationServiceImpl extends ServiceImpl<SpecificationMapper, S
             dto.setDurationDays(spec.getDurationDays());
             dto.setPrice(spec.getPrice());
             dto.setStockQuantity(spec.getStockQuantity());
-            dto.setStatus("发放中".equals(spec.getStatus()) ? "发放中" : "已停用");
+            // 直接返回数据库中的英文状态值，前端负责显示映射
+            dto.setStatus(spec.getStatus());
             dto.setCreatedAt(spec.getCreatedAt());
             dto.setUpdatedAt(spec.getUpdatedAt());
             

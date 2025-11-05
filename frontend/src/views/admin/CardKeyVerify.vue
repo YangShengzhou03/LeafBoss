@@ -44,10 +44,10 @@
                     {{ getStatusText(cardKeyInfo.status) }}
                   </el-tag>
                 </el-descriptions-item>
-                <el-descriptions-item label="商品规格">{{ cardKeyInfo.productSpec || '未设置' }}</el-descriptions-item>
+                <el-descriptions-item label="商品规格">{{ cardKeyInfo.productSpec || cardKeyInfo.specificationName || cardKeyInfo.specificationId || '未设置' }}</el-descriptions-item>
                 <el-descriptions-item label="价格">¥{{ cardKeyInfo.price || '0.00' }}</el-descriptions-item>
                 <el-descriptions-item label="使用时间">{{ cardKeyInfo.activateTime || '未使用' }}</el-descriptions-item>
-                <el-descriptions-item label="创建时间">{{ cardKeyInfo.createTime || '-' }}</el-descriptions-item>
+                <el-descriptions-item label="创建时间">{{ cardKeyInfo.createdAt || '-' }}</el-descriptions-item>
               </el-descriptions>
             </div>
           </div>
@@ -62,6 +62,7 @@ import { ref, computed } from 'vue'
 import { ElMessage } from 'element-plus'
 import { CircleCheck, CircleClose, Warning } from '@element-plus/icons-vue'
 import Server from '@/utils/Server.js'
+import { specificationApi } from '@/api/index.js'
 
 // 卡密输入
 const cardKeyInput = ref('')
@@ -79,9 +80,13 @@ const getStatusText = (status) => {
     active: '可用',
     used: '已使用',
     disabled: '已禁用',
-    expired: '已过期'
+    expired: '已过期',
+    '未使用': '未使用',
+    '已使用': '已使用',
+    '已禁用': '已禁用',
+    '已过期': '已过期'
   }
-  return statusMap[status] || '未知'
+  return statusMap[status] || status || '未知'
 }
 
 // 状态标签类型映射
@@ -90,7 +95,11 @@ const getStatusTagType = (status) => {
     active: 'success',
     used: 'info',
     disabled: 'warning',
-    expired: 'danger'
+    expired: 'danger',
+    '未使用': 'success',
+    '已使用': 'info',
+    '已禁用': 'warning',
+    '已过期': 'danger'
   }
   return typeMap[status] || 'info'
 }
@@ -98,35 +107,39 @@ const getStatusTagType = (status) => {
 // 验证结果相关计算属性
 const resultClass = computed(() => {
   const status = cardKeyInfo.value.status
-  if (status === 'active') return 'result-success'
-  if (status === 'used') return 'result-info'
-  if (status === 'disabled' || status === 'expired') return 'result-warning'
-  return 'result-error'
+  if (status === 'active' || status === '未使用') return 'result-success'
+  if (status === 'used' || status === '已使用') return 'result-info'
+  if (status === 'disabled' || status === '已禁用' || status === 'expired' || status === '已过期') return 'result-warning'
+  if (status === '未知') return 'result-error'
+  return 'result-success' // 默认显示成功样式
 })
 
 const resultTitle = computed(() => {
   const status = cardKeyInfo.value.status
-  if (status === 'active') return '卡密验证成功 - 卡密可用'
-  if (status === 'used') return '卡密验证成功 - 卡密已使用'
-  if (status === 'disabled') return '卡密验证成功 - 卡密已禁用'
-  if (status === 'expired') return '卡密验证成功 - 卡密已过期'
-  return '卡密验证失败'
+  if (status === 'active' || status === '未使用') return '卡密验证成功 - 卡密可用'
+  if (status === 'used' || status === '已使用') return '卡密验证成功 - 卡密已使用'
+  if (status === 'disabled' || status === '已禁用') return '卡密验证成功 - 卡密已禁用'
+  if (status === 'expired' || status === '已过期') return '卡密验证成功 - 卡密已过期'
+  if (status === '未知') return '卡密验证失败'
+  return '卡密验证成功'
 })
 
 const resultIcon = computed(() => {
   const status = cardKeyInfo.value.status
-  if (status === 'active') return CircleCheck
-  if (status === 'used') return CircleCheck
-  if (status === 'disabled' || status === 'expired') return Warning
-  return CircleClose
+  if (status === 'active' || status === '未使用') return CircleCheck
+  if (status === 'used' || status === '已使用') return CircleCheck
+  if (status === 'disabled' || status === '已禁用' || status === 'expired' || status === '已过期') return Warning
+  if (status === '未知') return CircleClose
+  return CircleCheck // 默认显示成功图标
 })
 
 const resultIconColor = computed(() => {
   const status = cardKeyInfo.value.status
-  if (status === 'active') return '#67C23A'
-  if (status === 'used') return '#409EFF'
-  if (status === 'disabled' || status === 'expired') return '#E6A23C'
-  return '#F56C6C'
+  if (status === 'active' || status === '未使用') return '#67C23A'
+  if (status === 'used' || status === '已使用') return '#409EFF'
+  if (status === 'disabled' || status === '已禁用' || status === 'expired' || status === '已过期') return '#E6A23C'
+  if (status === '未知') return '#F56C6C'
+  return '#67C23A' // 默认显示成功颜色
 })
 
 // 验证卡密
@@ -142,22 +155,94 @@ const handleVerify = async () => {
     // 调用真实API验证卡密
     const response = await Server.get(`/api/card-keys/verify/${cardKeyInput.value.trim()}`)
     
-    if (response && response.code === 200 && response.data) {
-      cardKeyInfo.value = response.data
-      showResult.value = true
-      ElMessage.success('卡密验证成功')
+    console.log('后端响应数据:', response)
+    console.log('响应类型:', typeof response)
+    console.log('响应键名:', Object.keys(response || {}))
+    
+    // 根据后端实际返回的数据结构处理
+    if (response && response.code === 200) {
+      // 如果响应包含code=200，说明卡密存在
+      if (response.data) {
+        // 使用data字段中的卡密信息
+        cardKeyInfo.value = response.data
+        
+        // 如果有规格ID，获取规格详细信息
+        if (response.data.specificationId) {
+          try {
+            const specResponse = await specificationApi.getSpecificationById(response.data.specificationId)
+            if (specResponse && specResponse.code === 200 && specResponse.data) {
+              // 将规格信息合并到卡密信息中
+              cardKeyInfo.value.specificationName = specResponse.data.name
+              cardKeyInfo.value.productId = specResponse.data.productId
+              
+              // 如果有产品ID，可以进一步获取产品名称
+              if (specResponse.data.productId) {
+                // 这里可以调用产品API获取产品名称
+                // 暂时先显示规格名称
+                cardKeyInfo.value.productSpec = specResponse.data.name
+              }
+            }
+          } catch (error) {
+            console.warn('获取规格信息失败:', error)
+            // 如果获取规格信息失败，使用默认显示
+            cardKeyInfo.value.productSpec = `规格ID: ${response.data.specificationId}`
+          }
+        } else {
+          // 没有规格ID，显示默认信息
+          cardKeyInfo.value.productSpec = '未设置'
+        }
+        
+        showResult.value = true
+        console.log('卡密信息设置成功:', cardKeyInfo.value)
+        ElMessage.success('卡密验证成功')
+      } else {
+        // 虽然code=200但没有data字段，视为验证失败
+        cardKeyInfo.value = {
+          cardKey: cardKeyInput.value.trim(),
+          status: '未知'
+        }
+        showResult.value = true
+        console.log('卡密验证失败，无数据:', cardKeyInfo.value)
+        ElMessage.error('卡密验证失败')
+      }
     } else {
       // 卡密不存在或验证失败
       cardKeyInfo.value = {
         cardKey: cardKeyInput.value.trim(),
-        status: 'not_found'
+        status: '未知'
       }
       showResult.value = true
-      ElMessage.error(response?.message || '卡密不存在')
+      console.log('卡密不存在，设置失败状态:', cardKeyInfo.value)
+      ElMessage.error('卡密验证失败')
     }
   } catch (error) {
     console.error('卡密验证失败:', error)
-    ElMessage.error('验证失败，请检查网络连接')
+    // 检查错误类型，统一处理为卡密验证失败
+    if (error.response && error.response.status === 404) {
+      // 404错误：卡密不存在
+      cardKeyInfo.value = {
+        cardKey: cardKeyInput.value.trim(),
+        status: '未知'
+      }
+      showResult.value = true
+      ElMessage.error('卡密验证失败')
+    } else if (!error.response) {
+      // 网络连接错误
+      cardKeyInfo.value = {
+        cardKey: cardKeyInput.value.trim(),
+        status: '未知'
+      }
+      showResult.value = true
+      ElMessage.error('验证失败，请检查网络连接')
+    } else {
+      // 其他服务器错误
+      cardKeyInfo.value = {
+        cardKey: cardKeyInput.value.trim(),
+        status: '未知'
+      }
+      showResult.value = true
+      ElMessage.error('卡密验证失败')
+    }
   } finally {
     verifying.value = false
   }

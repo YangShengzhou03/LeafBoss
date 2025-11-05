@@ -76,7 +76,7 @@ export const cardKeyApi = {
 
   /**
    * 删除卡密
-   * @param {string} cardKey - 卡密
+   * @param {string} cardKey - 卡密代码
    * @returns {Promise} 删除结果
    */
   deleteCardKey(cardKey) {
@@ -85,7 +85,7 @@ export const cardKeyApi = {
 
   /**
    * 切换卡密状态
-   * @param {string} cardKey - 卡密
+   * @param {string} cardKey - 卡密代码
    * @param {string} status - 新状态
    * @returns {Promise} 切换结果
    */

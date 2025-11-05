@@ -79,6 +79,18 @@ public class SpecificationController {
     @PutMapping("/{id}")
     public Result<Boolean> updateSpecification(@PathVariable String id, @RequestBody Specification specification) {
         specification.setId(Integer.parseInt(id));
+        
+        // 处理状态字段转换：前端可能发送数字状态值，需要转换为数据库ENUM值
+        if (specification.getStatus() != null) {
+            String status = specification.getStatus();
+            if ("1".equals(status) || "active".equals(status)) {
+                specification.setStatus("active");
+            } else if ("0".equals(status) || "inactive".equals(status)) {
+                specification.setStatus("inactive");
+            }
+            // 其他情况保持原值
+        }
+        
         boolean result = specificationService.updateById(specification);
         return result ? Result.success("规格更新成功", true) : Result.error("规格更新失败");
     }

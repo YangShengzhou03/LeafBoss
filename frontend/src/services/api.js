@@ -93,6 +93,15 @@ const AdminService = {
     return cardKeyApi.toggleCardKeyStatus(id, status)
   },
 
+  disableCardKey(id) {
+    return cardKeyApi.disableCard(id)
+  },
+
+  clearUsedCardKeys() {
+    // 清空已使用卡密的API调用
+    return Server.delete('/api/card-keys/clear-used')
+  },
+
   exportCardKeys(params) {
     return Server.get('/api/admin/card-keys/export', params, { responseType: 'blob' })
   },
