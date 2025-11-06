@@ -15,7 +15,7 @@ import java.util.Map;
 @Component
 public class JwtUtil {
     
-    // 使用安全的密钥生成
+    // 使用安全的卡密生成
     private static final SecretKey SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS256);
     
     // token过期时间：7天（开发环境可适当延长）

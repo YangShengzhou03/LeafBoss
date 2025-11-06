@@ -14,7 +14,7 @@ import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * 对外卡密验证控制器
- * 无需token即可访问，用于应用程序安装时验证安装密钥
+ * 无需token即可访问，用于应用程序安装时验证安装卡密
  */
 @RestController
 @RequestMapping("/api/public/card-keys")
@@ -38,8 +38,8 @@ public class PublicCardKeyController {
             CardKey card = cardKeyService.findByCardKey(cardKey);
             
             if (card == null) {
-                operationLogService.logOperation("CARD_KEY", "验证安装密钥失败 - 密钥不存在: " + cardKey, getClientIpAddress(request));
-                return Result.error(404, "该密钥不存在");
+                operationLogService.logOperation("CARD_KEY", "公共接口验证失败 - 卡密不存在: " + cardKey, getClientIpAddress(request));
+                return Result.error(404, "该卡密不存在");
             }
             
             String status = card.getStatus();
@@ -48,8 +48,8 @@ public class PublicCardKeyController {
                 case "未使用":
                     boolean activated = cardKeyService.activateCard(cardKey, "system", "system@leafcard.com");
                     if (!activated) {
-                        operationLogService.logOperation("CARD_KEY", "验证安装密钥失败 - 激活失败: " + cardKey, getClientIpAddress(request));
-                        return Result.error(500, "密钥验证成功但使用失败");
+                        operationLogService.logOperation("CARD_KEY", "验证安装卡密失败 - 激活失败: " + cardKey, getClientIpAddress(request));
+                        return Result.error(500, "卡密验证成功但使用失败");
                     }
                     
                     Specification spec = specificationService.getById(card.getSpecificationId());
@@ -57,32 +57,32 @@ public class PublicCardKeyController {
                         Product product = productService.getById(spec.getProductId());
                         if (product != null) {
                             String productSpecInfo = product.getName() + "-" + spec.getName();
-                            operationLogService.logOperation("CARD_KEY", "验证安装密钥成功 - 密钥: " + cardKey + ", 商品规格: " + productSpecInfo, getClientIpAddress(request));
+                            operationLogService.logOperation("CARD_KEY", "验证安装卡密成功 - 卡密: " + cardKey + ", 商品规格: " + productSpecInfo, getClientIpAddress(request));
                             return Result.success(productSpecInfo);
                         } else {
-                            operationLogService.logOperation("CARD_KEY", "验证安装密钥成功但商品不存在 - 密钥: " + cardKey + ", 规格ID: " + spec.getId(), getClientIpAddress(request));
+                            operationLogService.logOperation("CARD_KEY", "验证安装卡密成功但商品不存在 - 卡密: " + cardKey + ", 规格ID: " + spec.getId(), getClientIpAddress(request));
                             return Result.success("未知商品-" + spec.getName());
                         }
                     } else {
-                        operationLogService.logOperation("CARD_KEY", "验证安装密钥成功但规格不存在 - 密钥: " + cardKey + ", 规格ID: " + card.getSpecificationId(), getClientIpAddress(request));
+                        operationLogService.logOperation("CARD_KEY", "验证安装卡密成功但规格不存在 - 卡密: " + cardKey + ", 规格ID: " + card.getSpecificationId(), getClientIpAddress(request));
                         return Result.success("未知商品规格");
                     }
                     
                 case "已使用":
-                    operationLogService.logOperation("CARD_KEY", "验证安装密钥失败 - 密钥已被使用: " + cardKey, getClientIpAddress(request));
-                    return Result.error(400, "该密钥已被使用");
+                    operationLogService.logOperation("CARD_KEY", "验证安装卡密失败 - 卡密已被使用: " + cardKey, getClientIpAddress(request));
+                    return Result.error(400, "该卡密已被使用");
                     
                 case "已禁用":
-                    operationLogService.logOperation("CARD_KEY", "验证安装密钥失败 - 密钥被禁用: " + cardKey, getClientIpAddress(request));
-                    return Result.error(400, "该密钥被禁用");
+                    operationLogService.logOperation("CARD_KEY", "验证安装卡密失败 - 卡密被禁用: " + cardKey, getClientIpAddress(request));
+                    return Result.error(400, "该卡密被禁用");
                     
                 default:
-                    operationLogService.logOperation("CARD_KEY", "验证安装密钥失败 - 密钥状态异常: " + cardKey + ", 状态: " + status, getClientIpAddress(request));
-                    return Result.error(400, "密钥状态异常");
+                    operationLogService.logOperation("CARD_KEY", "验证安装卡密失败 - 卡密状态异常: " + cardKey + ", 状态: " + status, getClientIpAddress(request));
+                    return Result.error(400, "卡密状态异常");
             }
             
         } catch (Exception e) {
-            operationLogService.logOperation("CARD_KEY", "验证安装密钥过程中发生系统异常: " + cardKey + ", 错误: " + e.getMessage(), getClientIpAddress(request));
+            operationLogService.logOperation("CARD_KEY", "验证安装卡密过程中发生系统异常: " + cardKey + ", 错误: " + e.getMessage(), getClientIpAddress(request));
             return Result.error(500, "验证过程中发生错误");
         }
     }

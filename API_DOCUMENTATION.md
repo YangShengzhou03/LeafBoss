@@ -1113,13 +1113,13 @@ Content-Type: application/json
 
 ## 🌐 公共卡密验证激活 API
 
-### ✅ 验证并激活安装密钥
+### ✅ 验证并激活安装卡密
 
 **接口地址**: `GET /api/public/card-keys/verify/{cardKey}`
 
 **请求头**: 无需认证
 
-**说明**: 验证安装密钥，验证成功时会自动使用该密钥（将未使用状态变为已使用）。此接口主要用于外部系统集成验证卡密有效性。
+**说明**: 验证安装卡密，验证成功时会自动使用该卡密（将未使用状态变为已使用）。此接口主要用于外部系统集成验证卡密有效性。
 
 **请求示例**:
 ```bash
@@ -1156,7 +1156,7 @@ curl -X GET "http://120.55.50.51/api/public/card-keys/verify/vD2Sbh1OXLLKPFBfB49
 ```json
 {
     "code": 400,
-    "message": "该密钥已被使用",
+    "message": "该卡密已被使用",
     "data": null
 }
 ```
