@@ -92,15 +92,15 @@ const getStatusText = (status) => {
 const getStatusTagType = (status) => {
   const typeMap = {
     active: 'success',
-    used: 'primary',
+    used: 'info',
     disabled: 'warning',
     expired: 'danger',
     '未使用': 'success',
-    '已使用': 'primary',
+    '已使用': 'info',
     '已禁用': 'warning',
     '已过期': 'danger'
   }
-  return typeMap[status] || 'primary'
+  return typeMap[status] || 'info'
 }
 
 // 验证结果相关计算属性

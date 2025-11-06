@@ -80,7 +80,7 @@
             </el-table-column>
             <el-table-column prop="status" label="规格状态" width="120" align="center">
               <template #default="scope">
-                <el-tag :type="scope.row.status === 'active' ? 'primary' : 'danger'">
+                <el-tag :type="scope.row.status === 'active' ? 'success' : 'danger'">
                   {{ scope.row.status === 'active' ? '发放中' : '已停用' }}
                 </el-tag>
               </template>

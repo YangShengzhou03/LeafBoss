@@ -53,7 +53,7 @@
           <el-table-column prop="status" label="状态" width="120" align="center">
             <template #default="scope">
               <el-tag :type="getStatusTagType(scope.row.status)">
-                {{ getStatusText(scope.row.status) }}
+                {{ scope.row.status }}
               </el-tag>
             </template>
           </el-table-column>
@@ -162,20 +162,10 @@ const pagedCardKeys = computed(() => {
 const getStatusTagType = (status) => {
   const typeMap = {
     '未使用': 'success',
-    '已使用': 'primary',
+    '已使用': 'info',
     '已禁用': 'danger'
   }
-  return typeMap[status] || 'primary'
-}
-
-// 状态文本映射
-const getStatusText = (status) => {
-  const textMap = {
-    '未使用': '未使用',
-    '已使用': '已使用',
-    '已禁用': '已禁用'
-  }
-  return textMap[status] || status || '未知'
+  return typeMap[status] || 'info'
 }
 
 // 加载卡密数据

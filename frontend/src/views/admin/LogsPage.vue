@@ -137,7 +137,7 @@ const filter = reactive({
 const getLevelType = (operationType) => {
   switch (operationType) {
     case 'LOGIN': return 'success'
-    case 'CARD_KEY': return 'primary'
+    case 'CARD_KEY': return 'info'
     case 'PRODUCT': return 'info'
     case 'SPECIFICATION': return 'warning'
     case 'USER': return 'danger'
