@@ -119,7 +119,7 @@ public class AdminController {
     }
 
     /**
-     * 重置管理员密码
+     * 重置管理员密码（需要验证码）
      */
     @PostMapping("/reset-password")
     public Result<Boolean> resetPassword(@RequestBody Map<String, String> resetRequest) {
@@ -135,6 +135,31 @@ public class AdminController {
         if (!"123456".equals(verificationCode.trim())) {
             return Result.error("验证码错误，请输入123456");
         }
+        
+        // 根据邮箱查找管理员
+        Admin admin = adminService.findByEmail(email);
+        if (admin == null) {
+            return Result.error("该邮箱对应的管理员不存在");
+        }
+        
+        // 更新密码
+        admin.setPasswordHash(newPassword);
+        boolean updated = adminService.updateById(admin);
+        
+        if (updated) {
+            return Result.success("密码重置成功", true);
+        } else {
+            return Result.error("密码重置失败");
+        }
+    }
+
+    /**
+     * 管理员直接重置用户密码（无需验证码）
+     */
+    @PostMapping("/admin-reset-password")
+    public Result<Boolean> adminResetPassword(@RequestBody Map<String, String> resetRequest) {
+        String email = resetRequest.get("email");
+        String newPassword = resetRequest.get("newPassword");
         
         // 根据邮箱查找管理员
         Admin admin = adminService.findByEmail(email);

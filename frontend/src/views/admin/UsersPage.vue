@@ -240,8 +240,8 @@ const resetPassword = async (user) => {
       }
     )
     
-    // 使用正确的重置密码API - 管理员重置用户密码
-    await api.user.resetPassword({ 
+    // 使用管理员重置密码API - 无需验证码
+    await api.user.adminResetPassword({ 
       email: user.email, 
       newPassword: '123456' 
     })

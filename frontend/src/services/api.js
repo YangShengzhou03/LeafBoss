@@ -188,6 +188,10 @@ const UserService = {
     return Server.post('/api/admins/reset-password', data)
   },
 
+  adminResetPassword(data) {
+    return Server.post('/api/admins/admin-reset-password', data)
+  },
+
   sendResetCode(data) {
     return Server.post('/api/admins/send-reset-code', data)
   },

@@ -1,10 +1,6 @@
 <template>
-  <div id="app">
-    <div v-if="isLoading" class="app-loading">
-      <el-icon class="is-loading" size="32"><Loading /></el-icon>
-      <p>正在加载应用...</p>
-    </div>
-    <div v-else-if="hasError" class="app-error">
+  <div id="app" v-loading="isLoading" :element-loading-text="loadingText" :element-loading-background="loadingBackground">
+    <div v-if="hasError" class="app-error">
       <el-result
         icon="error"
         title="应用加载失败"
@@ -22,11 +18,12 @@
 <script setup>
 import { ref, onMounted, onErrorCaptured } from 'vue'
 import store from './utils/store.js'
-import { Loading } from '@element-plus/icons-vue'
 
 const isLoading = ref(true)
 const hasError = ref(false)
 const errorMessage = ref('')
+const loadingText = ref('正在加载应用...')
+const loadingBackground = ref('rgba(255, 255, 255, 0.8)')
 
 onErrorCaptured((err) => {
   hasError.value = true
@@ -88,18 +85,13 @@ body {
   flex-direction: column;
 }
 
-.app-loading, .app-error {
+.app-error {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   height: 100vh;
   width: 100vw;
-}
-
-.app-loading p {
-  margin-top: 20px;
-  color: #909399;
 }
 
 :root {
