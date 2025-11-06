@@ -132,6 +132,62 @@ java -jar target/leaf-card-backend-1.0.0.jar
 - **数据统计**：使用情况统计和报表生成
 - **系统设置**：系统参数配置和权限设置
 
+### API 使用示例
+
+#### 卡密验证核销示例
+
+**验证卡密有效性（无需认证）：**
+```bash
+# 验证卡密并自动激活
+curl -X GET "http://120.55.50.51/api/public/card-keys/verify/vD2Sbh1OXLLKPFBfB49JnCaV0atSlyQh"
+```
+
+**成功响应：**
+```json
+{
+    "code": 200,
+    "message": "验证成功",
+    "data": {
+        "productName": "VIP会员",
+        "specificationName": "月卡",
+        "durationDays": 30,
+        "status": "已激活",
+        "activateTime": "2024-01-15T14:30:00",
+        "expireTime": "2024-02-14T14:30:00"
+    }
+}
+```
+
+**管理员登录获取令牌：**
+```bash
+curl -X POST "http://localhost:8080/api/auth/login" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "admin@leafcard.com",
+    "password": "123456"
+  }'
+```
+
+**获取产品列表（需要认证）：**
+```bash
+curl -X GET "http://localhost:8080/api/products" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+```
+
+**批量验证卡密脚本示例：**
+```bash
+#!/bin/bash
+# 批量验证卡密
+card_keys=("KEY1" "KEY2" "KEY3")
+for key in "${card_keys[@]}"; do
+  echo "验证卡密: $key"
+  curl -s -X GET "http://120.55.50.51/api/public/card-keys/verify/$key"
+  echo ""
+  sleep 1
+
+done
+```
+
 #### 开发指南
 
 **前端开发：**
