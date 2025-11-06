@@ -160,11 +160,9 @@ import { Download, Upload } from '@element-plus/icons-vue'
 import Server from '@/utils/Server.js'
 import api from '@/services/api.js'
 
-// 生成状态
 const generating = ref(false)
 const addingToStock = ref(false)
 
-// 生成表单
 const generateForm = reactive({
   count: 100,
   length: 32,
@@ -173,28 +171,19 @@ const generateForm = reactive({
   charset: ['numbers', 'uppercase', 'lowercase']
 })
 
-// 商品列表
 const productList = ref([])
-// 规格列表（全部规格）
 const allSpecList = ref([])
-// 当前商品对应的规格列表
 const specList = ref([])
-
-// 生成的卡密列表
 const generatedKeys = ref([])
-
-// 分页相关
 const currentPage = ref(1)
 const pageSize = ref(10)
 
-// 计算当前页显示的数据
 const paginatedKeys = computed(() => {
   const startIndex = (currentPage.value - 1) * pageSize.value
   const endIndex = startIndex + pageSize.value
   return generatedKeys.value.slice(startIndex, endIndex)
 })
 
-// 分页事件处理
 const handleSizeChange = (size) => {
   pageSize.value = size
   currentPage.value = 1
@@ -204,7 +193,6 @@ const handleCurrentChange = (page) => {
   currentPage.value = page
 }
 
-// 加载商品列表
 const loadProducts = async () => {
   try {
     const response = await Server.get('/api/products')
@@ -225,7 +213,6 @@ const loadProducts = async () => {
   }
 }
 
-// 加载全部规格列表（用于缓存）
 const loadAllSpecs = async () => {
   try {
     const response = await Server.get('/api/specifications')
@@ -248,7 +235,6 @@ const loadAllSpecs = async () => {
   }
 }
 
-// 根据商品ID加载对应的规格列表
 const loadSpecsByProduct = (productId) => {
   if (!productId) {
     specList.value = []
@@ -264,7 +250,6 @@ const loadSpecsByProduct = (productId) => {
   }
 }
 
-// 添加卡密到库存
 const addToStock = async () => {
   if (generatedKeys.value.length === 0) {
     ElMessage.warning('请先生成卡密')
@@ -289,7 +274,6 @@ const addToStock = async () => {
       }
     )
     
-    // 批量创建卡密 - 逐个调用API
     let successCount = 0
     let errorCount = 0
     
@@ -297,8 +281,8 @@ const addToStock = async () => {
       try {
           const response = await api.admin.generateCardKey({
             cardKey: keyInfo.key,
-            specificationId: generateForm.specId,  // 修正：使用后端实体类期望的参数名
-            status: '未使用'  // 修正：使用数据库允许的ENUM值
+            specificationId: generateForm.specId,
+            status: '未使用'
           })
           
           if (response.code === 200) {
@@ -313,8 +297,6 @@ const addToStock = async () => {
     
     if (successCount > 0) {
       ElMessage.success(`成功添加 ${successCount} 个卡密到库存`)
-      
-      // 清空生成的卡密
       generatedKeys.value = []
     }
     
@@ -331,7 +313,6 @@ const addToStock = async () => {
   }
 }
 
-// 生成随机卡密
 const generateRandomKey = () => {
   let charset = ''
   

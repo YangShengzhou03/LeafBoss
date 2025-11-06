@@ -115,24 +115,14 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { Search } from '@element-plus/icons-vue'
 import api from '../../services/api'
 
-// 加载状态
 const loading = ref(false)
-
-// 卡密列表数据
 const cardKeys = ref([])
-
-// 搜索条件
 const searchQuery = ref('')
 const statusFilter = ref('')
-
-// 分页信息
 const currentPage = ref(1)
 const pageSize = ref(10)
 const total = ref(0)
 
-
-
-// 计算属性：筛选后的卡密列表
 const filteredCardKeys = computed(() => {
   let filtered = [...cardKeys.value]
   
@@ -151,14 +141,12 @@ const filteredCardKeys = computed(() => {
   return filtered
 })
 
-// 计算属性：分页后的卡密列表
 const pagedCardKeys = computed(() => {
   const startIndex = (currentPage.value - 1) * pageSize.value
   const endIndex = startIndex + pageSize.value
   return filteredCardKeys.value.slice(startIndex, endIndex)
 })
 
-// 状态标签类型映射
 const getStatusTagType = (status) => {
   const typeMap = {
     '未使用': 'success',
@@ -168,15 +156,12 @@ const getStatusTagType = (status) => {
   return typeMap[status] || 'info'
 }
 
-// 加载卡密数据
 const loadCardKeys = async () => {
   loading.value = true
   try {
-    // 使用新的API接口获取包含商品和规格名称的卡密列表
     const response = await api.admin.getCardKeyListWithDetails()
     
     if (response && response.data) {
-      // 将返回的数据转换为前端需要的格式
       const newCardKeys = response.data.map(cardKey => ({
         id: cardKey.id,
         cardKey: cardKey.cardKey,
@@ -192,8 +177,6 @@ const loadCardKeys = async () => {
       }))
       
       cardKeys.value = newCardKeys
-      
-      // 更新总数
       total.value = filteredCardKeys.value.length
     } else {
       cardKeys.value = []
@@ -208,14 +191,11 @@ const loadCardKeys = async () => {
   }
 }
 
-// 搜索处理
 const handleSearch = () => {
   currentPage.value = 1
-  // 直接更新总数，避免重复计算
   total.value = filteredCardKeys.value.length
 }
 
-// 重置筛选
 const resetFilter = () => {
   searchQuery.value = ''
   statusFilter.value = ''
@@ -223,7 +203,6 @@ const resetFilter = () => {
   total.value = cardKeys.value.length
 }
 
-// 格式化日期时间
 const formatDateTime = (dateTimeStr) => {
   if (!dateTimeStr) return ''
   try {
@@ -241,13 +220,11 @@ const formatDateTime = (dateTimeStr) => {
   }
 }
 
-// 复制卡密
 const copyCardKey = async (cardKey) => {
   try {
     await navigator.clipboard.writeText(cardKey)
     ElMessage.success('卡密已复制到剪贴板')
   } catch (err) {
-    // 降级方案
     const textArea = document.createElement('textarea')
     textArea.value = cardKey
     document.body.appendChild(textArea)
@@ -258,7 +235,6 @@ const copyCardKey = async (cardKey) => {
   }
 }
 
-// 清空已使用卡密
 const handleClearUsed = async () => {
   try {
     await ElMessageBox.confirm(
@@ -272,10 +248,7 @@ const handleClearUsed = async () => {
       }
     )
     
-    // 清空已使用卡密功能暂未实现
     ElMessage.warning('清空已使用卡密功能正在开发中，敬请期待')
-    // 这里可以添加批量删除已使用卡密的逻辑
-    // 例如：遍历已使用卡密列表，逐个调用删除API
   } catch (error) {
     if (error !== 'cancel') {
       ElMessage.error('清空已使用卡密失败，请检查网络连接')
@@ -283,9 +256,6 @@ const handleClearUsed = async () => {
   }
 }
 
-
-
-// 切换卡密状态（禁用/启用）
 const handleToggleCardKey = async (row) => {
   const isDisabling = row.status !== '已禁用'
   const actionText = isDisabling ? '禁用' : '启用'
@@ -301,20 +271,16 @@ const handleToggleCardKey = async (row) => {
       }
     )
     
-    // 调用真实API切换卡密状态
     let response
     if (isDisabling) {
-      // 禁用卡密 - 传递卡密字符串
       response = await api.admin.disableCardKey(row.cardKey)
     } else {
-      // 启用卡密（设置为未使用状态）
       response = await api.admin.toggleCardKeyStatus(row.cardKey, '未使用')
     }
     
-    // 修复响应格式检查：后端返回的是Result对象，包含code、message、data字段
     if (response && response.code === 200) {
       ElMessage.success(`${actionText}成功`)
-      loadCardKeys() // 重新加载数据
+      loadCardKeys()
     } else {
       ElMessage.error(`${actionText}失败`)
     }
@@ -325,7 +291,6 @@ const handleToggleCardKey = async (row) => {
   }
 }
 
-// 删除卡密
 const handleDeleteCardKey = async (row) => {
   try {
     await ElMessageBox.confirm(
@@ -338,10 +303,8 @@ const handleDeleteCardKey = async (row) => {
       }
     )
     
-    // 调用真实API删除卡密
     const response = await api.admin.deleteCardKey(row.cardKey)
     
-    // 修复响应格式检查：后端返回的是Result对象，包含code、message、data字段
     if (response && response.code === 200) {
       ElMessage.success('删除成功')
       loadCardKeys()
