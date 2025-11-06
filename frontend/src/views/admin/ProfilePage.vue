@@ -30,7 +30,7 @@
               </div>
               <div class="info-item">
                 <span class="info-label">账户状态：</span>
-                <el-tag type="success">正常</el-tag>
+                <el-tag type="primary">正常</el-tag>
               </div>
             </div>
           </div>

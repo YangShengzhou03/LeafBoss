@@ -141,8 +141,8 @@ const getLevelType = (operationType) => {
     case 'PRODUCT': return 'info'
     case 'SPECIFICATION': return 'warning'
     case 'USER': return 'danger'
-    case 'SYSTEM': return ''
-    default: return ''
+    case 'SYSTEM': return 'info'
+    default: return 'info'
   }
 }
 

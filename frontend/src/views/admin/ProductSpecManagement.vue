@@ -80,7 +80,7 @@
             </el-table-column>
             <el-table-column prop="status" label="规格状态" width="120" align="center">
               <template #default="scope">
-                <el-tag :type="scope.row.status === 'active' ? 'success' : 'danger'">
+                <el-tag :type="scope.row.status === 'active' ? 'primary' : 'danger'">
                   {{ scope.row.status === 'active' ? '发放中' : '已停用' }}
                 </el-tag>
               </template>
@@ -91,7 +91,7 @@
                 <el-button size="small" @click="editSpec(scope.row)">编辑</el-button>
                 <el-button 
                   size="small" 
-                  :type="scope.row.status === 'active' ? 'warning' : 'success'"
+                  :type="scope.row.status === 'active' ? 'warning' : 'primary'"
                   @click="toggleSpecStatus(scope.row)"
                 >
                   {{ scope.row.status === 'active' ? '停用' : '启用' }}

@@ -36,7 +36,7 @@ const AdminService = {
   },
 
   clearLogs() {
-    return Server.delete('/api/operation-logs/clear')
+    return Server.delete('/api/operation-logs')
   },
 
   getCardKeyListWithDetails() {

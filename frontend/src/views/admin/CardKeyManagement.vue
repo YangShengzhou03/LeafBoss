@@ -76,7 +76,7 @@
             <template #default="scope">
               <el-button 
                 size="small" 
-                :type="scope.row.status === '已禁用' ? 'success' : 'warning'"
+                :type="scope.row.status === '已禁用' ? 'primary' : 'warning'"
                 @click="handleToggleCardKey(scope.row)"
               >
                 {{ scope.row.status === '已禁用' ? '启用' : '禁用' }}

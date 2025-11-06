@@ -49,7 +49,7 @@
             <el-table-column prop="description" label="商品描述" min-width="200" align="left" :show-overflow-tooltip="true" />
             <el-table-column prop="status" label="状态" width="100" align="center">
               <template #default="scope">
-                <el-tag :type="scope.row.status === 'active' ? 'success' : 'danger'">
+                <el-tag :type="scope.row.status === 'active' ? 'primary' : 'danger'">
                   {{ scope.row.status === 'active' ? '上架' : '下架' }}
                 </el-tag>
               </template>
