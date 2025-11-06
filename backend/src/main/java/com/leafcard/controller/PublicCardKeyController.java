@@ -39,7 +39,7 @@ public class PublicCardKeyController {
             
             if (card == null) {
                 operationLogService.logOperation("CARD_KEY", "公共接口验证失败 - 卡密不存在: " + cardKey, getClientIpAddress(request));
-                return Result.error(404, "该卡密不存在");
+                return Result.error(404, "卡密不存在，请检查卡密是否正确或获取有效卡密");
             }
             
             String status = card.getStatus();
@@ -49,7 +49,7 @@ public class PublicCardKeyController {
                     boolean activated = cardKeyService.activateCard(cardKey, "system", "system@leafcard.com");
                     if (!activated) {
                         operationLogService.logOperation("CARD_KEY", "验证安装卡密失败 - 激活失败: " + cardKey, getClientIpAddress(request));
-                        return Result.error(500, "卡密验证成功但使用失败");
+                        return Result.error(500, "卡密验证成功但使用失败，请联系开发者处理");
                     }
                     
                     Specification spec = specificationService.getById(card.getSpecificationId());
@@ -70,20 +70,20 @@ public class PublicCardKeyController {
                     
                 case "已使用":
                     operationLogService.logOperation("CARD_KEY", "验证安装卡密失败 - 卡密已被使用: " + cardKey, getClientIpAddress(request));
-                    return Result.error(400, "该卡密已被使用");
+                    return Result.error(400, "该卡密已被使用，请确认是否已在其他设备使用");
                     
                 case "已禁用":
                     operationLogService.logOperation("CARD_KEY", "验证安装卡密失败 - 卡密被禁用: " + cardKey, getClientIpAddress(request));
-                    return Result.error(400, "该卡密被禁用");
+                    return Result.error(400, "该卡密已被禁用，请联系开发者了解原因");
                     
                 default:
                     operationLogService.logOperation("CARD_KEY", "验证安装卡密失败 - 卡密状态异常: " + cardKey + ", 状态: " + status, getClientIpAddress(request));
-                    return Result.error(400, "卡密状态异常");
+                    return Result.error(400, "卡密状态异常，请联系开发者处理");
             }
             
         } catch (Exception e) {
             operationLogService.logOperation("CARD_KEY", "验证安装卡密过程中发生系统异常: " + cardKey + ", 错误: " + e.getMessage(), getClientIpAddress(request));
-            return Result.error(500, "验证过程中发生错误");
+            return Result.error(500, "验证过程中发生系统错误，请稍后重试");
         }
     }
     
