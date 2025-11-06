@@ -36,10 +36,10 @@
         <div class="container">
           <div class="hero-content">
             <h1 class="hero-title">LeafCard</h1>
-            <p class="hero-description">枫叶卡管系统 - 卡密管理系统</p>
+            <p class="hero-description">内部卡密管理系统</p>
             <div class="cta-buttons">
             <el-button type="primary" size="large" class="start-btn" @click="handleStart">
-              {{ isAuthenticated ? '进入管理后台' : '立即开始使用' }}
+              {{ isAuthenticated ? '进入管理后台' : '登录系统' }}
             </el-button>
           </div>
           </div>
@@ -48,7 +48,7 @@
 
       <section id="features" class="features-section">
         <div class="container">
-          <h2>LeafCard - 枫叶卡管系统的特色功能</h2>
+          <h2>系统功能模块</h2>
           <div class="features-grid">
             <div class="feature-card" v-for="feature in features" :key="feature.id">
               <div class="feature-icon">
@@ -66,8 +66,8 @@
       <div class="container">
         <div class="footer-content">
           <div class="footer-section">
-            <h3>枫叶卡管系统</h3>
-            <p>卡密管理系统</p>
+            <h3>LeafCard</h3>
+            <p>内部卡密管理系统</p>
           </div>
           <div class="footer-section">
             <h4>产品功能</h4>
@@ -92,7 +92,7 @@
           </div>
         </div>
         <div class="footer-bottom">
-          <p>&copy; 2024-2025 LeafCard - 枫叶卡管系统</p>
+          <p>&copy; 2024-2025 LeafCard - 内部卡密管理系统</p>
           <div class="icp-info">
             <a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer">
               赣ICP备2025075576号
@@ -135,13 +135,13 @@ const features = ref([
     id: 2,
     icon: Box,
     title: '商品管理',
-    description: '灵活的商品和规格管理，支持多种产品类型和授权策略。'
+    description: '商品和规格管理，支持多种产品类型和授权策略。'
   },
   {
     id: 3,
     icon: DataLine,
     title: '数据分析',
-    description: '详细的使用数据统计和分析，帮助您做出更好的管理决策。'
+    description: '使用数据统计和分析，支持管理决策。'
   }
 ])
 
