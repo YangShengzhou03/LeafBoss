@@ -27,8 +27,8 @@ public class LogUtil {
      * 记录登录日志
      */
     public void logLogin(boolean success, String description, HttpServletRequest request) {
-        String operationType = success ? "admin_login" : "LOGIN_FAILED";
-        logOperation(operationType, description, request);
+        String detailedDescription = success ? "管理员登录成功 - " + description : "管理员登录失败 - " + description;
+        logOperation("LOGIN", detailedDescription, request);
     }
     
     /**

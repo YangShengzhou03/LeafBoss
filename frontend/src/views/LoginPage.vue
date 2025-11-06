@@ -477,7 +477,7 @@ const handleRegister = async () => {
       ElMessage.error(response.message || '注册失败');
     }
   } catch (error) {
-    ElMessage.error('注册失败，请检查网络连接');
+    console.log('注册失败')
   }
 };
 

@@ -75,7 +75,7 @@ CREATE TABLE card_keys (
 -- 操作日志表
 CREATE TABLE operation_logs (
     id INT PRIMARY KEY AUTO_INCREMENT COMMENT '日志唯一标识符',
-    operation_type ENUM('card_create', 'card_activate', 'card_disable', 'product_create', 'product_update', 'admin_login') NOT NULL COMMENT '操作类型',
+    operation_type ENUM('LOGIN', 'CARD_KEY', 'PRODUCT', 'SPECIFICATION', 'USER', 'SYSTEM') NOT NULL COMMENT '操作类型',
     description TEXT COMMENT '描述',
     ip_address VARCHAR(50) COMMENT 'IP地址',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '创建时间',

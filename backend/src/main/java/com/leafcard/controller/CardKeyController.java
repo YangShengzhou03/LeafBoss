@@ -151,7 +151,7 @@ public class CardKeyController {
         
         if (updated) {
             // 记录激活卡密日志
-            logUtil.logCardKeyOperation("card_activate", "激活卡密 - 规格ID: " + cardKeyEntity.getSpecificationId(), request);
+            logUtil.logCardKeyOperation("CARD_KEY", "管理员激活了卡密: " + cardKeyEntity.getCardKey() + " - 规格ID: " + cardKeyEntity.getSpecificationId(), request);
             
             return Result.success("卡密激活成功", true);
         } else {
@@ -184,7 +184,7 @@ public class CardKeyController {
         
         if (updated) {
             // 记录禁用卡密日志
-            logUtil.logCardKeyOperation("card_disable", "禁用卡密 - 规格ID: " + cardKeyEntity.getSpecificationId(), request);
+            logUtil.logCardKeyOperation("CARD_KEY", "管理员禁用了卡密: " + cardKeyEntity.getCardKey() + " - 规格ID: " + cardKeyEntity.getSpecificationId(), request);
             
             return Result.success("卡密禁用成功", true);
         } else {
@@ -206,7 +206,7 @@ public class CardKeyController {
         
         if (deleted) {
             // 记录删除卡密日志
-            logUtil.logCardKeyOperation("card_delete", "删除卡密 - 规格ID: " + cardKey.getSpecificationId(), request);
+            logUtil.logCardKeyOperation("CARD_KEY", "管理员删除了卡密: " + cardKey.getCardKey() + " - 规格ID: " + cardKey.getSpecificationId(), request);
             
             return Result.success("卡密删除成功", true);
         } else {
@@ -239,7 +239,7 @@ public class CardKeyController {
         
         if (success) {
             // 记录批量生成卡密日志
-            logUtil.logCardKeyOperation("card_batch_generate", "批量生成卡密 - 产品ID: " + productId + ", 数量: " + quantity, request);
+            logUtil.logCardKeyOperation("CARD_KEY", "管理员为产品ID: " + productId + " 批量生成了 " + quantity + " 张卡密", request);
             
             return Result.success("批量生成卡密成功", true);
         } else {

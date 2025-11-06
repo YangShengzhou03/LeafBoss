@@ -87,7 +87,7 @@ public class SpecificationController {
         
         if (saved) {
             // 记录创建规格日志
-            logUtil.logSpecificationOperation("specification_create", "创建规格: " + specification.getName(), request);
+            logUtil.logSpecificationOperation("SPECIFICATION", "管理员创建了规格: " + specification.getName() + " (ID: " + specification.getId() + ", 产品ID: " + specification.getProductId() + ")", request);
             
             return Result.success("规格创建成功", true);
         } else {
@@ -116,7 +116,7 @@ public class SpecificationController {
         
         if (updated) {
             // 记录更新规格日志
-            logUtil.logSpecificationOperation("specification_update", "更新规格: " + specification.getName(), request);
+            logUtil.logSpecificationOperation("SPECIFICATION", "管理员更新了规格: " + specification.getName() + " (ID: " + specification.getId() + ", 产品ID: " + specification.getProductId() + ")", request);
             
             return Result.success("规格更新成功", true);
         } else {
@@ -138,7 +138,7 @@ public class SpecificationController {
         
         if (deleted) {
             // 记录删除规格日志
-            logUtil.logSpecificationOperation("specification_delete", "删除规格: " + specification.getName(), request);
+            logUtil.logSpecificationOperation("SPECIFICATION", "管理员删除了规格: " + specification.getName() + " (ID: " + specification.getId() + ", 产品ID: " + specification.getProductId() + ")", request);
             
             return Result.success("规格删除成功", true);
         } else {

@@ -102,7 +102,7 @@ public class AdminController {
         boolean saved = adminService.save(admin);
         if (saved) {
             // 记录创建管理员日志
-            logUtil.logUserOperation("admin_create", "创建管理员 - 邮箱: " + admin.getEmail(), request);
+            logUtil.logUserOperation("USER", "管理员创建了新的管理员账户 - 邮箱: " + admin.getEmail() + " (ID: " + admin.getId() + ")", request);
             
             return Result.success("管理员创建成功", true);
         } else {
@@ -140,7 +140,7 @@ public class AdminController {
         
         if (updated) {
             // 记录重置密码日志
-            logUtil.logUserOperation("password_reset", "重置管理员密码 - 邮箱: " + email, request);
+            logUtil.logUserOperation("USER", "管理员通过邮箱验证重置了密码 - 邮箱: " + email, request);
             
             return Result.success("密码重置成功", true);
         } else {
@@ -168,7 +168,7 @@ public class AdminController {
         
         if (updated) {
             // 记录管理员重置密码日志
-            logUtil.logUserOperation("admin_password_reset", "管理员直接重置密码 - 邮箱: " + email, request);
+            logUtil.logUserOperation("USER", "管理员直接重置了其他管理员密码 - 邮箱: " + email, request);
             
             return Result.success("密码重置成功", true);
         } else {

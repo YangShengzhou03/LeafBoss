@@ -84,7 +84,7 @@ public class ProductController {
         
         if (saved) {
             // 记录创建产品日志
-            logUtil.logProductOperation("product_create", "创建产品: " + product.getName(), request);
+            logUtil.logProductOperation("PRODUCT", "管理员创建了产品: " + product.getName() + " (ID: " + product.getId() + ")", request);
             
             return Result.success("产品创建成功", true);
         } else {
@@ -113,7 +113,7 @@ public class ProductController {
         
         if (updated) {
             // 记录更新产品日志
-            logUtil.logProductOperation("product_update", "更新产品: " + product.getName(), request);
+            logUtil.logProductOperation("PRODUCT", "管理员更新了产品: " + product.getName() + " (ID: " + product.getId() + ")", request);
             
             return Result.success("产品更新成功", true);
         } else {
@@ -135,7 +135,7 @@ public class ProductController {
         
         if (deleted) {
             // 记录删除产品日志
-            logUtil.logProductOperation("product_delete", "删除产品: " + product.getName(), request);
+            logUtil.logProductOperation("PRODUCT", "管理员删除了产品: " + product.getName() + " (ID: " + product.getId() + ")", request);
             
             return Result.success("产品删除成功", true);
         } else {
