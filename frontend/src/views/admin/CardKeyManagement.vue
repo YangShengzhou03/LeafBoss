@@ -315,7 +315,7 @@ const handleToggleCardKey = async (row) => {
     // 调用真实API切换卡密状态
     let response
     if (isDisabling) {
-      // 禁用卡密
+      // 禁用卡密 - 传递卡密字符串
       response = await api.admin.disableCardKey(row.cardKey)
     } else {
       // 启用卡密（设置为未使用状态）

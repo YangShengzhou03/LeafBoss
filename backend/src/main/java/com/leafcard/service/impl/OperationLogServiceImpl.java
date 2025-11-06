@@ -139,7 +139,19 @@ public class OperationLogServiceImpl extends ServiceImpl<OperationLogMapper, Ope
         operationLog.setAdminId(adminId);
         operationLog.setOperationType(operationType);
         operationLog.setTargetType(targetType);
-        operationLog.setTargetId(Integer.parseInt(targetId));
+        
+        // 安全处理targetId转换，避免NumberFormatException
+        try {
+            if (targetId != null && !targetId.isEmpty()) {
+                operationLog.setTargetId(Integer.parseInt(targetId));
+            } else {
+                operationLog.setTargetId(0); // 默认值
+            }
+        } catch (NumberFormatException e) {
+            // 如果targetId不是数字，使用默认值
+            operationLog.setTargetId(0);
+        }
+        
         operationLog.setDescription(description);
         operationLog.setIpAddress(ipAddress);
         operationLog.setCreatedAt(LocalDateTime.now());

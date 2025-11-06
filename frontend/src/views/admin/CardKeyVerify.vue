@@ -62,7 +62,7 @@ import { ref, computed } from 'vue'
 import { ElMessage } from 'element-plus'
 import { CircleCheck, CircleClose, Warning } from '@element-plus/icons-vue'
 import Server from '@/utils/Server.js'
-import { specificationApi } from '@/api/index.js'
+import api from '@/services/api.js'
 
 // 卡密输入
 const cardKeyInput = ref('')
@@ -169,7 +169,7 @@ const handleVerify = async () => {
         // 如果有规格ID，获取规格详细信息
         if (response.data.specificationId) {
           try {
-            const specResponse = await specificationApi.getSpecificationById(response.data.specificationId)
+            const specResponse = await api.admin.getSpecificationById(response.data.specificationId)
             if (specResponse && specResponse.code === 200 && specResponse.data) {
               // 将规格信息合并到卡密信息中
               cardKeyInfo.value.specificationName = specResponse.data.name

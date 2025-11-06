@@ -142,7 +142,6 @@ import { ref, reactive, onMounted, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Search } from '@element-plus/icons-vue'
 import api from '../../services/api'
-import { userApi } from '../../api'
 
 // 数据状态
 const loading = ref(false)
@@ -293,11 +292,11 @@ const saveUser = async () => {
     }
     
     if (editingUser.value) {
-      // 更新用户 - 直接使用userApi
-      await userApi.updateUser(editingUser.value.id, userData)
+      // 更新用户 - 使用统一的api服务
+      await api.admin.updateUser(editingUser.value.id, userData)
     } else {
-      // 添加用户 - 直接使用userApi
-      await userApi.createUser(userData)
+      // 添加用户 - 使用统一的api服务
+      await api.admin.createUser(userData)
     }
     
     ElMessage.success(editingUser.value ? '用户更新成功' : '用户添加成功')
@@ -325,8 +324,8 @@ const toggleUserStatus = async (user) => {
     const newStatus = user.status === 'active' ? 'disabled' : 'active'
     const enabled = newStatus === 'active'
     
-    // 更新用户状态 - 直接使用userApi
-    await userApi.updateUser(user.id, {
+    // 更新用户状态 - 使用统一的api服务
+    await api.admin.updateUser(user.id, {
       status: enabled ? 1 : 0
     })
     

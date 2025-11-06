@@ -1,6 +1,7 @@
 import { reactive } from 'vue'
 import Server from './Server.js'
 import * as utils from './utils.js'
+import api from '@/services/api.js'
 
 // 全局状态
 const state = reactive({
@@ -56,7 +57,7 @@ const store = {
   async adminLogin(credentials) {
     state.loading = true
     try {
-      const response = await Server.post('/admin/login', credentials)
+      const response = await api.admin.login(credentials)
       
       if (response && response.code === 200 && response.data) {
         const { token, user } = response.data
@@ -95,7 +96,7 @@ const store = {
   async login(credentials) {
     state.loading = true
     try {
-      const response = await Server.post('/auth/login', credentials)
+      const response = await api.user.login(credentials)
       
       // 后端返回的数据结构是 {code: 200, message: "登录成功", data: {token: "...", user: {...}}}
       // 注意：Server.js的响应拦截器已经将后端返回的完整响应包装成了response.data
@@ -129,7 +130,7 @@ const store = {
   // 更新用户信息
   async updateUserProfile(userData) {
     try {
-      const response = await Server.put('/user/profile', userData)
+      const response = await api.user.updateUserInfo(userData)
       
       if (response && response.code === 200 && response.data) {
         // 更新本地用户信息
@@ -147,7 +148,7 @@ const store = {
   // 修改密码
   async changePassword(passwordData) {
     try {
-      const response = await Server.put('/user/password', passwordData)
+      const response = await api.user.changePassword(passwordData)
       
       if (response && response.code === 200) {
         return { success: true, message: response.message || '密码修改成功' }
@@ -203,7 +204,7 @@ const store = {
   async register(userData) {
     state.loading = true
     try {
-      const response = await Server.post('/auth/register', userData)
+      const response = await api.user.register(userData)
       
       // 后端返回的数据结构是 {code: 200, message: "注册成功", data: {token: "...", user: {...}}}
       // 注意：Server.js的响应拦截器已经将后端返回的完整响应包装成了response.data
@@ -242,7 +243,7 @@ const store = {
   async sendVerificationCode(email) {
     state.loading = true
     try {
-      await Server.post('/verification/send', { email })
+      await api.user.sendVerificationCode({ email })
       return { success: true, message: '验证码发送成功' }
     } catch (error) {
       console.error('发送验证码失败:', error)
@@ -260,7 +261,7 @@ const store = {
     }
 
     try {
-      const response = await Server.get('/api/auth/me')
+      const response = await api.user.getCurrentUser()
       
       // 根据API响应结构，用户信息在response.data中
       // 响应结构: {code: 200, message: "操作成功", data: {用户信息}}
@@ -289,7 +290,7 @@ const store = {
     }
 
     try {
-      const response = await Server.get('/api/user/storage')
+      const response = await api.user.getStorageInfo()
       // 注意：Server.js的响应拦截器已经将后端返回的完整响应包装成了response.data
       // 后端返回的数据结构是 {code: 200, message: "success", data: {storageQuota: 1073741824, usedStorage: 1048576, ...}}
       const storageData = response.data || response
@@ -314,7 +315,7 @@ const store = {
   async updateProfile(userData) {
     state.loading = true
     try {
-      const response = await Server.put('/user/profile', userData)
+      const response = await api.user.updateUserInfo(userData)
       this.setUser(response.data)
       return { success: true, message: '更新成功' }
     } catch (error) {
@@ -329,7 +330,7 @@ const store = {
   async updatePassword(passwordData) {
     state.loading = true
     try {
-      await Server.put('/user/password', passwordData)
+      await api.user.changePassword(passwordData)
       return { success: true, message: '密码更新成功' }
     } catch (error) {
       console.error('更新密码失败:', error)
@@ -343,7 +344,7 @@ const store = {
   async logout() {
     try {
       // 调用后端登出API
-      await Server.post('/auth/logout')
+      await api.user.logout()
     } catch (error) {
       console.error('登出失败:', error)
     } finally {

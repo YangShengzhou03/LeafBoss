@@ -1,5 +1,4 @@
 import Server from '../utils/Server'
-import { userApi, productApi, specificationApi, cardKeyApi, operationLogApi } from '../api'
 
 const AdminService = {
   login(data) {
@@ -15,50 +14,56 @@ const AdminService = {
   },
 
   getUserList(params) {
-    return userApi.getUsers(params.page || 1, params.size || 10)
+    return Server.get('/api/admins', { page: params.page || 1, size: params.size || 10 })
   },
 
   getLogList(params) {
-    return operationLogApi.getOperationLogs(
-      params.page || 1, 
-      params.size || 10,
-      params.startDate,
-      params.endDate,
-      params.operationType,
-      params.adminId
-    )
+    return Server.get('/api/operation-logs', {
+      page: params.page || 1,
+      size: params.size || 10,
+      startDate: params.startDate,
+      endDate: params.endDate,
+      operationType: params.operationType,
+      adminId: params.adminId
+    })
   },
 
   getLogStats(params) {
-    return operationLogApi.getLogStats(params.startDate, params.endDate)
+    return Server.get('/api/operation-logs/stats', {
+      startDate: params.startDate,
+      endDate: params.endDate
+    })
   },
 
   exportLogs(params) {
-    return operationLogApi.exportLogs(params.startDate, params.endDate)
+    return Server.get('/api/operation-logs/export', {
+      startDate: params.startDate,
+      endDate: params.endDate
+    }, { responseType: 'blob' })
   },
 
   clearLogs() {
-    return operationLogApi.clearLogs()
+    return Server.delete('/api/operation-logs/clear')
   },
 
   getLogsByAdmin(adminId) {
-    return operationLogApi.getOperationLogsByAdmin(adminId)
+    return Server.get(`/api/operation-logs/admin/${adminId}`)
   },
 
   getLogsByType(operationType) {
-    return operationLogApi.getOperationLogsByType(operationType)
+    return Server.get(`/api/operation-logs/type/${operationType}`)
   },
 
   getLogsByTarget(targetType, targetId) {
-    return operationLogApi.getOperationLogsByTarget(targetType, targetId)
+    return Server.get(`/api/operation-logs/target/${targetType}/${targetId}`)
   },
 
   logOperation(data) {
-    return operationLogApi.logOperation(data)
+    return Server.post('/api/operation-logs', data)
   },
 
   logDetailedOperation(data) {
-    return operationLogApi.logDetailedOperation(data)
+    return Server.post('/api/operation-logs/detailed', data)
   },
 
   getSystemConfig() {
@@ -70,35 +75,38 @@ const AdminService = {
   },
 
   getCardKeyList(params) {
-    return cardKeyApi.getCardKeys(params.page || 1, params.size || 10, params.status)
+    return Server.get('/api/card-keys', {
+      page: params.page || 1,
+      size: params.size || 10,
+      status: params.status
+    })
   },
 
   getCardKeyListWithDetails() {
-    return cardKeyApi.getCardKeyListWithDetails()
+    return Server.get('/api/card-keys/with-details')
   },
 
   generateCardKey(data) {
-    return cardKeyApi.createCardKey(data)
+    return Server.post('/api/card-keys', data)
   },
 
   editCardKey(id, data) {
-    return cardKeyApi.updateCardKey(id, data)
+    return Server.put(`/api/card-keys/${id}`, data)
   },
 
   deleteCardKey(id) {
-    return cardKeyApi.deleteCardKey(id)
+    return Server.delete(`/api/card-keys/${id}`)
   },
 
   toggleCardKeyStatus(id, status) {
-    return cardKeyApi.toggleCardKeyStatus(id, status)
+    return Server.put(`/api/card-keys/${id}/status`, { status })
   },
 
   disableCardKey(id) {
-    return cardKeyApi.disableCard(id)
+    return Server.put(`/api/card-keys/${id}/disable`)
   },
 
   clearUsedCardKeys() {
-    // 清空已使用卡密的API调用
     return Server.delete('/api/card-keys/clear-used')
   },
 
@@ -107,41 +115,57 @@ const AdminService = {
   },
 
   getProductList(params) {
-    return productApi.getProducts(params.page || 1, params.size || 10, params.category, params.status)
+    return Server.get('/api/products', {
+      page: params.page || 1,
+      size: params.size || 10,
+      category: params.category,
+      status: params.status
+    })
   },
 
   createProduct(data) {
-    return productApi.createProduct(data)
+    return Server.post('/api/products', data)
   },
 
   editProduct(id, data) {
-    return productApi.updateProduct(id, data)
+    return Server.put(`/api/products/${id}`, data)
   },
 
   deleteProduct(id) {
-    return productApi.deleteProduct(id)
+    return Server.delete(`/api/products/${id}`)
   },
 
   getSpecList(params) {
-    return specificationApi.getSpecifications(params.page || 1, params.size || 10)
+    return Server.get('/api/specifications', {
+      page: params.page || 1,
+      size: params.size || 10
+    })
   },
 
   createSpec(data) {
-    return specificationApi.createSpecification(data)
+    return Server.post('/api/specifications', data)
   },
 
   editSpec(id, data) {
-    return specificationApi.updateSpecification(id, data)
+    return Server.put(`/api/specifications/${id}`, data)
   },
 
   deleteSpec(id) {
-    return specificationApi.deleteSpecification(id)
+    return Server.delete(`/api/specifications/${id}`)
+  },
+
+  getSpecificationById(id) {
+    return Server.get(`/api/specifications/${id}`)
   }
 }
 
 const UserService = {
   login(data) {
-    return userApi.login(data)
+    return Server.post('/api/auth/login', data)
+  },
+
+  logout() {
+    return Server.post('/api/auth/logout')
   },
 
   register(data) {
@@ -149,23 +173,23 @@ const UserService = {
   },
 
   createUser(data) {
-    return userApi.createUser(data)
+    return Server.post('/api/admins', data)
   },
 
   deleteUser(id) {
-    return userApi.deleteUser(id)
+    return Server.delete(`/api/admins/${id}`)
   },
 
   resetPassword(data) {
-    return userApi.resetPassword(data)
+    return Server.post('/api/admins/reset-password', data)
   },
 
   sendResetCode(data) {
-    return userApi.sendResetCode(data)
+    return Server.post('/api/admins/send-reset-code', data)
   },
 
   getUserInfo() {
-    return userApi.getUserInfo()
+    return Server.get('/api/admins/info')
   },
 
   getCaptcha() {
@@ -177,15 +201,19 @@ const UserService = {
   },
 
   updateUserInfo(data) {
-    return Server.put('/api/auth/me', data)
+    return Server.put('/api/admins/info', data)
   },
 
   changePassword(data) {
-    return Server.put('/api/auth/password', data)
+    return Server.put('/api/admins/password', data)
   },
 
   getStorageInfo() {
     return Server.get('/api/user/storage')
+  },
+
+  sendVerificationCode(data) {
+    return Server.post('/api/verification/send', data)
   },
 
   getFileList(params) {
