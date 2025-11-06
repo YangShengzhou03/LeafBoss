@@ -234,20 +234,22 @@ const handleEditProduct = (row) => {
 // 保存商品
 const saveProduct = async () => {
   try {
-    if (isEditing.value) {
-      const response = await productApi.updateProduct(productForm.id, productForm);
+    if (editingProduct.value) {
+      // 更新商品
+      const response = await api.admin.editProduct(productForm.id, productForm);
       if (response && response.code === 200) {
         ElMessage.success('商品更新成功');
-        dialogVisible.value = false;
+        showAddDialog.value = false;
         loadProducts();
       } else {
         ElMessage.error(response?.message || '保存商品失败');
       }
     } else {
-      const response = await productApi.createProduct(productForm);
+      // 添加商品
+      const response = await api.admin.createProduct(productForm);
       if (response && response.code === 200) {
         ElMessage.success('商品添加成功');
-        dialogVisible.value = false;
+        showAddDialog.value = false;
         loadProducts();
       } else {
         ElMessage.error(response?.message || '保存商品失败');

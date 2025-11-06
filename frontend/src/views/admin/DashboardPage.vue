@@ -191,21 +191,27 @@ const loadDashboardData = async () => {
     
     // 使用API获取仪表盘统计数据
     const response = await api.admin.getDashboardStats()
+    console.log('后端响应内容:', response)
+    console.log('响应数据:', response?.data)
+    
     if (response && response.data) {
       const data = response.data
+      console.log('解析后的数据:', data)
+      
+      // 正确映射后端返回的数据到前端期望的结构
       stats.value = {
-        cardKeyCount: data.cardKeyCount || 0,
-        productCount: data.productCount || 0,
+        cardKeyCount: data.totalOrders || 0, // 使用totalOrders作为卡密总数
+        productCount: data.activeUsers || 0,  // 使用activeUsers作为商品总数
         dailySales: data.dailySales || 0,
         dailyRevenue: data.dailyRevenue || 0,
-        cardKeyGrowth: data.cardKeyGrowth || 0,
-        productGrowth: data.productGrowth || 0,
-        dailySalesGrowth: data.dailySalesGrowth || 0,
-        dailyGrowth: data.dailyGrowth || 0
+        cardKeyGrowth: data.conversionRate || 0, // 使用conversionRate作为卡密增长率
+        productGrowth: data.dailyRevenueChange || 0, // 使用dailyRevenueChange作为商品增长率
+        dailySalesGrowth: data.dailySalesChange || 0,
+        dailyGrowth: data.dailyRevenueChange || 0
       }
       
-      // 获取销量前五的商品数据
-      topProducts.value = data.topProducts || []
+      // 获取销量前五的商品数据（后端暂无此数据，使用空数组）
+      topProducts.value = []
     } else {
       // API返回空数据时，使用空数据
       stats.value = {

@@ -207,14 +207,45 @@ public class AdminController {
      * 更新管理员信息
      */
     @PutMapping("/{id}")
-    public Result<Boolean> updateAdmin(@PathVariable String id, @RequestBody Admin admin) {
-        admin.setId(id);
-        boolean updated = adminService.updateById(admin);
-        
-        if (updated) {
-            return Result.success("管理员更新成功", true);
-        } else {
-            return Result.error("管理员更新失败");
+    public Result<Boolean> updateAdmin(@PathVariable String id, @RequestBody Map<String, Object> updateData) {
+        try {
+            // 获取现有管理员信息
+            Admin existingAdmin = adminService.getById(id);
+            if (existingAdmin == null) {
+                return Result.error("管理员不存在");
+            }
+            
+            // 更新字段
+            if (updateData.containsKey("username")) {
+                existingAdmin.setUsername((String) updateData.get("username"));
+            }
+            if (updateData.containsKey("email")) {
+                existingAdmin.setEmail((String) updateData.get("email"));
+            }
+            if (updateData.containsKey("status")) {
+                // 处理状态字段，支持字符串和数字类型
+                Object statusObj = updateData.get("status");
+                if (statusObj instanceof Integer) {
+                    // 如果是数字，转换为对应的字符串状态
+                    int statusValue = (Integer) statusObj;
+                    existingAdmin.setStatus(statusValue == 1 ? "active" : "inactive");
+                } else if (statusObj instanceof String) {
+                    existingAdmin.setStatus((String) statusObj);
+                }
+            }
+            if (updateData.containsKey("passwordHash")) {
+                existingAdmin.setPasswordHash((String) updateData.get("passwordHash"));
+            }
+            
+            boolean updated = adminService.updateById(existingAdmin);
+            
+            if (updated) {
+                return Result.success("管理员更新成功", true);
+            } else {
+                return Result.error("管理员更新失败");
+            }
+        } catch (Exception e) {
+            return Result.error("更新管理员信息时发生错误: " + e.getMessage());
         }
     }
 

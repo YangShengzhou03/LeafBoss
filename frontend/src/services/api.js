@@ -180,6 +180,10 @@ const UserService = {
     return Server.delete(`/api/admins/${id}`)
   },
 
+  updateUser(id, data) {
+    return Server.put(`/api/admins/${id}`, data)
+  },
+
   resetPassword(data) {
     return Server.post('/api/admins/reset-password', data)
   },

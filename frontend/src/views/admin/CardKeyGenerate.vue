@@ -158,6 +158,7 @@ import { ref, reactive, onMounted, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Download, Upload } from '@element-plus/icons-vue'
 import Server from '@/utils/Server.js'
+import api from '@/services/api.js'
 
 // 生成状态
 const generating = ref(false)
@@ -294,17 +295,17 @@ const addToStock = async () => {
     
     for (const keyInfo of generatedKeys.value) {
       try {
-        const response = await Server.post('/api/card-keys', {
-          cardKey: keyInfo.key,
-          specificationId: generateForm.specId,  // 修正：使用后端实体类期望的参数名
-          status: '未使用'  // 修正：使用数据库允许的ENUM值
-        })
-        
-        if (response.data && response.data.success) {
-          successCount++
-        } else {
-          errorCount++
-        }
+          const response = await api.admin.generateCardKey({
+            cardKey: keyInfo.key,
+            specificationId: generateForm.specId,  // 修正：使用后端实体类期望的参数名
+            status: '未使用'  // 修正：使用数据库允许的ENUM值
+          })
+          
+          if (response.code === 200) {
+            successCount++
+          } else {
+            errorCount++
+          }
       } catch (error) {
         errorCount++
       }

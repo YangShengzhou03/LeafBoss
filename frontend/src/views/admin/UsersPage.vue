@@ -293,10 +293,10 @@ const saveUser = async () => {
     
     if (editingUser.value) {
       // 更新用户 - 使用统一的api服务
-      await api.admin.updateUser(editingUser.value.id, userData)
+      await api.user.updateUser(editingUser.value.id, userData)
     } else {
       // 添加用户 - 使用统一的api服务
-      await api.admin.createUser(userData)
+      await api.user.createUser(userData)
     }
     
     ElMessage.success(editingUser.value ? '用户更新成功' : '用户添加成功')
@@ -321,11 +321,11 @@ const addUser = () => {
 // 切换用户状态
 const toggleUserStatus = async (user) => {
   try {
-    const newStatus = user.status === 'active' ? 'disabled' : 'active'
+    const newStatus = user.status === 'active' ? 'inactive' : 'active'
     const enabled = newStatus === 'active'
     
     // 更新用户状态 - 使用统一的api服务
-    await api.admin.updateUser(user.id, {
+    await api.user.updateUser(user.id, {
       status: enabled ? 1 : 0
     })
     
@@ -350,8 +350,8 @@ const deleteUser = async (user) => {
       }
     )
     
-    // 调用删除用户API - 直接使用userApi
-    await userApi.deleteUser(user.id)
+    // 调用删除用户API - 使用统一的api服务
+    await api.user.deleteUser(user.id)
     ElMessage.success('用户删除成功')
     loadUsers()
   } catch (error) {

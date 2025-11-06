@@ -60,11 +60,14 @@ public class DashboardController {
             stats.put("dailySalesChange", Math.round(dailySalesChange * 100.0) / 100.0);
             stats.put("dailyRevenueChange", Math.round(dailyRevenueChange * 100.0) / 100.0);
             
-            // 其他统计数据
-            stats.put("totalOrders", 156);
-            stats.put("totalRevenue", 1544.4);
-            stats.put("activeUsers", 89);
-            stats.put("conversionRate", 12.5);
+            // 其他统计数据 - 从数据库查询真实数据
+            List<CardKey> allCardKeys = cardKeyService.list();
+            List<Specification> allSpecifications = specificationService.list();
+            
+            stats.put("totalOrders", allCardKeys.size());  // 卡密总数
+            stats.put("totalRevenue", calculateTotalRevenue(allCardKeys));  // 总收入
+            stats.put("activeUsers", allSpecifications.size());  // 商品总数
+            stats.put("conversionRate", 0.0);  // 转化率暂时设为0
             
             return Result.success(stats);
         } catch (Exception e) {
@@ -142,5 +145,24 @@ public class DashboardController {
             return current > 0 ? 100.0 : 0.0;
         }
         return ((current - previous) / previous) * 100.0;
+    }
+    
+    /**
+     * 计算所有已激活卡密的总收入
+     */
+    private double calculateTotalRevenue(List<CardKey> allCardKeys) {
+        double totalRevenue = 0.0;
+        
+        for (CardKey card : allCardKeys) {
+            // 只计算已激活的卡密
+            if (card.getActivateTime() != null && card.getSpecificationId() != null) {
+                Specification spec = specificationService.getById(card.getSpecificationId());
+                if (spec != null && spec.getPrice() != null) {
+                    totalRevenue += spec.getPrice();
+                }
+            }
+        }
+        
+        return totalRevenue;
     }
 }
