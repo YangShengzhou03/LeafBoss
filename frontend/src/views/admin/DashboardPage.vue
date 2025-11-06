@@ -167,7 +167,7 @@ const pieChartOption = computed(() => {
     },
     series: [
       {
-        name: '卡密规格',
+        name: '商品',
         type: 'pie',
         radius: ['50%', '80%'],
         avoidLabelOverlap: false,
