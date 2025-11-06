@@ -26,7 +26,7 @@ const routes = [
   {
     path: '/admin',
     component: () => import('@/components/AdminLayout.vue'),
-    meta: { requiresAuth: true, requiresAdmin: true },
+    meta: { requiresAuth: true },
     children: [
       {
         path: '',
@@ -217,15 +217,16 @@ router.beforeEach((to, from, next) => {
       if (store.state.user === null) {
         store.setUser({
           id: decoded.id,
-          username: decoded.username,
-          role: decoded.role
+          username: decoded.username
+          // 移除role字段，所有登录用户都是管理员
         });
       }
       
-      if (to.meta.requiresAdmin && decoded.role !== 'admin') {
-        next('/');
-        return;
-      }
+      // 移除角色验证，所有登录用户都是管理员
+      // if (to.meta.requiresAdmin && decoded.role !== 'admin') {
+      //   next('/');
+      //   return;
+      // }
     } catch (error) {
       localStorage.removeItem('token');
       next('/login');
