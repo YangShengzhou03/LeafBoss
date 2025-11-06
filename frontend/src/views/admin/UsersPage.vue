@@ -31,7 +31,7 @@
               <el-select v-model="statusFilter" placeholder="用户状态" clearable @change="handleSearch">
                 <el-option label="全部" value="" />
                 <el-option label="正常" value="active" />
-                <el-option label="禁用" value="disabled" />
+                <el-option label="禁用" value="inactive" />
               </el-select>
             </el-col>
             <el-col :span="14" class="button-group">
@@ -122,7 +122,7 @@
         <el-form-item label="状态" prop="status">
           <el-radio-group v-model="userForm.status">
               <el-radio label="active">正常</el-radio>
-              <el-radio label="disabled">禁用</el-radio>
+              <el-radio label="inactive">禁用</el-radio>
             </el-radio-group>
         </el-form-item>
 
@@ -267,6 +267,7 @@ const handleCurrentChange = (page) => {
 const editUser = (user) => {
   editingUser.value = user
   userForm.email = user.email
+  // 直接使用后端返回的状态值（active/inactive）
   userForm.status = user.status
   userForm.password = '' // 编辑时不显示密码
   showAddUserDialog.value = true
