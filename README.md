@@ -264,7 +264,7 @@ mvn test
 ### 数据库迁移
 系统使用JPA自动创建表结构，首次启动时会自动执行`data.sql`中的初始化数据。
 
-## � API接口
+## 🔗 API接口
 
 详细的API接口文档请参考：[API_DOCUMENTATION.md](./API_DOCUMENTATION.md)
 
@@ -461,18 +461,18 @@ COPY target/leaf-card-backend-1.0.0.jar /app.jar
 - 💳 基础卡管理功能
 - 📈 基础数据统计功能
 
-#### 许可证
+## 📄 许可证
 
 本项目采用 MIT 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情。
 
-#### 联系方式
+## 📞 联系方式
 
 - **GitHub 仓库**: [https://github.com/YangShengzhou03/LeafCard](https://github.com/YangShengzhou03/LeafCard)
 - **问题反馈**: [GitHub Issues](https://github.com/YangShengzhou03/LeafCard/issues)
 - **邮箱**: dev@leafcard.com
 - **项目主页**: [https://github.com/YangShengzhou03/LeafCard](https://github.com/YangShengzhou03/LeafCard)
 
-#### 项目统计
+## 📊 项目统计
 
 ![GitHub Release](https://img.shields.io/github/v/release/YangShengzhou03/LeafCard?style=flat-square)
 ![GitHub Last Commit](https://img.shields.io/github/last-commit/YangShengzhou03/LeafCard?style=flat-square)
@@ -808,6 +808,8 @@ LeafAuto 支持多种重复频率类型：
 ##  许可证
 
 本项目采用 MIT 许可证，详情请查看 [LICENSE](LICENSE) 文件。
+
+## 🙏 感谢您
 
 ---
 
