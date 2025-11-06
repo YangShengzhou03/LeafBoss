@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: leaf_card-backend
+  datasource:
+    url: jdbc:mysql://localhost:3306/leaf_card?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+
+  jackson:
+    default-property-inclusion: non_null
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: Asia/Shanghai
+
+server:
+  port: 8081
+
+app:
+  jwt:
+    secret: leaf_card-secret-key-for-jwt-token-generation
+    expiration: 86400000
+
