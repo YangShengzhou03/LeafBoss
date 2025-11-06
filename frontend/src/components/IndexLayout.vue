@@ -93,6 +93,11 @@
         </div>
         <div class="footer-bottom">
           <p>&copy; 2024-2025 LeafCard - 枫叶卡管系统</p>
+          <div class="icp-info">
+            <a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer">
+              赣ICP备2025075576号
+            </a>
+          </div>
         </div>
       </div>
     </footer>
@@ -468,6 +473,21 @@ const handleStart = () => {
 
 .footer-bottom p {
   margin: 0;
+}
+
+.icp-info {
+  margin-top: 12px;
+}
+
+.icp-info a {
+  color: #9ca3af;
+  text-decoration: none;
+  transition: color 0.2s ease;
+  font-size: 13px;
+}
+
+.icp-info a:hover {
+  color: #3b82f6;
 }
 
 /* 响应式设计 */
