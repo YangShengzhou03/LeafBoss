@@ -187,7 +187,7 @@ const loadLogs = async () => {
       params.operationType = filter.operationType
     }
     
-    // 调用API获取日志列表
+    // 调用API获取日志列表（后端分页）
     const response = await api.admin.getLogList(params)
     
     // 处理API响应数据格式

@@ -39,6 +39,14 @@ const AdminService = {
     return Server.delete('/api/operation-logs')
   },
 
+  getCardKeyList(params) {
+    return Server.get('/api/card-keys', {
+      page: params.page || 1,
+      size: params.size || 10,
+      status: params.status
+    })
+  },
+
   getCardKeyListWithDetails() {
     return Server.get('/api/card-keys/with-details')
   },

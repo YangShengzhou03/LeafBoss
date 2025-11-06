@@ -182,12 +182,25 @@ const filteredUsers = computed(() => {
 const loadUsers = async () => {
   loading.value = true
   try {
-    const response = await api.admin.getUserList({
+    // 构建查询参数（后端分页）
+    const params = {
       page: currentPage.value,
-      size: pageSize.value,
-      keyword: searchQuery.value,
-      status: statusFilter.value
-    })
+      size: pageSize.value
+    }
+    
+    // 添加搜索条件
+    if (searchQuery.value) {
+      params.keyword = searchQuery.value
+    }
+    
+    // 添加状态筛选条件
+    if (statusFilter.value) {
+      params.status = statusFilter.value
+    }
+    
+    // 调用API获取用户列表（后端分页）
+    const response = await api.admin.getUserList(params)
+    
     if (response && response.data) {
       users.value = response.data.records || response.data.content || []
       totalUsers.value = response.data.total || response.data.totalElements || 0

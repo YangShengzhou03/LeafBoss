@@ -315,16 +315,16 @@ const formatDateTime = (dateTime) => {
   }
 }
 
-// 分页处理
+// 分页处理（后端分页）
 const handleSizeChange = (size) => {
   pageSize.value = size
   currentPage.value = 1
-  // 实际项目中应该重新调用API
+  loadProducts()
 }
 
 const handleCurrentChange = (page) => {
   currentPage.value = page
-  // 实际项目中应该重新调用API
+  loadProducts()
 }
 
 onMounted(() => {

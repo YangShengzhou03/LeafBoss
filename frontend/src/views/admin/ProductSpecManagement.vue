@@ -274,13 +274,13 @@ const loadProducts = async () => {
 const loadSpecs = async () => {
   loading.value = true
   try {
-    // 构建查询参数
+    // 构建查询参数（后端分页）
     const params = {
       page: currentPage.value,
       size: pageSize.value
     }
     
-    // 调用分页API获取商品规格列表
+    // 调用分页API获取商品规格列表（后端分页）
     const response = await api.admin.getSpecList(params)
     
     // 处理API响应数据格式

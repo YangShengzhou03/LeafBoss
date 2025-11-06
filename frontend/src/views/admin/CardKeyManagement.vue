@@ -123,28 +123,9 @@ const currentPage = ref(1)
 const pageSize = ref(10)
 const total = ref(0)
 
-const filteredCardKeys = computed(() => {
-  let filtered = [...cardKeys.value]
-  
-  if (searchQuery.value) {
-    const query = searchQuery.value.toLowerCase()
-    filtered = filtered.filter(cardKey => 
-      cardKey.cardKey.toLowerCase().includes(query) ||
-      (cardKey.userEmail && cardKey.userEmail.toLowerCase().includes(query))
-    )
-  }
-  
-  if (statusFilter.value) {
-    filtered = filtered.filter(cardKey => cardKey.status === statusFilter.value)
-  }
-  
-  return filtered
-})
-
+// 后端分页实现，无需前端过滤和分页计算
 const pagedCardKeys = computed(() => {
-  const startIndex = (currentPage.value - 1) * pageSize.value
-  const endIndex = startIndex + pageSize.value
-  return filteredCardKeys.value.slice(startIndex, endIndex)
+  return cardKeys.value
 })
 
 const getStatusTagType = (status) => {
@@ -159,10 +140,25 @@ const getStatusTagType = (status) => {
 const loadCardKeys = async () => {
   loading.value = true
   try {
-    const response = await api.admin.getCardKeyListWithDetails()
+    // 构建查询参数（后端分页）
+    const params = {
+      page: currentPage.value,
+      size: pageSize.value
+    }
+    
+    // 添加筛选条件
+    if (statusFilter.value) {
+      params.status = statusFilter.value
+    }
+    
+    const response = await api.admin.getCardKeyList(params)
     
     if (response && response.data) {
-      const newCardKeys = response.data.map(cardKey => ({
+      // 后端分页返回的数据结构
+      const pageData = response.data
+      const records = pageData.records || pageData.content || []
+      
+      const newCardKeys = records.map(cardKey => ({
         id: cardKey.id,
         cardKey: cardKey.cardKey,
         status: cardKey.status,
@@ -177,7 +173,7 @@ const loadCardKeys = async () => {
       }))
       
       cardKeys.value = newCardKeys
-      total.value = filteredCardKeys.value.length
+      total.value = pageData.total || pageData.totalElements || 0
     } else {
       cardKeys.value = []
       total.value = 0
@@ -193,14 +189,14 @@ const loadCardKeys = async () => {
 
 const handleSearch = () => {
   currentPage.value = 1
-  total.value = filteredCardKeys.value.length
+  loadCardKeys()
 }
 
 const resetFilter = () => {
   searchQuery.value = ''
   statusFilter.value = ''
   currentPage.value = 1
-  total.value = cardKeys.value.length
+  loadCardKeys()
 }
 
 const formatDateTime = (dateTimeStr) => {
