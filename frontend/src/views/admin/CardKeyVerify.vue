@@ -154,10 +154,6 @@ const handleVerify = async () => {
     // 调用真实API验证卡密
     const response = await Server.get(`/api/card-keys/verify/${cardKeyInput.value.trim()}`)
     
-    console.log('后端响应数据:', response)
-    console.log('响应类型:', typeof response)
-    console.log('响应键名:', Object.keys(response || {}))
-    
     // 根据后端实际返回的数据结构处理
       if (response && response.code === 200) {
         // 如果响应包含code=200，说明卡密存在
@@ -172,7 +168,6 @@ const handleVerify = async () => {
           }
           
           showResult.value = true
-          console.log('卡密信息设置成功:', cardKeyInfo.value)
           ElMessage.success('卡密验证成功')
       } else {
         // 虽然code=200但没有data字段，视为验证失败
@@ -181,7 +176,6 @@ const handleVerify = async () => {
           status: '未知'
         }
         showResult.value = true
-        console.log('卡密验证失败，无数据:', cardKeyInfo.value)
         ElMessage.error('卡密验证失败')
       }
     } else {
@@ -191,11 +185,9 @@ const handleVerify = async () => {
         status: '未知'
       }
       showResult.value = true
-      console.log('卡密不存在，设置失败状态:', cardKeyInfo.value)
       ElMessage.error('卡密验证失败')
     }
   } catch (error) {
-    console.error('卡密验证失败:', error)
     // 检查错误类型，统一处理为卡密验证失败
     if (error.response && error.response.status === 404) {
       // 404错误：卡密不存在

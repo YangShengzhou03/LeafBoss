@@ -299,7 +299,6 @@ const loadProducts = async () => {
       products.value = []
     }
   } catch (error) {
-    console.error('加载商品列表失败:', error)
     products.value = []
   }
 }
@@ -342,7 +341,7 @@ const loadSpecs = async () => {
             try {
               createTime = new Date(createTime).toLocaleString()
             } catch (e) {
-              console.log(e)
+              // 忽略日期解析错误
             }
           }
         }
@@ -361,7 +360,6 @@ const loadSpecs = async () => {
       totalSpecs.value = 0
     }
   } catch (error) {
-    console.error('加载商品规格失败:', error)
     ElMessage.error('加载商品规格失败，请检查网络连接')
     specs.value = []
     totalSpecs.value = 0
@@ -409,12 +407,6 @@ const editSpec = (spec) => {
 // 切换规格状态
 const toggleSpecStatus = async (spec) => {
   try {
-    console.log('切换规格状态 - 详细状态信息:', {
-      显示状态: spec.status,
-      实际状态值: spec.status,
-      状态类型: typeof spec.status
-    })
-    
     await ElMessageBox.confirm(
       `确定要${spec.status === 'active' ? '停用' : '启用'}该规格吗？`,
       '提示',
@@ -423,30 +415,24 @@ const toggleSpecStatus = async (spec) => {
     
     // 修复状态切换逻辑：使用英文状态值（数据库只接受active/inactive）
     const newStatus = spec.status === 'active' ? 'inactive' : 'active'
-    console.log('切换规格状态 - 当前状态:', spec.status, '新状态:', newStatus)
     
     // 调用API更新规格状态 - 使用英文状态值
     const response = await api.admin.editSpec(spec.id, {
       status: newStatus
     })
     
-    console.log('API响应:', response)
-    
     if (response && response.code === 200) {
       // 更新本地状态 - 使用英文状态值
       spec.status = newStatus
-      console.log('本地状态更新成功，新状态:', spec.status)
       ElMessage.success('操作成功')
       
       // 重新加载数据确保数据一致性
       loadSpecs()
     } else {
-      console.error('API返回失败:', response)
       ElMessage.error('操作失败')
     }
   } catch (error) {
     if (error !== 'cancel') {
-      console.error('切换规格状态失败:', error)
       ElMessage.error('操作失败，请检查网络连接')
     }
   }
@@ -483,7 +469,6 @@ const deleteSpec = async (spec) => {
     }
   } catch (error) {
     if (error !== 'cancel') {
-      console.error('删除规格失败:', error)
       ElMessage.error('删除失败，请检查网络连接')
     }
   }
@@ -542,7 +527,6 @@ const saveSpec = async () => {
     // 重新加载数据确保数据一致性
     loadSpecs()
   } catch (error) {
-    console.error('保存规格失败:', error)
     ElMessage.error('操作失败')
   }
 }

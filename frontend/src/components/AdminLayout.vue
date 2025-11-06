@@ -163,7 +163,6 @@ const handleCommand = async (command) => {
     }
   } catch (error) {
     if (error !== 'cancel') {
-      console.error('操作失败:', error)
       ElMessage.error('操作失败，请重试')
     }
   }
@@ -177,7 +176,6 @@ onMounted(async () => {
 
     await nextTick()
   } catch (error) {
-    console.error('初始化失败:', error)
     ElMessage.error('初始化失败，请刷新页面重试')
   }
 })

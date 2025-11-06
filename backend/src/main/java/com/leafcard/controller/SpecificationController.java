@@ -78,12 +78,10 @@ public class SpecificationController {
      */
     @PostMapping
     public Result<Boolean> createSpecification(@RequestBody Specification specification, HttpServletRequest request) {
-        // 检查规格名称是否已存在
         if (specificationService.findByName(specification.getName()) != null) {
             return Result.error("规格名称已存在");
         }
         
-        // 设置默认状态
         if (specification.getStatus() == null || specification.getStatus().trim().isEmpty()) {
             specification.setStatus("active");
         }
@@ -91,7 +89,6 @@ public class SpecificationController {
         boolean saved = specificationService.save(specification);
         
         if (saved) {
-            // 获取商品名称
             String productName = "未知商品";
             if (specification.getProductId() != null) {
                 Product product = productService.getById(specification.getProductId());
@@ -100,7 +97,6 @@ public class SpecificationController {
                 }
             }
             
-            // 记录创建规格日志
             logUtil.logSpecificationOperation("SPECIFICATION", "创建规格: " + productName + "-" + specification.getName(), request);
             
             return Result.success("规格创建成功", true);
@@ -119,7 +115,6 @@ public class SpecificationController {
             return Result.error("规格不存在");
         }
         
-        // 检查规格名称是否与其他规格冲突
         Specification specWithSameName = specificationService.findByName(specification.getName());
         if (specWithSameName != null && !specWithSameName.getId().equals(Integer.parseInt(id))) {
             return Result.error("规格名称已存在");
@@ -129,7 +124,6 @@ public class SpecificationController {
         boolean updated = specificationService.updateById(specification);
         
         if (updated) {
-            // 获取商品名称
             String productName = "未知商品";
             if (specification.getProductId() != null) {
                 Product product = productService.getById(specification.getProductId());
@@ -138,7 +132,6 @@ public class SpecificationController {
                 }
             }
             
-            // 记录更新规格日志
             logUtil.logSpecificationOperation("SPECIFICATION", "更新规格: " + productName + "-" + specification.getName(), request);
             
             return Result.success("规格更新成功", true);
@@ -160,7 +153,6 @@ public class SpecificationController {
         boolean deleted = specificationService.removeById(Integer.parseInt(id));
         
         if (deleted) {
-            // 获取商品名称
             String productName = "未知商品";
             if (specification.getProductId() != null) {
                 Product product = productService.getById(specification.getProductId());
@@ -169,7 +161,6 @@ public class SpecificationController {
                 }
             }
             
-            // 记录删除规格日志
             logUtil.logSpecificationOperation("SPECIFICATION", "删除规格: " + productName + "-" + specification.getName(), request);
             
             return Result.success("规格删除成功", true);

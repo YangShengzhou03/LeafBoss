@@ -170,7 +170,6 @@ const handleUserCommand = async (command) => {
     }
   } catch (error) {
     if (error !== 'cancel') {
-      console.error('操作失败:', error)
       ElMessage.error('操作失败，请重试')
     }
   }
@@ -201,7 +200,6 @@ const handleStart = () => {
       router.push('/login')
     }
   } catch (error) {
-    console.error('Navigation error:', error)
     ElMessage.error('页面跳转失败，请重试')
   }
 }

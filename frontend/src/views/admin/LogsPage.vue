@@ -206,7 +206,6 @@ const loadLogs = async () => {
       }
     }
   } catch (error) {
-    console.error('加载日志数据失败:', error)
     ElMessage.error('加载日志数据失败')
   } finally {
     loading.value = false
@@ -263,7 +262,6 @@ const exportLogs = async () => {
 
     ElMessage.success('日志导出成功')
   } catch (error) {
-    console.error('导出日志失败:', error)
     ElMessage.error('导出日志失败')
   } finally {
     exporting.value = false
@@ -293,7 +291,6 @@ const clearLogs = async () => {
     ElMessage.success('日志清空成功')
   } catch (error) {
     if (error !== 'cancel') {
-      console.error('清空日志失败:', error)
       ElMessage.error('清空日志失败')
     }
   } finally {

@@ -214,7 +214,6 @@ const loadUsers = async () => {
       totalUsers.value = 0
     }
   } catch (error) {
-    console.error('加载用户数据失败:', error)
     ElMessage.error('加载用户数据失败')
   } finally {
     loading.value = false

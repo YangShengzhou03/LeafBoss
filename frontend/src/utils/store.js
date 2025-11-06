@@ -117,7 +117,6 @@ const store = {
       
       return { success: false, message: response?.message || '登录失败' }
     } catch (error) {
-      console.error('登录失败:', error)
       return { success: false, message: '登录失败，请检查网络连接' }
     } finally {
       state.loading = false
@@ -137,7 +136,6 @@ const store = {
       
       return { success: false, message: response?.message || '更新失败' }
     } catch (error) {
-      console.error('更新用户信息失败:', error)
       return { success: false, message: '更新失败，请重试' }
     }
   },
@@ -153,7 +151,6 @@ const store = {
       
       return { success: false, message: response?.message || '密码修改失败' }
     } catch (error) {
-      console.error('修改密码失败:', error)
       return { success: false, message: '密码修改失败，请重试' }
     }
   },
@@ -181,7 +178,6 @@ const store = {
       
       return true
     } catch (error) {
-      console.error('检查登录状态失败:', error)
       this.clearUser()
       return false
     }
@@ -229,7 +225,6 @@ const store = {
       
       return { success: false, message: response?.message || '注册失败' }
     } catch (error) {
-      console.error('注册失败:', error)
       return { success: false, message: '注册失败，请检查网络连接' }
     } finally {
       state.loading = false
@@ -243,7 +238,6 @@ const store = {
       await api.user.sendVerificationCode({ email })
       return { success: true, message: '验证码发送成功' }
     } catch (error) {
-      console.error('发送验证码失败:', error)
       return { success: false, message: '验证码发送失败，请重试' }
     } finally {
       state.loading = false
@@ -271,8 +265,6 @@ const store = {
         }
       }
     } catch (error) {
-      console.error('获取用户信息失败:', error)
-      
       // 只有在token无效或过期时才清除token
       if (error.response && (error.response.status === 401 || error.response.status === 403)) {
         this.clearUser()
@@ -303,7 +295,6 @@ const store = {
       }
       return storageData
     } catch (error) {
-      console.error('获取存储信息失败:', error)
       return null
     }
   },
@@ -316,7 +307,6 @@ const store = {
       this.setUser(response.data)
       return { success: true, message: '更新成功' }
     } catch (error) {
-      console.error('更新用户信息失败:', error)
       return { success: false, message: '更新失败，请重试' }
     } finally {
       state.loading = false
@@ -330,7 +320,6 @@ const store = {
       await api.user.changePassword(passwordData)
       return { success: true, message: '密码更新成功' }
     } catch (error) {
-      console.error('更新密码失败:', error)
       return { success: false, message: '密码更新失败，请重试' }
     } finally {
       state.loading = false
@@ -343,7 +332,7 @@ const store = {
       // 调用后端登出API
       await api.user.logout()
     } catch (error) {
-      console.error('登出失败:', error)
+      // 忽略登出错误
     } finally {
       // 无论API调用是否成功，都清除本地状态
       this.clearUser()
@@ -358,8 +347,6 @@ const store = {
         await this.fetchStorageInfo()
         return true
       } catch (error) {
-        console.error('应用初始化失败:', error)
-        
         // 只有在token无效或过期时才清除token
         if (error.response && (error.response.status === 401 || error.response.status === 403)) {
           this.clearUser()

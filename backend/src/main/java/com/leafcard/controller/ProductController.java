@@ -70,12 +70,10 @@ public class ProductController {
      */
     @PostMapping
     public Result<Boolean> createProduct(@RequestBody Product product, HttpServletRequest request) {
-        // 检查产品名称是否已存在
         if (productService.findByName(product.getName()) != null) {
             return Result.error("产品名称已存在");
         }
         
-        // 设置默认状态
         if (product.getStatus() == null || product.getStatus().trim().isEmpty()) {
             product.setStatus("active");
         }
@@ -83,7 +81,6 @@ public class ProductController {
         boolean saved = productService.save(product);
         
         if (saved) {
-            // 记录创建产品日志
             logUtil.logProductOperation("PRODUCT", "创建产品: " + product.getName(), request);
             
             return Result.success("产品创建成功", true);
@@ -102,7 +99,6 @@ public class ProductController {
             return Result.error("产品不存在");
         }
         
-        // 检查产品名称是否与其他产品冲突
         Product productWithSameName = productService.findByName(product.getName());
         if (productWithSameName != null && !productWithSameName.getId().equals(Integer.parseInt(id))) {
             return Result.error("产品名称已存在");
@@ -112,7 +108,6 @@ public class ProductController {
         boolean updated = productService.updateById(product);
         
         if (updated) {
-            // 记录更新产品日志
             logUtil.logProductOperation("PRODUCT", "更新产品: " + product.getName(), request);
             
             return Result.success("产品更新成功", true);
@@ -134,7 +129,6 @@ public class ProductController {
         boolean deleted = productService.removeById(Integer.parseInt(id));
         
         if (deleted) {
-            // 记录删除产品日志
             logUtil.logProductOperation("PRODUCT", "删除产品: " + product.getName(), request);
             
             return Result.success("产品删除成功", true);

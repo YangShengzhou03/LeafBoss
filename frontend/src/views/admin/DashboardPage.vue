@@ -191,12 +191,9 @@ const loadDashboardData = async () => {
     
     // 使用API获取仪表盘统计数据
     const response = await api.admin.getDashboardStats()
-    console.log('后端响应内容:', response)
-    console.log('响应数据:', response?.data)
     
     if (response && response.data) {
       const data = response.data
-      console.log('解析后的数据:', data)
       
       // 正确映射后端返回的数据到前端期望的结构
       stats.value = {

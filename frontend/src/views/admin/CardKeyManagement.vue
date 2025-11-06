@@ -278,7 +278,6 @@ const handleClearUsed = async () => {
     // 例如：遍历已使用卡密列表，逐个调用删除API
   } catch (error) {
     if (error !== 'cancel') {
-      console.error('清空已使用卡密失败:', error)
       ElMessage.error('清空已使用卡密失败，请检查网络连接')
     }
   }
@@ -321,7 +320,6 @@ const handleToggleCardKey = async (row) => {
     }
   } catch (error) {
     if (error !== 'cancel') {
-      console.error(`${actionText}卡密失败:`, error)
       ElMessage.error(`${actionText}卡密失败，请检查网络连接`)
     }
   }
@@ -352,7 +350,6 @@ const handleDeleteCardKey = async (row) => {
     }
   } catch (error) {
     if (error !== 'cancel') {
-      console.error('删除卡密失败:', error)
       ElMessage.error('删除卡密失败，请检查网络连接')
     }
   }

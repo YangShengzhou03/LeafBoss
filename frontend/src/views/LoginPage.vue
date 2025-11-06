@@ -474,10 +474,10 @@ const handleRegister = async () => {
       ElMessage.success('注册成功');
       router.replace('/admin');
     } else {
-      ElMessage.error(response.message || '注册失败');
+      ElMessage.error(response.message || '注册失败')
     }
   } catch (error) {
-    console.log('注册失败')
+    ElMessage.error('注册失败，请检查网络连接')
   }
 };
 

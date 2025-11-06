@@ -177,12 +177,10 @@ const loadUserInfo = async () => {
         createTime: userData.createTime || userData.createdAt || userData.registrationTime || ''
       }
       
-      console.log('用户信息加载成功:', userInfo.value)
     } else {
       ElMessage.error('获取用户信息失败')
     }
   } catch (error) {
-    console.error('加载用户信息失败:', error)
     ElMessage.error('加载用户信息失败，请检查网络连接')
   }
 }
@@ -224,7 +222,6 @@ const saveProfile = async () => {
       ElMessage.error('保存失败，请重试')
     }
   } catch (error) {
-    console.error('保存个人资料失败:', error)
     if (error.errors) {
       ElMessage.warning('请检查表单填写是否正确')
     } else {

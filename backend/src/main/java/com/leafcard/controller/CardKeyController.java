@@ -90,7 +90,6 @@ public class CardKeyController {
         CardKey card = cardKeyService.findByCardKey(cardKey);
         
         if (card != null) {
-            // 创建包含卡密和规格信息的完整响应
             Map<String, Object> response = new HashMap<>();
             response.put("id", card.getId());
             response.put("cardKey", card.getCardKey());
@@ -103,7 +102,6 @@ public class CardKeyController {
             response.put("createdAt", card.getCreatedAt());
             response.put("updatedAt", card.getUpdatedAt());
             
-            // 获取规格信息（包括价格）
             if (card.getSpecificationId() != null) {
                 Specification spec = specificationService.getById(card.getSpecificationId());
                 if (spec != null) {
@@ -111,7 +109,6 @@ public class CardKeyController {
                     response.put("price", spec.getPrice());
                     response.put("durationDays", spec.getDurationDays());
                     
-                    // 获取产品信息
                     Product product = productService.getById(spec.getProductId());
                     if (product != null) {
                         response.put("productName", product.getName());
@@ -150,7 +147,6 @@ public class CardKeyController {
         boolean updated = cardKeyService.updateById(cardKeyEntity);
         
         if (updated) {
-            // 获取商品名-规格名
             String productSpecName = "未知商品-未知规格";
             if (cardKeyEntity.getSpecificationId() != null) {
                 Specification spec = specificationService.getById(cardKeyEntity.getSpecificationId());
@@ -166,7 +162,6 @@ public class CardKeyController {
                 }
             }
             
-            // 记录激活卡密日志
             logUtil.logCardKeyOperation("CARD_KEY", "激活卡密: " + cardKeyEntity.getCardKey() + " - " + productSpecName, request);
             
             return Result.success("卡密激活成功", true);
@@ -199,7 +194,6 @@ public class CardKeyController {
         boolean updated = cardKeyService.updateById(cardKeyEntity);
         
         if (updated) {
-            // 获取商品名-规格名
             String productSpecName = "未知商品-未知规格";
             if (cardKeyEntity.getSpecificationId() != null) {
                 Specification spec = specificationService.getById(cardKeyEntity.getSpecificationId());
@@ -215,7 +209,6 @@ public class CardKeyController {
                 }
             }
             
-            // 记录禁用卡密日志
             logUtil.logCardKeyOperation("CARD_KEY", "禁用卡密: " + cardKeyEntity.getCardKey() + " - " + productSpecName, request);
             
             return Result.success("卡密禁用成功", true);
@@ -237,7 +230,6 @@ public class CardKeyController {
         boolean deleted = cardKeyService.removeById(Integer.parseInt(id));
         
         if (deleted) {
-            // 获取商品名-规格名
             String productSpecName = "未知商品-未知规格";
             if (cardKey.getSpecificationId() != null) {
                 Specification spec = specificationService.getById(cardKey.getSpecificationId());
@@ -253,7 +245,6 @@ public class CardKeyController {
                 }
             }
             
-            // 记录删除卡密日志
             logUtil.logCardKeyOperation("CARD_KEY", "删除卡密: " + cardKey.getCardKey() + " - " + productSpecName, request);
             
             return Result.success("卡密删除成功", true);
@@ -275,7 +266,6 @@ public class CardKeyController {
         boolean deleted = cardKeyService.removeById(cardKeyEntity.getId());
         
         if (deleted) {
-            // 获取商品名-规格名
             String productSpecName = "未知商品-未知规格";
             if (cardKeyEntity.getSpecificationId() != null) {
                 Specification spec = specificationService.getById(cardKeyEntity.getSpecificationId());
@@ -291,7 +281,6 @@ public class CardKeyController {
                 }
             }
             
-            // 记录删除卡密日志
             logUtil.logCardKeyOperation("CARD_KEY", "删除卡密: " + cardKeyEntity.getCardKey() + " - " + productSpecName, request);
             
             return Result.success("卡密删除成功", true);
@@ -324,7 +313,6 @@ public class CardKeyController {
         boolean success = cardKeyService.batchGenerateCardKeys(productId, quantity, prefix);
         
         if (success) {
-            // 获取商品名
             String productName = "未知商品";
             if (productId != null) {
                 Product product = productService.getById(productId);
@@ -333,7 +321,6 @@ public class CardKeyController {
                 }
             }
             
-            // 记录批量生成卡密日志
             logUtil.logCardKeyOperation("CARD_KEY", "批量生成卡密 - 商品: " + productName + " 数量: " + quantity, request);
             
             return Result.success("批量生成卡密成功", true);
@@ -384,7 +371,6 @@ public class CardKeyController {
             boolean updated = cardKeyService.updateById(card);
             
             if (updated) {
-                // 获取商品名-规格名
                 String productSpecName = "未知商品-未知规格";
                 if (card.getSpecificationId() != null) {
                     Specification spec = specificationService.getById(card.getSpecificationId());
@@ -400,7 +386,6 @@ public class CardKeyController {
                     }
                 }
                 
-                // 记录切换卡密状态日志
                 String action = "启用";
                 if ("已禁用".equals(status)) {
                     action = "禁用";

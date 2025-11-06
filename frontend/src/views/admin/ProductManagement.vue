@@ -292,7 +292,6 @@ const handleDeleteProduct = async (row) => {
     }
   } catch (error) {
     if (error !== 'cancel') {
-      console.error('删除商品失败:', error)
       ElMessage.error('删除失败，请检查网络连接')
     }
   }
@@ -312,7 +311,6 @@ const formatDateTime = (dateTime) => {
       second: '2-digit'
     })
   } catch (error) {
-    console.error('时间格式化错误:', error)
     return dateTime
   }
 }
