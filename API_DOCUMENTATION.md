@@ -1788,3 +1788,302 @@ A: 建议措施：
 2. 金额字段使用数字类型，单位为元
 3. 分页查询默认页码为1，页大小为10
 4. 生产环境请配置HTTPS和安全的认证方式
+
+## 生产环境部署指南
+
+### 服务器环境要求
+
+- **操作系统**: CentOS 7+/Ubuntu 18.04+
+- **Java**: JDK 17+
+- **数据库**: MySQL 8.0+
+- **内存**: 最低4GB，推荐8GB+
+- **磁盘空间**: 最低20GB可用空间
+- **网络**: 公网IP，开放80/443端口
+
+### 部署前准备
+
+1. **安装Java环境**
+```bash
+# 下载并安装JDK 17
+wget https://download.java.net/java/GA/jdk17.0.2/dfd4a8d0985749f896bed50d7138ee7f/8/GPL/openjdk-17.0.2_linux-x64_bin.tar.gz
+tar -xzf openjdk-17.0.2_linux-x64_bin.tar.gz
+sudo mv jdk-17.0.2 /usr/local/
+
+# 配置环境变量
+echo 'export JAVA_HOME=/usr/local/jdk-17.0.2' >> ~/.bashrc
+echo 'export PATH=$JAVA_HOME/bin:$PATH' >> ~/.bashrc
+source ~/.bashrc
+```
+
+2. **配置数据库**
+```sql
+-- 创建数据库和用户
+CREATE DATABASE leafcard CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER 'leafcard_user'@'%' IDENTIFIED BY 'your_secure_password';
+GRANT ALL PRIVILEGES ON leafcard.* TO 'leafcard_user'@'%';
+FLUSH PRIVILEGES;
+```
+
+3. **上传部署文件**
+```bash
+# 创建项目目录
+sudo mkdir -p /root/project/backend
+sudo mkdir -p /root/project/frontend
+
+# 上传后端jar包和配置文件
+# backend.jar 和 application.yml 需要上传到 /root/project/backend/
+```
+
+### 生产环境部署脚本
+
+```bash
+# 停止当前可能运行的进程 
+ps -ef | grep backend.jar | grep -v grep | awk '{print $2}' | xargs kill -9 
+ 
+# 重新启动后端服务（使用生产环境配置） 
+cd /root/project/backend 
+nohup ./jdk-17.0.17+10-jre/bin/java -jar backend.jar \ 
+  --spring.config.location=file:./application.yml \ 
+  --spring.profiles.active=prod > backend.log 2>&1 & 
+ 
+# 查看启动日志确认服务状态 
+tail -f backend.log
+```
+
+### 完整的部署脚本（推荐使用）
+
+```bash
+#!/bin/bash
+
+# LeafCard 生产环境部署脚本
+# 使用方法：./deploy.sh
+
+set -e
+
+echo "=== LeafCard 生产环境部署开始 ==="
+
+# 检查Java环境
+if ! command -v java &> /dev/null; then
+    echo "错误: Java未安装，请先安装JDK 17+"
+    exit 1
+fi
+
+JAVA_VERSION=$(java -version 2>&1 | head -n 1 | cut -d'"' -f2)
+echo "Java版本: $JAVA_VERSION"
+
+# 检查项目目录
+PROJECT_DIR="/root/project/backend"
+if [ ! -d "$PROJECT_DIR" ]; then
+    echo "错误: 项目目录不存在: $PROJECT_DIR"
+    exit 1
+fi
+
+cd "$PROJECT_DIR"
+
+# 检查必要的文件
+if [ ! -f "backend.jar" ]; then
+    echo "错误: backend.jar 文件不存在"
+    exit 1
+fi
+
+if [ ! -f "application.yml" ]; then
+    echo "错误: application.yml 配置文件不存在"
+    exit 1
+fi
+
+echo "停止当前运行的服务..."
+
+# 停止当前进程
+pkill -f "backend.jar" || true
+sleep 3
+
+# 确保进程已停止
+if pgrep -f "backend.jar" > /dev/null; then
+    echo "强制停止残留进程..."
+    pkill -9 -f "backend.jar"
+    sleep 2
+fi
+
+echo "启动后端服务..."
+
+# 启动服务
+nohup java -jar backend.jar \
+    --spring.config.location=file:./application.yml \
+    --spring.profiles.active=prod > backend.log 2>&1 &
+
+# 记录进程ID
+echo $! > backend.pid
+
+echo "等待服务启动..."
+sleep 10
+
+# 检查服务状态
+if pgrep -f "backend.jar" > /dev/null; then
+    echo "✅ 服务启动成功"
+    echo "进程ID: $(cat backend.pid)"
+    echo "日志文件: $PROJECT_DIR/backend.log"
+    
+    # 显示最近日志
+    echo "=== 最近日志输出 ==="
+    tail -20 backend.log
+else
+    echo "❌ 服务启动失败"
+    echo "=== 错误日志 ==="
+    tail -50 backend.log
+    exit 1
+fi
+
+echo "=== 部署完成 ==="
+echo "服务地址: http://your-server-ip:8080"
+echo "API文档: http://your-server-ip:8080/swagger-ui.html"
+```
+
+### 系统服务配置（可选）
+
+创建systemd服务文件 `/etc/systemd/system/leafcard.service`：
+
+```ini
+[Unit]
+Description=LeafCard Backend Service
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/root/project/backend
+ExecStart=/usr/local/jdk-17.0.2/bin/java -jar backend.jar --spring.config.location=file:./application.yml --spring.profiles.active=prod
+ExecStop=/bin/kill -15 $MAINPID
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+```
+
+使用systemd管理服务：
+```bash
+# 重新加载systemd配置
+sudo systemctl daemon-reload
+
+# 启用服务开机自启
+sudo systemctl enable leafcard
+
+# 启动服务
+sudo systemctl start leafcard
+
+# 查看服务状态
+sudo systemctl status leafcard
+
+# 查看服务日志
+sudo journalctl -u leafcard -f
+```
+
+### 监控和维护
+
+1. **日志监控**
+```bash
+# 实时查看日志
+tail -f /root/project/backend/backend.log
+
+# 查看错误日志
+grep -i error /root/project/backend/backend.log
+
+# 查看访问日志
+grep "GET\|POST" /root/project/backend/backend.log
+```
+
+2. **性能监控**
+```bash
+# 查看内存使用
+ps aux --sort=-%mem | head -10
+
+# 查看磁盘空间
+df -h
+
+# 查看网络连接
+netstat -an | grep :8080
+```
+
+3. **备份脚本**
+```bash
+#!/bin/bash
+# 数据库备份脚本
+BACKUP_DIR="/backup/leafcard"
+DATE=$(date +%Y%m%d_%H%M%S)
+
+mkdir -p $BACKUP_DIR
+
+# 备份数据库
+mysqldump -u leafcard_user -p'your_password' leafcard > $BACKUP_DIR/leafcard_$DATE.sql
+
+# 备份配置文件
+tar -czf $BACKUP_DIR/config_$DATE.tar.gz /root/project/backend/application.yml
+
+echo "备份完成: $BACKUP_DIR/leafcard_$DATE.sql"
+```
+
+### 故障排除
+
+1. **服务无法启动**
+   - 检查Java版本是否为17+
+   - 检查application.yml配置文件
+   - 查看backend.log错误信息
+
+2. **数据库连接失败**
+   - 检查数据库服务是否运行
+   - 验证数据库连接信息
+   - 检查防火墙设置
+
+3. **内存不足**
+   - 增加JVM内存参数：`-Xmx2g -Xms1g`
+   - 监控系统内存使用情况
+
+4. **端口被占用**
+   - 检查8080端口是否被其他进程占用
+   - 修改application.yml中的server.port配置
+
+### 安全建议
+
+1. **防火墙配置**
+```bash
+# 只开放必要端口
+sudo ufw allow 22    # SSH
+sudo ufw allow 80    # HTTP
+sudo ufw allow 443   # HTTPS
+sudo ufw enable
+```
+
+2. **SSL证书配置**
+   - 使用Let's Encrypt获取免费SSL证书
+   - 配置Nginx反向代理和HTTPS
+
+3. **定期更新**
+   - 定期更新系统和依赖包
+   - 监控安全公告
+   - 定期备份数据
+
+## 版本历史
+
+### v1.0.0 (2024-01-15)
+- 初始版本发布
+- 支持产品管理、规格管理、卡密管理
+- 完整的API文档
+- 生产环境部署支持
+
+### v1.1.0 (计划中)
+- 支付集成功能
+- 订单管理
+- 用户管理增强
+- 性能优化
+
+## 技术支持
+
+- **文档**: 本文档
+- **问题反馈**: 创建GitHub Issue
+- **紧急支持**: 联系开发团队
+- **社区**: 加入开发者社区讨论
+
+---
+
+*最后更新: 2025-11-15*  
+*文档版本: v1.0.0*
