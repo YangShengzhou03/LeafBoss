@@ -63,8 +63,12 @@ public class CardKeyController {
      * 获取包含商品和规格名称的卡密列表
      */
     @GetMapping("/with-details")
-    public Result<List<CardKeyDTO>> getCardKeysWithDetails() {
-        List<CardKeyDTO> cardKeyList = cardKeyService.getCardKeyListWithDetails();
+    public Result<List<CardKeyDTO>> getCardKeysWithDetails(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) Long specificationId) {
+        List<CardKeyDTO> cardKeyList = cardKeyService.getCardKeyListWithDetails(keyword, specificationId);
         return Result.success(cardKeyList);
     }
 

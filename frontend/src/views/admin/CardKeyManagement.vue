@@ -481,7 +481,7 @@ onMounted(() => {
   background-color: #fafafa;
 }
 
-/* 按钮样式优化 */
+/* 按钮样式优化 - 移除可能影响原生悬浮效果的样式 */
 .cardkey-card :deep(.el-button) {
   border-radius: 4px;
 }

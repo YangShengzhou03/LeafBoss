@@ -47,7 +47,28 @@ public class CardKeyServiceImpl extends ServiceImpl<CardKeyMapper, CardKey> impl
 
     @Override
     public List<CardKeyDTO> getCardKeyListWithDetails() {
-        List<CardKey> cardKeys = baseMapper.selectList(null);
+        return getCardKeyListWithDetails(null, null);
+    }
+    
+    @Override
+    public List<CardKeyDTO> getCardKeyListWithDetails(String keyword, Long specificationId) {
+        QueryWrapper<CardKey> queryWrapper = new QueryWrapper<>();
+        
+        // 根据规格ID筛选
+        if (specificationId != null) {
+            queryWrapper.eq("specification_id", specificationId);
+        }
+        
+        // 根据关键词筛选（卡密或用户邮箱）
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            queryWrapper.and(wrapper -> wrapper
+                .like("card_key", keyword)
+                .or()
+                .like("user_email", keyword)
+            );
+        }
+        
+        List<CardKey> cardKeys = baseMapper.selectList(queryWrapper);
         
         return cardKeys.stream().map(cardKey -> {
             CardKeyDTO dto = new CardKeyDTO();

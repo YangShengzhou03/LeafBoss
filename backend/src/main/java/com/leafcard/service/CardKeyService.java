@@ -27,6 +27,11 @@ public interface CardKeyService extends IService<CardKey> {
     List<CardKeyDTO> getCardKeyListWithDetails();
     
     /**
+     * 获取包含商品和规格名称的卡密列表（支持筛选）
+     */
+    List<CardKeyDTO> getCardKeyListWithDetails(String keyword, Long specificationId);
+    
+    /**
      * 激活卡密
      */
     boolean activateCard(String cardKey, String userId, String userEmail);
