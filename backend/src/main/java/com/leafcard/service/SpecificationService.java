@@ -51,4 +51,16 @@ public interface SpecificationService extends IService<Specification> {
      * @return 规格对象
      */
     Specification findByName(String name);
+    
+    /**
+     * 分页查询规格列表（支持关键词和产品ID筛选）
+     * @param page 分页信息
+     * @param keyword 关键词（规格名称或产品名称）
+     * @param productId 产品ID
+     * @return 分页结果
+     */
+    com.baomidou.mybatisplus.core.metadata.IPage<Specification> getSpecificationsWithFilters(
+            com.baomidou.mybatisplus.extension.plugins.pagination.Page<Specification> page, 
+            String keyword, 
+            Long productId);
 }

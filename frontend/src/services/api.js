@@ -14,7 +14,12 @@ const AdminService = {
   },
 
   getUserList(params) {
-    return Server.get('/api/admins', { page: params.page || 1, size: params.size || 10 })
+    return Server.get('/api/admins', {
+      page: params.page || 1,
+      size: params.size || 10,
+      keyword: params.keyword,
+      status: params.status
+    })
   },
 
   getLogList(params) {
@@ -43,12 +48,18 @@ const AdminService = {
     return Server.get('/api/card-keys', {
       page: params.page || 1,
       size: params.size || 10,
-      status: params.status
+      status: params.status,
+      specificationId: params.specificationId
     })
   },
 
-  getCardKeyListWithDetails() {
-    return Server.get('/api/card-keys/with-details')
+  getCardKeyListWithDetails(params) {
+    return Server.get('/api/card-keys/with-details', {
+      page: params.page || 1,
+      size: params.size || 10,
+      keyword: params.keyword,
+      specificationId: params.specificationId
+    })
   },
 
   generateCardKey(data) {
@@ -91,7 +102,9 @@ const AdminService = {
   getSpecList(params) {
     return Server.get('/api/specifications', {
       page: params.page || 1,
-      size: params.size || 10
+      size: params.size || 10,
+      keyword: params.keyword,
+      productId: params.productId
     })
   },
 

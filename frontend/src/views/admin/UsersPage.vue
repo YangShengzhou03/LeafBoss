@@ -35,6 +35,9 @@
               </el-select>
             </el-col>
             <el-col :span="14" class="button-group">
+              <el-button type="primary" @click="handleSearch">查询</el-button>
+              <el-button @click="resetFilters">重置</el-button>
+              <div style="flex: 1;"></div>
               <el-button type="primary" @click="addUser">
                 添加用户
               </el-button>
@@ -216,6 +219,13 @@ const loadUsers = async () => {
 }
 
 const handleSearch = () => {
+  currentPage.value = 1
+  loadUsers()
+}
+
+const resetFilters = () => {
+  searchQuery.value = ''
+  statusFilter.value = ''
   currentPage.value = 1
   loadUsers()
 }

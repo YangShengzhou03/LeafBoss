@@ -123,4 +123,25 @@ public class SpecificationServiceImpl extends ServiceImpl<SpecificationMapper, S
         queryWrapper.eq("name", name);
         return baseMapper.selectOne(queryWrapper);
     }
+    
+    @Override
+    public com.baomidou.mybatisplus.core.metadata.IPage<Specification> getSpecificationsWithFilters(
+            com.baomidou.mybatisplus.extension.plugins.pagination.Page<Specification> page, 
+            String keyword, 
+            Long productId) {
+        
+        QueryWrapper<Specification> queryWrapper = new QueryWrapper<>();
+        
+        // 添加产品ID筛选条件
+        if (productId != null) {
+            queryWrapper.eq("product_id", productId);
+        }
+        
+        // 添加关键词筛选条件（规格名称）
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            queryWrapper.like("name", keyword.trim());
+        }
+        
+        return this.page(page, queryWrapper);
+    }
 }

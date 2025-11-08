@@ -37,9 +37,11 @@ public class SpecificationController {
     @GetMapping
     public Result<IPage<Specification>> getSpecifications(
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) Long productId) {
         Page<Specification> pageInfo = new Page<>(page, size);
-        IPage<Specification> result = specificationService.page(pageInfo);
+        IPage<Specification> result = specificationService.getSpecificationsWithFilters(pageInfo, keyword, productId);
         return Result.success(result);
     }
 

@@ -209,6 +209,7 @@ const specRules = {
   price: [{ required: true, message: '请输入价格', trigger: 'blur' }]
 }
 
+// 后端分页实现，无需前端过滤和分页计算
 const filteredSpecs = computed(() => {
   return specs.value
 })
@@ -258,7 +259,7 @@ const loadSpecs = async () => {
   loading.value = true
   try {
     // 使用筛选参数调用API
-    const response = await api.admin.getSpecificationDTOs({
+    const response = await api.admin.getSpecList({
       page: currentPage.value,
       size: pageSize.value,
       keyword: searchQuery.value,
