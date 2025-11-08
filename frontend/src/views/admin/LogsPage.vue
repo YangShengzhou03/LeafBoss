@@ -7,7 +7,6 @@
         </div>
       </template>
       
-      <!-- 筛选区域 -->
       <div class="filter-section">
         <el-row :gutter="16">
           <el-col :span="6">
@@ -52,7 +51,6 @@
         </el-row>
       </div>
       
-      <!-- 日志列表 -->
       <el-table 
         v-loading="loading" 
         :data="logs" 
@@ -77,7 +75,6 @@
         <el-table-column prop="createdAt" label="操作时间" width="180" align="center" />
       </el-table>
       
-      <!-- 分页 -->
       <div class="pagination-container">
         <el-pagination
           v-model:current-page="currentPage"
@@ -91,7 +88,6 @@
       </div>
     </el-card>
     
-    <!-- 日志详情对话框 -->
     <el-dialog v-model="showLogDetail" title="日志详情" width="500px">
       <div v-if="selectedLog">
         <el-descriptions :column="1" border>
@@ -116,7 +112,6 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { Download, Delete } from '@element-plus/icons-vue'
 import api from '../../services/api'
 
-// 响应式数据
 const loading = ref(false)
 const exporting = ref(false)
 const clearing = ref(false)
@@ -127,13 +122,11 @@ const pageSize = ref(10)
 const showLogDetail = ref(false)
 const selectedLog = ref(null)
 
-// 筛选条件
 const filter = reactive({
   dateRange: [],
   operationType: ''
 })
 
-// 获取操作类型对应的标签类型
 const getLevelType = (operationType) => {
   switch (operationType) {
     case 'LOGIN': return 'success'
@@ -146,7 +139,6 @@ const getLevelType = (operationType) => {
   }
 }
 
-// 获取操作类型名称
 const getOperationTypeName = (operationType) => {
   switch (operationType) {
     case 'LOGIN': return '登录'
@@ -159,7 +151,6 @@ const getOperationTypeName = (operationType) => {
   }
 }
 
-// 重置筛选条件
 const resetFilter = () => {
   filter.dateRange = []
   filter.operationType = ''
@@ -167,7 +158,6 @@ const resetFilter = () => {
   loadLogs()
 }
 
-// 加载日志数据
 const loadLogs = async () => {
   loading.value = true
   try {
@@ -176,24 +166,19 @@ const loadLogs = async () => {
       size: pageSize.value
     }
     
-    // 添加时间范围参数
     if (filter.dateRange && filter.dateRange.length === 2) {
       params.startDate = filter.dateRange[0]
       params.endDate = filter.dateRange[1]
     }
     
-    // 添加操作类型筛选参数
     if (filter.operationType) {
       params.operationType = filter.operationType
     }
     
-    // 调用API获取日志列表（后端分页）
     const response = await api.admin.getLogList(params)
     
-    // 处理API响应数据格式
     if (response && response.data) {
       const data = response.data
-      // 支持两种可能的响应格式：records/content 和 total/totalElements
       if (data.records) {
         logs.value = data.records
         totalLogs.value = data.total || 0
@@ -212,13 +197,11 @@ const loadLogs = async () => {
   }
 }
 
-// 筛选处理
 const handleFilter = () => {
   currentPage.value = 1
   loadLogs()
 }
 
-// 分页处理
 const handleSizeChange = (size) => {
   pageSize.value = size
   currentPage.value = 1
@@ -230,28 +213,23 @@ const handleCurrentChange = (page) => {
   loadLogs()
 }
 
-// 查看日志详情
 const viewLogDetail = (log) => {
   selectedLog.value = log
   showLogDetail.value = true
 }
 
-// 导出日志
 const exportLogs = async () => {
   exporting.value = true
   try {
     const params = {}
     
-    // 添加时间范围参数
     if (filter.dateRange && filter.dateRange.length === 2) {
       params.startDate = filter.dateRange[0]
       params.endDate = filter.dateRange[1]
     }
     
-    // 调用API导出日志
     const response = await api.admin.exportLogs(params)
 
-    // 创建下载链接
     const blob = new Blob([response.data], { type: 'application/json' })
     const url = window.URL.createObjectURL(blob)
     const link = document.createElement('a')
@@ -268,7 +246,6 @@ const exportLogs = async () => {
   }
 }
 
-// 清空日志
 const clearLogs = async () => {
   try {
     await ElMessageBox.confirm(
@@ -283,7 +260,6 @@ const clearLogs = async () => {
 
     clearing.value = true
 
-    // 调用API清空日志
     await api.admin.clearLogs()
 
     logs.value = []

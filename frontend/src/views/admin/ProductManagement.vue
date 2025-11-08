@@ -7,7 +7,6 @@
         </div>
       </template>
 
-      <!-- 搜索栏 -->
       <div class="search-bar">
         <el-row :gutter="20">
           <el-col :span="6">
@@ -41,7 +40,6 @@
         </el-row>
       </div>
 
-      <!-- 商品列表 -->
       <div class="table-container">
         <el-table 
           :data="filteredProducts" 
@@ -74,7 +72,6 @@
               </template>
             </el-table-column>
           
-          <!-- 空状态 -->
           <template #empty>
             <div class="empty-container" style="padding: 40px 0;">
               <el-empty description="暂无商品数据" :image-size="120" />
@@ -83,7 +80,6 @@
         </el-table>
       </div>
 
-      <!-- 分页 -->
       <div class="pagination-container">
         <el-pagination
           v-model:current-page="currentPage"
@@ -97,7 +93,6 @@
       </div>
     </el-card>
     
-    <!-- 添加/编辑商品对话框 -->
     <el-dialog
       v-model="showAddDialog"
       :title="editingProduct ? '编辑商品' : '添加商品'"
@@ -133,49 +128,36 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { Search } from '@element-plus/icons-vue'
 import api from '../../services/api'
 
-// 加载状态
 const loading = ref(false)
 
-// 商品列表数据
 const products = ref([])
 
-// 表格key，用于强制重新渲染表格
 const tableKey = ref(0)
 
-// 搜索条件
 const searchQuery = ref('')
 const statusFilter = ref('')
 
-// 分页信息
 const currentPage = ref(1)
 const pageSize = ref(10)
 const total = ref(0)
 
-// 对话框状态
 const showAddDialog = ref(false)
 const editingProduct = ref(null)
 
-// 表单数据
 const productForm = reactive({
   name: '',
   description: '',
   status: 'active'
 })
 
-// 表单验证规则
 const productRules = {
   name: [{ required: true, message: '请输入商品名称', trigger: 'blur' }]
 }
 
-// 计算属性：筛选后的商品列表（用于前端显示，但实际筛选通过后端API实现）
 const filteredProducts = computed(() => {
   return products.value
 })
 
-// 分类标签类型映射函数已移除，因为所有商品都是虚拟卡密，不需要分类
-// 分类文本映射函数已移除，因为所有商品都是虚拟卡密，不需要分类
-
-// 加载商品数据
 const loadProducts = async () => {
   loading.value = true
   try {
@@ -199,43 +181,36 @@ const loadProducts = async () => {
     total.value = 0
   } finally {
     loading.value = false
-    // 强制更新表格key，避免ResizeObserver循环错误
     tableKey.value += 1
   }
 }
 
-// 搜索处理
 const handleSearch = () => {
   currentPage.value = 1
   loadProducts()
 }
 
-// 重置筛选
 const resetFilters = () => {
   searchQuery.value = ''
   statusFilter.value = ''
   handleSearch()
 }
 
-// 新增商品
 const handleAddProduct = () => {
   showAddDialog.value = true
   editingProduct.value = null
   resetForm()
 }
 
-// 编辑商品
 const handleEditProduct = (row) => {
   editingProduct.value = row
   Object.assign(productForm, row)
   showAddDialog.value = true
 }
 
-// 保存商品
 const saveProduct = async () => {
   try {
     if (editingProduct.value) {
-      // 更新商品
       const response = await api.admin.editProduct(productForm.id, productForm);
       if (response && response.code === 200) {
         ElMessage.success('商品更新成功');
@@ -245,7 +220,6 @@ const saveProduct = async () => {
         ElMessage.error(response?.message || '保存商品失败');
       }
     } else {
-      // 添加商品
       const response = await api.admin.createProduct(productForm);
       if (response && response.code === 200) {
         ElMessage.success('商品添加成功');
@@ -258,9 +232,8 @@ const saveProduct = async () => {
   } catch (error) {
     ElMessage.error('保存商品失败，请检查网络连接');
   }
-};
+}
 
-// 重置表单
 const resetForm = () => {
   editingProduct.value = null
   Object.assign(productForm, {
@@ -270,7 +243,6 @@ const resetForm = () => {
   })
 }
 
-// 删除商品
 const handleDeleteProduct = async (row) => {
   try {
     await ElMessageBox.confirm(
@@ -297,7 +269,6 @@ const handleDeleteProduct = async (row) => {
   }
 }
 
-// 时间格式化函数
 const formatDateTime = (dateTime) => {
   if (!dateTime) return ''
   try {
@@ -315,7 +286,6 @@ const formatDateTime = (dateTime) => {
   }
 }
 
-// 分页处理（后端分页）
 const handleSizeChange = (size) => {
   pageSize.value = size
   currentPage.value = 1

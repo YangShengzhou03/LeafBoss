@@ -7,10 +7,8 @@
         </div>
       </template>
 
-      <!-- 生成配置 -->
       <div class="config-section">
         <el-form :model="generateForm" label-width="100px">
-          <!-- 第一行：生成数量、卡密长度、商品、规格 -->
           <el-row :gutter="8">
             <el-col :span="4">
               <el-form-item label="生成数量">
@@ -54,7 +52,6 @@
             </el-col>
           </el-row>
 
-          <!-- 第二行：字符集 -->
           <el-row :gutter="12">
             <el-col :span="24">
               <el-form-item label="字符集">
@@ -69,13 +66,11 @@
         </el-form>
       </div>
 
-      <!-- 生成结果 -->
       <div v-if="generatedKeys.length > 0" class="result-section">
         <div class="result-header">
           <div class="result-header-content">
             <span class="result-title">生成结果 ({{ generatedKeys.length }} 条)</span>
 
-            <!-- 商品规格信息 -->
             <div v-if="generateForm.productId && generateForm.specId" class="product-spec-info">
               <span class="info-label">商品：</span>
               <span class="info-value">{{ getProductName(generateForm.productId) }}</span>
@@ -83,7 +78,6 @@
               <span class="info-value">{{ getSpecName(generateForm.specId) }}</span>
             </div>
 
-            <!-- 操作按钮 -->
             <div class="action-buttons">
               <el-button type="success" @click="addToStock" :loading="addingToStock"
                 :disabled="!generateForm.productId || !generateForm.specId" class="action-btn">
@@ -94,7 +88,7 @@
               </el-button>
               <el-button type="primary" @click="copyCardKeys">
                 <el-icon>
-                  <Copy />
+                  <CopyDocument />
                 </el-icon>
                 一键复制
               </el-button>
@@ -121,7 +115,6 @@
           <el-table-column prop="specName" label="规格" width="120" align="center" />
         </el-table>
 
-        <!-- 分页 -->
         <div class="pagination-container" v-if="generatedKeys.length > 10">
           <el-pagination v-model:current-page="currentPage" v-model:page-size="pageSize" :page-sizes="[10, 20, 50, 100]"
             :total="generatedKeys.length" layout="total, sizes, prev, pager, next, jumper"
@@ -135,7 +128,7 @@
 <script setup>
 import { ref, reactive, onMounted, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Download, Upload, Copy } from '@element-plus/icons-vue'
+import { Download, Upload, CopyDocument } from '@element-plus/icons-vue'
 import Server from '@/utils/Server.js'
 import api from '@/services/api.js'
 
@@ -319,7 +312,6 @@ const generateRandomKey = () => {
   return result
 }
 
-// 生成卡密
 const generateCardKeys = async () => {
   if (generateForm.count <= 0) {
     ElMessage.warning('请设置生成数量')
@@ -344,13 +336,12 @@ const generateCardKeys = async () => {
     const product = productList.value.find(p => p.id === generateForm.productId)
     const spec = specList.value.find(s => s.id === generateForm.specId)
 
-    const maxAttempts = generateForm.count * 10 // 最大尝试次数，避免无限循环
+    const maxAttempts = generateForm.count * 10
     let attempts = 0
 
     while (generatedKeys.value.length < generateForm.count && attempts < maxAttempts) {
       const key = generateRandomKey()
 
-      // 检查是否与已生成的卡密重复
       const isDuplicateInGenerated = generatedKeys.value.some(k => k.key === key)
 
       if (!isDuplicateInGenerated) {
@@ -376,19 +367,16 @@ const generateCardKeys = async () => {
   }
 }
 
-// 获取商品名称
 const getProductName = (productId) => {
   const product = productList.value.find(p => p.id === productId)
   return product ? product.name : ''
 }
 
-// 获取规格名称
 const getSpecName = (specId) => {
   const spec = specList.value.find(s => s.id === specId)
   return spec ? spec.name : ''
 }
 
-// 商品选择变化事件
 const handleProductChange = (productId) => {
   loadSpecsByProduct(productId)
 }
@@ -398,7 +386,6 @@ onMounted(() => {
   loadAllSpecs()
 })
 
-// 导出卡密
 const exportCardKeys = () => {
   if (generatedKeys.value.length === 0) {
     ElMessage.warning('没有可导出的卡密')
@@ -418,14 +405,12 @@ const exportCardKeys = () => {
   ElMessage.success('卡密已导出为TXT文件')
 }
 
-// 复制单个卡密
 const copyCardKey = async (key) => {
   try {
     await navigator.clipboard.writeText(key)
     ElMessage.success('卡密已复制到剪贴板')
   } catch (error) {
-    // 降级方案
-    const textArea = document.createElement('textarea')
+      const textArea = document.createElement('textarea')
     textArea.value = key
     document.body.appendChild(textArea)
     textArea.select()
@@ -435,9 +420,27 @@ const copyCardKey = async (key) => {
   }
 }
 
+const copyCardKeys = async () => {
+  if (generatedKeys.value.length === 0) {
+    ElMessage.warning('没有可复制的卡密')
+    return
+  }
 
+  try {
+    const allKeys = generatedKeys.value.map(key => key.key).join('\n')
+    await navigator.clipboard.writeText(allKeys)
+    ElMessage.success(`已复制 ${generatedKeys.value.length} 个卡密到剪贴板`)
+  } catch (error) {
+    const textArea = document.createElement('textarea')
+    textArea.value = generatedKeys.value.map(key => key.key).join('\n')
+    document.body.appendChild(textArea)
+    textArea.select()
+    document.execCommand('copy')
+    document.body.removeChild(textArea)
+    ElMessage.success(`已复制 ${generatedKeys.value.length} 个卡密到剪贴板`)
+  }
+}
 
-// 重置表单
 const resetForm = () => {
   Object.assign(generateForm, {
     count: 100,

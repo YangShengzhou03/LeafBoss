@@ -285,6 +285,7 @@ const store = {
     try {
       await api.user.logout()
     } catch (error) {
+      // 忽略登出错误，继续清理用户信息
     } finally {
       this.clearUser()
     }

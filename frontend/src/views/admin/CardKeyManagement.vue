@@ -7,7 +7,6 @@
         </div>
       </template>
 
-      <!-- 搜索栏 -->
       <div class="search-bar">
         <el-row :gutter="16">
           <el-col :span="6">
@@ -39,7 +38,6 @@
         </el-row>
       </div>
 
-      <!-- 卡密列表 -->
       <div class="table-container">
         <el-table :data="pagedCardKeys" style="width: 100%" v-loading="loading" :scroll="{ x: 1200 }">
           <template #empty>
@@ -96,7 +94,6 @@
         </el-table>
       </div>
 
-      <!-- 分页 -->
       <div class="pagination-container">
         <el-pagination
           v-model:current-page="currentPage"
@@ -127,7 +124,6 @@ const currentPage = ref(1)
 const pageSize = ref(10)
 const total = ref(0)
 
-// 后端分页实现，无需前端过滤和分页计算
 const pagedCardKeys = computed(() => {
   return cardKeys.value
 })
@@ -144,7 +140,6 @@ const getStatusTagType = (status) => {
 const loadCardKeys = async () => {
   loading.value = true
   try {
-    // 使用包含商品和规格名称的API接口，并传递筛选参数
     const response = await api.admin.getCardKeyListWithDetails({
       page: currentPage.value,
       size: pageSize.value,
@@ -311,7 +306,6 @@ const handleDeleteCardKey = async (row) => {
   }
 }
 
-// 分页处理
 const handleSizeChange = (size) => {
   pageSize.value = size
   currentPage.value = 1

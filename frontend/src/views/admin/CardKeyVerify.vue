@@ -8,7 +8,6 @@
       </template>
 
       <div class="verify-content">
-        <!-- 卡密输入区域 -->
         <div class="input-section">
           <el-input
             v-model="cardKeyInput"
@@ -24,7 +23,6 @@
           </el-button>
         </div>
 
-        <!-- 验证结果区域 -->
         <div v-if="showResult" class="result-section">
           <el-divider content-position="left">验证结果</el-divider>
           
@@ -63,17 +61,13 @@ import { ElMessage } from 'element-plus'
 import { CircleCheck, CircleClose, Warning } from '@element-plus/icons-vue'
 import Server from '@/utils/Server.js'
 
-// 卡密输入
 const cardKeyInput = ref('')
 
-// 验证状态
 const verifying = ref(false)
 
-// 验证结果
 const showResult = ref(false)
 const cardKeyInfo = ref({})
 
-// 状态文本映射
 const getStatusText = (status) => {
   const statusMap = {
     active: '可用',
@@ -88,7 +82,6 @@ const getStatusText = (status) => {
   return statusMap[status] || status || '未知'
 }
 
-// 状态标签类型映射
 const getStatusTagType = (status) => {
   const typeMap = {
     active: 'success',
@@ -103,14 +96,13 @@ const getStatusTagType = (status) => {
   return typeMap[status] || 'info'
 }
 
-// 验证结果相关计算属性
 const resultClass = computed(() => {
   const status = cardKeyInfo.value.status
   if (status === 'active' || status === '未使用') return 'result-success'
   if (status === 'used' || status === '已使用') return 'result-info'
   if (status === 'disabled' || status === '已禁用' || status === 'expired' || status === '已过期') return 'result-warning'
   if (status === '未知') return 'result-error'
-  return 'result-success' // 默认显示成功样式
+  return 'result-success'
 })
 
 const resultTitle = computed(() => {
@@ -129,7 +121,7 @@ const resultIcon = computed(() => {
   if (status === 'used' || status === '已使用') return CircleCheck
   if (status === 'disabled' || status === '已禁用' || status === 'expired' || status === '已过期') return Warning
   if (status === '未知') return CircleClose
-  return CircleCheck // 默认显示成功图标
+  return CircleCheck
 })
 
 const resultIconColor = computed(() => {
@@ -138,10 +130,9 @@ const resultIconColor = computed(() => {
   if (status === 'used' || status === '已使用') return '#409EFF'
   if (status === 'disabled' || status === '已禁用' || status === 'expired' || status === '已过期') return '#E6A23C'
   if (status === '未知') return '#F56C6C'
-  return '#67C23A' // 默认显示成功颜色
+  return '#67C23A'
 })
 
-// 验证卡密
 const handleVerify = async () => {
   if (!cardKeyInput.value.trim()) {
     ElMessage.warning('请输入卡密代码')
@@ -151,26 +142,19 @@ const handleVerify = async () => {
   verifying.value = true
   
   try {
-    // 调用真实API验证卡密
     const response = await Server.get(`/api/card-keys/verify/${cardKeyInput.value.trim()}`)
     
-    // 根据后端实际返回的数据结构处理
       if (response && response.code === 200) {
-        // 如果响应包含code=200，说明卡密存在
         if (response.data) {
-          // 使用data字段中的卡密信息
           cardKeyInfo.value = response.data
           
-          // 后端已经返回了完整的规格和产品信息，直接使用
           if (!cardKeyInfo.value.productSpec && cardKeyInfo.value.specificationName) {
-            // 如果没有productSpec字段，但有名称为，使用规格名称
             cardKeyInfo.value.productSpec = cardKeyInfo.value.specificationName
           }
           
           showResult.value = true
           ElMessage.success('卡密验证成功')
       } else {
-        // 虽然code=200但没有data字段，视为验证失败
         cardKeyInfo.value = {
           cardKey: cardKeyInput.value.trim(),
           status: '未知'
@@ -179,7 +163,6 @@ const handleVerify = async () => {
         ElMessage.error('卡密验证失败')
       }
     } else {
-      // 卡密不存在或验证失败
       cardKeyInfo.value = {
         cardKey: cardKeyInput.value.trim(),
         status: '未知'
@@ -188,9 +171,7 @@ const handleVerify = async () => {
       ElMessage.error('卡密验证失败')
     }
   } catch (error) {
-    // 检查错误类型，统一处理为卡密验证失败
     if (error.response && error.response.status === 404) {
-      // 404错误：卡密不存在
       cardKeyInfo.value = {
         cardKey: cardKeyInput.value.trim(),
         status: '未知'
@@ -198,7 +179,6 @@ const handleVerify = async () => {
       showResult.value = true
       ElMessage.error('卡密验证失败')
     } else if (!error.response) {
-      // 网络连接错误
       cardKeyInfo.value = {
         cardKey: cardKeyInput.value.trim(),
         status: '未知'
@@ -206,7 +186,6 @@ const handleVerify = async () => {
       showResult.value = true
       ElMessage.error('验证失败，请检查网络连接')
     } else {
-      // 其他服务器错误
       cardKeyInfo.value = {
         cardKey: cardKeyInput.value.trim(),
         status: '未知'
@@ -219,7 +198,6 @@ const handleVerify = async () => {
   }
 }
 
-// 清空结果
 const clearResult = () => {
   showResult.value = false
   cardKeyInfo.value = {}

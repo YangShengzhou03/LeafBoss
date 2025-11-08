@@ -12,7 +12,6 @@
       </template>
       
       <div class="dashboard-content">
-        <!-- 第一行：核心统计数据 -->
         <el-row :gutter="20" class="stats-row">
           <el-col :span="6">
             <div class="stat-card primary">
@@ -87,9 +86,7 @@
           </el-col>
         </el-row>
 
-        <!-- 图表数据 -->
         <el-row :gutter="20" class="charts-row">
-          <!-- 未使用卡密占比 -->
           <el-col :span="24">
             <el-card class="chart-card">
               <template #header>
@@ -138,7 +135,6 @@ use([
   LegendComponent
 ])
 
-// 统计数据
 const stats = ref({
   cardKeyCount: 0,
   monthlyRevenue: 0,
@@ -152,10 +148,8 @@ const stats = ref({
 
 const loading = ref(false)
 
-// 未使用卡密规格分布数据
 const specDistribution = ref([])
 
-// 饼图配置
 const pieChartOption = computed(() => {
   return {
     tooltip: {
@@ -206,51 +200,43 @@ const pieChartOption = computed(() => {
   }
 })
 
-// 获取规格颜色
 const getSpecColor = (index) => {
   const colors = ['#409eff', '#67c23a', '#e6a23c', '#f56c6c', '#909399', '#b37feb', '#ff85c0']
   return colors[index % colors.length]
 }
 
-// 刷新数据
 const refreshData = async () => {
   await loadDashboardData()
 }
 
-// 格式化货币金额，限制小数位为2位
 const formatCurrency = (value) => {
   if (value === null || value === undefined) return '0.00'
   return parseFloat(value).toFixed(2)
 }
 
-// 加载仪表盘数据
 const loadDashboardData = async () => {
   try {
     loading.value = true
     
-    // 使用API获取仪表盘统计数据
     const response = await api.admin.getDashboardStats()
     
     if (response && response.data) {
       const data = response.data
       
-      // 正确映射后端返回的数据到前端期望的结构
       stats.value = {
-        cardKeyCount: data.totalOrders || 0, // 使用totalOrders作为卡密总数
-        monthlyRevenue: data.monthlyRevenue || 0,  // 使用monthlyRevenue作为当月收入
+        cardKeyCount: data.totalOrders || 0,
+        monthlyRevenue: data.monthlyRevenue || 0,
         dailySales: data.dailySales || 0,
         dailyRevenue: data.dailyRevenue || 0,
-        cardKeyGrowth: data.conversionRate || 0, // 使用conversionRate作为卡密增长率
-        monthlyGrowth: data.monthlyRevenueChange || 0, // 使用monthlyRevenueChange作为月收入增长率
+        cardKeyGrowth: data.conversionRate || 0,
+        monthlyGrowth: data.monthlyRevenueChange || 0,
         dailySalesGrowth: data.dailySalesChange || 0,
         dailyGrowth: data.dailyRevenueChange || 0
       }
       
-      // 从后端获取未使用卡密规格分布数据
       await loadSpecDistribution()
       
     } else {
-      // API返回空数据时，使用空数据
       stats.value = {
         cardKeyCount: 0,
         monthlyRevenue: 0,
@@ -264,14 +250,12 @@ const loadDashboardData = async () => {
       
       specDistribution.value = []
       
-      // 空数据时给出提示
       ElMessage.warning('仪表盘数据为空，请检查数据配置')
     }
     
   } catch (error) {
-    // 根据错误类型给出不同的提示
     if (error.response && error.response.status === 401) {
-      // 401错误已经在拦截器中处理，这里不需要重复提示
+      ElMessage.warning('登录过期，请重新登录')
     } else if (error.code === 'NETWORK_ERROR' || !error.response) {
       ElMessage.error('网络连接失败，请检查网络连接')
     } else if (error.response.status === 500) {
@@ -280,7 +264,6 @@ const loadDashboardData = async () => {
       ElMessage.error('加载仪表盘数据失败，请稍后重试')
     }
     
-    // 出错时使用空数据
     stats.value = {
       cardKeyCount: 0,
       monthlyRevenue: 0,
@@ -298,26 +281,21 @@ const loadDashboardData = async () => {
   }
 }
 
-// 从后端加载规格分布数据
 const loadSpecDistribution = async () => {
   try {
     console.log('开始加载规格分布数据...')
-    // 使用API获取规格DTO列表（包含卡密统计信息）
     const response = await api.admin.getSpecificationDTOs()
     console.log('API响应:', response)
     
-    // 根据Server.js的拦截器逻辑，如果code=200，response.data就是实际的业务数据
     if (response && response.code === 200 && response.data) {
       const specifications = response.data
       console.log('规格数据:', specifications)
       
-      // 计算未使用卡密总数（注意字段名是unusedKeys而不是unusedCards）
       const totalUnusedCards = specifications.reduce((total, spec) => total + (spec.unusedKeys || 0), 0)
       console.log('未使用卡密总数:', totalUnusedCards)
       
-      // 过滤出有未使用卡密的规格，并按未使用卡密数量排序
       const distributionData = specifications
-        .filter(spec => spec.unusedKeys > 0) // 只显示有未使用卡密的规格
+        .filter(spec => spec.unusedKeys > 0)
         .map(spec => ({
           name: spec.name,
           count: spec.unusedKeys || 0,
@@ -325,7 +303,7 @@ const loadSpecDistribution = async () => {
             ? Math.round((spec.unusedKeys / totalUnusedCards) * 100) 
             : 0
         }))
-        .sort((a, b) => b.count - a.count) // 按未使用卡密数量降序排列
+        .sort((a, b) => b.count - a.count)
       
       console.log('处理后的分布数据:', distributionData)
       specDistribution.value = distributionData
