@@ -8,7 +8,6 @@
       </template>
       
       <div class="product-spec-content">
-        <!-- 搜索和筛选 -->
         <div class="search-bar">
           <el-row :gutter="20">
             <el-col :span="6">
@@ -42,7 +41,6 @@
           </el-row>
         </div>
         
-        <!-- 商品规格列表 -->
         <div class="table-container">
           <el-table :data="filteredSpecs" style="width: 100%" v-loading="loading" :scroll="{ x: 1200 }">
             <el-table-column prop="id" label="ID" width="100" align="center">
@@ -106,7 +104,6 @@
               </template>
             </el-table-column>
             
-            <!-- 空状态 -->
             <template #empty>
               <div class="empty-container" style="padding: 40px 0;">
                 <el-empty description="暂无规格数据" :image-size="120" />
@@ -115,7 +112,6 @@
           </el-table>
         </div>
         
-        <!-- 分页 -->
         <div class="pagination-container">
           <el-pagination
             v-model:current-page="currentPage"
@@ -130,7 +126,6 @@
       </div>
     </el-card>
     
-    <!-- 添加/编辑规格对话框 -->
     <el-dialog
       v-model="showAddDialog"
       :title="editingSpec ? '编辑规格' : '添加规格'"
@@ -173,29 +168,22 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { Search } from '@element-plus/icons-vue'
 import api from '../../services/api'
 
-// 加载状态
 const loading = ref(false)
 
-// 商品规格列表
 const specs = ref([])
 
-// 商品列表（用于下拉选择）
 const products = ref([])
 
-// 搜索条件
 const searchQuery = ref('')
 const statusFilter = ref('')
 
-// 分页信息
 const currentPage = ref(1)
 const pageSize = ref(10)
 const totalSpecs = ref(0)
 
-// 对话框状态
 const showAddDialog = ref(false)
 const editingSpec = ref(null)
 
-// 表单数据
 const specForm = reactive({
   productId: '',
   productName: '',
@@ -203,40 +191,33 @@ const specForm = reactive({
   price: 0
 })
 
-// 格式化ID显示
 const formatId = (id) => {
   if (!id) return ''
-  // 直接显示前8位，后面用省略号
   if (id.length > 8) {
     return `${id.substring(0, 8)}...`
   }
   return id
 }
 
-// 表单验证规则
 const specRules = {
   productId: [{ required: true, message: '请选择商品', trigger: 'change' }],
   name: [{ required: true, message: '请输入规格名称', trigger: 'blur' }],
   price: [{ required: true, message: '请输入价格', trigger: 'blur' }]
 }
 
-// 计算属性：直接显示当前页的数据
 const filteredSpecs = computed(() => {
   return specs.value
 })
 
-// 计算属性：显示后端返回的总数
 const filteredTotal = computed(() => {
   return totalSpecs.value
 })
 
-// 计算使用率
 const calculateUsageRate = (used, total) => {
   if (!total || total === 0) return 0
   return Math.round((used / total) * 100)
 }
 
-// 获取使用率样式类
 const getUsageRateClass = (used, total) => {
   const rate = calculateUsageRate(used, total)
   if (rate >= 80) return 'high-usage'
@@ -244,13 +225,12 @@ const getUsageRateClass = (used, total) => {
   return 'low-usage'
 }
 
-// 加载商品列表
 const loadProducts = async () => {
   try {
     const response = await api.admin.getProductList({
       page: 1,
-      size: 1000, // 获取所有商品
-      status: 'active' // 只获取上架的商品
+      size: 1000,
+      status: 'active'
     })
     
     if (response && response.data) {
@@ -270,45 +250,35 @@ const loadProducts = async () => {
   }
 }
 
-// 加载商品规格数据
 const loadSpecs = async () => {
   loading.value = true
   try {
-    // 使用getSpecificationDTOs接口获取包含卡密统计信息的规格数据
     const response = await api.admin.getSpecificationDTOs()
     
-    // 处理API响应数据格式
     if (response && response.data) {
       const specList = response.data
       
-      // 前端分页处理
       const startIndex = (currentPage.value - 1) * pageSize.value
       const endIndex = startIndex + pageSize.value
       const pageSpecs = specList.slice(startIndex, endIndex)
       
-      // 处理规格数据，添加商品名称和格式化创建时间
       const processedSpecs = pageSpecs.map(spec => {
-        // 根据productId查找商品名称
         const product = products.value.find(p => p.id === spec.productId)
         const productName = product ? product.name : spec.productName || '未知商品'
         
-        // 格式化创建时间
         let createTime = spec.createTime || spec.createdAt || spec.create_time || ''
         if (createTime) {
-          // 如果是时间戳，转换为日期格式
           if (typeof createTime === 'number' || /^\d+$/.test(createTime)) {
             createTime = new Date(parseInt(createTime)).toLocaleString()
           } else if (typeof createTime === 'string') {
-            // 尝试解析日期字符串
             try {
               createTime = new Date(createTime).toLocaleString()
             } catch (e) {
-              // 忽略日期解析错误
+              createTime = '未知时间'
             }
           }
         }
         
-        // 卡密统计字段映射：后端返回的是totalKeys/usedKeys/unusedKeys
         return {
           ...spec,
           productName: productName,
@@ -319,7 +289,6 @@ const loadSpecs = async () => {
         }
       })
       
-      // 存储当前页的规格数据
       specs.value = processedSpecs
       totalSpecs.value = specList.length
     } else {
@@ -336,34 +305,28 @@ const loadSpecs = async () => {
   }
 }
 
-// 搜索处理
 const handleSearch = () => {
   currentPage.value = 1
   loadSpecs()
 }
 
-// 重置筛选
 const resetFilters = () => {
   searchQuery.value = ''
   statusFilter.value = ''
   handleSearch()
 }
 
-// 分页处理
 const handleSizeChange = (size) => {
   pageSize.value = size
   currentPage.value = 1
-  // 重新调用API获取数据
   loadSpecs()
 }
 
 const handleCurrentChange = (page) => {
   currentPage.value = page
-  // 重新调用API获取数据
   loadSpecs()
 }
 
-// 编辑规格
 const editSpec = (spec) => {
   editingSpec.value = spec
   Object.assign(specForm, {
@@ -374,7 +337,6 @@ const editSpec = (spec) => {
   showAddDialog.value = true
 }
 
-// 切换规格状态
 const toggleSpecStatus = async (spec) => {
   try {
     await ElMessageBox.confirm(
@@ -383,20 +345,16 @@ const toggleSpecStatus = async (spec) => {
       { type: 'warning' }
     )
     
-    // 修复状态切换逻辑：使用英文状态值（数据库只接受active/inactive）
     const newStatus = spec.status === 'active' ? 'inactive' : 'active'
     
-    // 调用API更新规格状态 - 使用英文状态值
     const response = await api.admin.editSpec(spec.id, {
       status: newStatus
     })
     
     if (response && response.code === 200) {
-      // 更新本地状态 - 使用英文状态值
       spec.status = newStatus
       ElMessage.success('操作成功')
       
-      // 重新加载数据确保数据一致性
       loadSpecs()
     } else {
       ElMessage.error('操作失败')
@@ -408,7 +366,6 @@ const toggleSpecStatus = async (spec) => {
   }
 }
 
-// 删除规格
 const deleteSpec = async (spec) => {
   try {
     await ElMessageBox.confirm(
@@ -421,18 +378,15 @@ const deleteSpec = async (spec) => {
       }
     )
     
-    // 调用API删除规格
     const response = await api.admin.deleteSpec(spec.id)
     if (response && response.code === 200) {
       ElMessage.success('删除成功')
       
-      // 从本地列表中移除
       const index = specs.value.findIndex(s => s.id === spec.id)
       if (index !== -1) {
         specs.value.splice(index, 1)
       }
       
-      // 重新加载数据确保数据一致性
       loadSpecs()
     } else {
       ElMessage.error('删除失败，请重试')
@@ -444,27 +398,22 @@ const deleteSpec = async (spec) => {
   }
 }
 
-// 保存规格
 const saveSpec = async () => {
   try {
-    // 获取选中的商品信息
     const selectedProduct = products.value.find(p => p.id === specForm.productId)
     if (!selectedProduct) {
       ElMessage.error('请选择有效的商品')
       return
     }
     
-    // 准备提交的数据
     const submitData = {
       ...specForm,
       productName: selectedProduct.name
     }
     
     if (editingSpec.value) {
-      // 调用API更新规格
       await api.admin.editSpec(editingSpec.value.id, submitData)
       
-      // 更新本地数据
       const index = specs.value.findIndex(s => s.id === editingSpec.value.id)
       if (index !== -1) {
         specs.value[index] = { 
@@ -474,10 +423,8 @@ const saveSpec = async () => {
         }
       }
     } else {
-      // 调用API添加新规格
       const response = await api.admin.createSpec(submitData)
       
-      // 添加新规格到本地列表
       const newSpec = {
         id: response.data?.id || Date.now(),
         ...submitData,
@@ -494,14 +441,12 @@ const saveSpec = async () => {
     ElMessage.success(editingSpec.value ? '更新成功' : '添加成功')
     resetForm()
     
-    // 重新加载数据确保数据一致性
     loadSpecs()
   } catch (error) {
     ElMessage.error('操作失败')
   }
 }
 
-// 重置表单
 const resetForm = () => {
   editingSpec.value = null
   Object.assign(specForm, {
