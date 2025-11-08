@@ -1,5 +1,7 @@
 package com.leafcard.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.leafcard.dto.SpecificationDTO;
 import com.leafcard.entity.Specification;
@@ -46,6 +48,15 @@ public interface SpecificationService extends IService<Specification> {
     List<SpecificationDTO> getSpecificationDTOs();
     
     /**
+     * 分页获取规格DTO列表（包含卡密统计信息）
+     * @param page 分页信息
+     * @param keyword 关键词（规格名称或产品名称）
+     * @param productId 产品ID
+     * @return 分页结果
+     */
+    IPage<SpecificationDTO> getSpecificationDTOsWithPagination(Page<Specification> page, String keyword, Long productId);
+    
+    /**
      * 根据名称查找规格
      * @param name 规格名称
      * @return 规格对象
@@ -59,8 +70,5 @@ public interface SpecificationService extends IService<Specification> {
      * @param productId 产品ID
      * @return 分页结果
      */
-    com.baomidou.mybatisplus.core.metadata.IPage<Specification> getSpecificationsWithFilters(
-            com.baomidou.mybatisplus.extension.plugins.pagination.Page<Specification> page, 
-            String keyword, 
-            Long productId);
+    IPage<Specification> getSpecificationsWithFilters(Page<Specification> page, String keyword, Long productId);
 }

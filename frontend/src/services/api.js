@@ -112,8 +112,19 @@ const AdminService = {
     })
   },
 
+  // 获取规格DTO列表（包含卡密统计信息）
   getSpecificationDTOs() {
     return Server.get('/api/specifications/dto')
+  },
+
+  // 分页获取规格DTO列表（包含卡密统计信息）
+  getSpecListDTO(params) {
+    return Server.get('/api/specifications/dto/pagination', {
+      page: params.page || 1,
+      size: params.size || 10,
+      keyword: params.keyword,
+      productId: params.productId
+    })
   },
 
   createSpec(data) {

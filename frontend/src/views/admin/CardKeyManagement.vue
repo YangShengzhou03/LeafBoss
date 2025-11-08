@@ -125,7 +125,9 @@ const pageSize = ref(10)
 const total = ref(0)
 
 const pagedCardKeys = computed(() => {
-  return cardKeys.value
+  const startIndex = (currentPage.value - 1) * pageSize.value
+  const endIndex = startIndex + pageSize.value
+  return cardKeys.value.slice(startIndex, endIndex)
 })
 
 const getStatusTagType = (status) => {

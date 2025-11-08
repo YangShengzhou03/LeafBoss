@@ -1,6 +1,8 @@
 package com.leafcard.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.leafcard.dto.CardKeyDTO;
 import com.leafcard.entity.CardKey;
@@ -46,12 +48,7 @@ public class CardKeyServiceImpl extends ServiceImpl<CardKeyMapper, CardKey> impl
     }
 
     @Override
-    public List<CardKeyDTO> getCardKeyListWithDetails() {
-        return getCardKeyListWithDetails(null, null);
-    }
-    
-    @Override
-    public List<CardKeyDTO> getCardKeyListWithDetails(String keyword, Long specificationId) {
+    public IPage<CardKeyDTO> getCardKeyListWithDetails(Page<CardKey> pageParam, String keyword, Long specificationId) {
         QueryWrapper<CardKey> queryWrapper = new QueryWrapper<>();
         
         // 根据规格ID筛选
@@ -68,9 +65,11 @@ public class CardKeyServiceImpl extends ServiceImpl<CardKeyMapper, CardKey> impl
             );
         }
         
-        List<CardKey> cardKeys = baseMapper.selectList(queryWrapper);
+        // 使用分页查询
+        Page<CardKey> cardKeyPage = baseMapper.selectPage(pageParam, queryWrapper);
         
-        return cardKeys.stream().map(cardKey -> {
+        // 转换为DTO列表
+        List<CardKeyDTO> dtoList = cardKeyPage.getRecords().stream().map(cardKey -> {
             CardKeyDTO dto = new CardKeyDTO();
             dto.setId(cardKey.getId());
             dto.setCardKey(cardKey.getCardKey());
@@ -102,6 +101,12 @@ public class CardKeyServiceImpl extends ServiceImpl<CardKeyMapper, CardKey> impl
             
             return dto;
         }).collect(Collectors.toList());
+        
+        // 创建分页结果
+        Page<CardKeyDTO> resultPage = new Page<>(cardKeyPage.getCurrent(), cardKeyPage.getSize(), cardKeyPage.getTotal());
+        resultPage.setRecords(dtoList);
+        
+        return resultPage;
     }
 
     @Override

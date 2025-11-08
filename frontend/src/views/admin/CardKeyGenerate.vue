@@ -136,7 +136,7 @@ const generating = ref(false)
 const addingToStock = ref(false)
 
 const generateForm = reactive({
-  count: 100,
+  count: 50,
   length: 32,
   productId: '',
   specId: '',

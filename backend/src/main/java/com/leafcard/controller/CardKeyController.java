@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -63,13 +62,14 @@ public class CardKeyController {
      * 获取包含商品和规格名称的卡密列表
      */
     @GetMapping("/with-details")
-    public Result<List<CardKeyDTO>> getCardKeysWithDetails(
+    public Result<IPage<CardKeyDTO>> getCardKeysWithDetails(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) Long specificationId) {
-        List<CardKeyDTO> cardKeyList = cardKeyService.getCardKeyListWithDetails(keyword, specificationId);
-        return Result.success(cardKeyList);
+        Page<CardKey> pageParam = new Page<>(page, size);
+        IPage<CardKeyDTO> cardKeyPage = cardKeyService.getCardKeyListWithDetails(pageParam, keyword, specificationId);
+        return Result.success(cardKeyPage);
     }
 
     /**

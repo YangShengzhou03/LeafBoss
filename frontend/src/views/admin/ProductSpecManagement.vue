@@ -258,8 +258,8 @@ const loadProducts = async () => {
 const loadSpecs = async () => {
   loading.value = true
   try {
-    // 使用筛选参数调用API
-    const response = await api.admin.getSpecList({
+    // 使用DTO接口获取包含卡密统计信息的规格数据
+    const response = await api.admin.getSpecListDTO({
       page: currentPage.value,
       size: pageSize.value,
       keyword: searchQuery.value,
@@ -267,7 +267,9 @@ const loadSpecs = async () => {
     })
     
     if (response && response.data) {
-      const specList = response.data.records || response.data.content || response.data || []
+      // 正确解析分页响应结构
+      const pageData = response.data
+      const specList = pageData.records || pageData.content || pageData.list || []
       
       const processedSpecs = specList.map(spec => {
         const product = products.value.find(p => p.id === spec.productId)
@@ -297,7 +299,7 @@ const loadSpecs = async () => {
       })
       
       specs.value = processedSpecs
-      totalSpecs.value = response.data.total || response.data.totalElements || specList.length
+      totalSpecs.value = pageData.total || pageData.totalElements || specList.length
     } else {
       specs.value = []
       totalSpecs.value = 0

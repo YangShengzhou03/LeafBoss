@@ -1,6 +1,8 @@
 package com.leafcard.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.leafcard.dto.SpecificationDTO;
 import com.leafcard.entity.CardKey;
@@ -118,6 +120,66 @@ public class SpecificationServiceImpl extends ServiceImpl<SpecificationMapper, S
     }
     
     @Override
+    public IPage<SpecificationDTO> getSpecificationDTOsWithPagination(Page<Specification> page, String keyword, Long productId) {
+        QueryWrapper<Specification> queryWrapper = new QueryWrapper<>();
+        
+        // 添加产品ID筛选条件
+        if (productId != null) {
+            queryWrapper.eq("product_id", productId);
+        }
+        
+        // 添加关键词筛选条件（规格名称）
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            queryWrapper.like("name", keyword.trim());
+        }
+        
+        // 执行分页查询
+        IPage<Specification> specificationPage = this.page(page, queryWrapper);
+        
+        // 转换为DTO并添加卡密统计信息
+        List<SpecificationDTO> dtoList = specificationPage.getRecords().stream().map(spec -> {
+            SpecificationDTO dto = new SpecificationDTO();
+            dto.setId(spec.getId());
+            dto.setProductId(spec.getProductId());
+            dto.setProductName(""); // 需要从产品表查询，暂时设为空
+            dto.setName(spec.getName());
+            dto.setDescription(spec.getDescription());
+            dto.setDurationDays(spec.getDurationDays());
+            dto.setPrice(spec.getPrice());
+            dto.setStockQuantity(spec.getStockQuantity());
+            // 直接返回数据库中的英文状态值，前端负责显示映射
+            dto.setStatus(spec.getStatus());
+            dto.setCreatedAt(spec.getCreatedAt());
+            dto.setUpdatedAt(spec.getUpdatedAt());
+            
+            // 统计该规格的卡密信息
+            QueryWrapper<CardKey> cardKeyQuery = new QueryWrapper<>();
+            cardKeyQuery.eq("specification_id", spec.getId());
+            
+            List<CardKey> cardKeys = cardKeyService.list(cardKeyQuery);
+            
+            // 计算各种状态的卡密数量
+            int totalKeys = cardKeys.size();
+            int usedKeys = (int) cardKeys.stream().filter(card -> "已使用".equals(card.getStatus())).count();
+            int unusedKeys = (int) cardKeys.stream().filter(card -> "未使用".equals(card.getStatus())).count();
+            int disabledKeys = (int) cardKeys.stream().filter(card -> "已禁用".equals(card.getStatus())).count();
+            
+            dto.setTotalKeys(totalKeys);
+            dto.setUsedKeys(usedKeys);
+            dto.setUnusedKeys(unusedKeys);
+            dto.setDisabledKeys(disabledKeys);
+            
+            return dto;
+        }).collect(Collectors.toList());
+        
+        // 创建分页结果
+        Page<SpecificationDTO> resultPage = new Page<>(specificationPage.getCurrent(), specificationPage.getSize(), specificationPage.getTotal());
+        resultPage.setRecords(dtoList);
+        
+        return resultPage;
+    }
+    
+    @Override
     public Specification findByName(String name) {
         QueryWrapper<Specification> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("name", name);
@@ -125,10 +187,7 @@ public class SpecificationServiceImpl extends ServiceImpl<SpecificationMapper, S
     }
     
     @Override
-    public com.baomidou.mybatisplus.core.metadata.IPage<Specification> getSpecificationsWithFilters(
-            com.baomidou.mybatisplus.extension.plugins.pagination.Page<Specification> page, 
-            String keyword, 
-            Long productId) {
+    public IPage<Specification> getSpecificationsWithFilters(Page<Specification> page, String keyword, Long productId) {
         
         QueryWrapper<Specification> queryWrapper = new QueryWrapper<>();
         

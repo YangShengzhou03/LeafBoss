@@ -1903,16 +1903,16 @@ sudo mkdir -p /root/project/frontend
 ### 生产环境部署脚本
 
 ```bash
-# 停止当前可能运行的进程 
-ps -ef | grep backend.jar | grep -v grep | awk '{print $2}' | xargs kill -9 
- 
-# 重新启动后端服务（使用生产环境配置） 
-cd /root/project/backend 
-nohup ./jdk-17.0.17+10-jre/bin/java -jar backend.jar \ 
-  --spring.config.location=file:./application.yml \ 
-  --spring.profiles.active=prod > backend.log 2>&1 & 
- 
-# 查看启动日志确认服务状态 
+# 停止当前可能运行的进程
+ps -ef | grep backend.jar | grep -v grep | awk '{print $2}' | xargs kill -9
+
+# 重新启动后端服务（使用生产环境配置）
+cd /root/project/backend
+nohup ./jdk-17.0.17+10-jre/bin/java -jar backend.jar \
+  --spring.config.location=file:./application.yml \
+  --spring.profiles.active=prod > backend.log 2>&1 &
+
+# 查看启动日志确认服务状态
 tail -f backend.log
 ```
 

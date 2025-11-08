@@ -188,4 +188,18 @@ public class SpecificationController {
         List<SpecificationDTO> specificationDTOs = specificationService.getSpecificationDTOs();
         return Result.success(specificationDTOs);
     }
+
+    /**
+     * 分页获取规格DTO列表（包含卡密统计信息）
+     */
+    @GetMapping("/dto/pagination")
+    public Result<IPage<SpecificationDTO>> getSpecificationDTOsWithPagination(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) Long productId) {
+        Page<Specification> pageInfo = new Page<>(page, size);
+        IPage<SpecificationDTO> result = specificationService.getSpecificationDTOsWithPagination(pageInfo, keyword, productId);
+        return Result.success(result);
+    }
 }

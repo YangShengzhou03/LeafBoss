@@ -6,6 +6,9 @@ import com.leafcard.entity.CardKey;
 
 import java.util.List;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+
 /**
  * 卡密服务接口
  */
@@ -22,14 +25,9 @@ public interface CardKeyService extends IService<CardKey> {
     List<CardKey> findByStatus(String status);
     
     /**
-     * 获取包含商品和规格名称的卡密列表
+     * 获取包含商品和规格名称的卡密列表（支持分页）
      */
-    List<CardKeyDTO> getCardKeyListWithDetails();
-    
-    /**
-     * 获取包含商品和规格名称的卡密列表（支持筛选）
-     */
-    List<CardKeyDTO> getCardKeyListWithDetails(String keyword, Long specificationId);
+    IPage<CardKeyDTO> getCardKeyListWithDetails(Page<CardKey> pageParam, String keyword, Long specificationId);
     
     /**
      * 激活卡密
