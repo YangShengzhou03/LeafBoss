@@ -33,6 +33,7 @@
             <el-button type="primary" @click="handleSearch">查询</el-button>
             <el-button @click="resetFilter">重置</el-button>
             <div style="flex: 1;"></div>
+            <el-button type="success" @click="handleExport">导出卡密</el-button>
             <el-button type="danger" @click="handleClearUsed">清空已使用</el-button>
           </el-col>
         </el-row>
@@ -222,6 +223,80 @@ const copyCardKey = async (cardKey) => {
     document.execCommand('copy')
     document.body.removeChild(textArea)
     ElMessage.success('卡密已复制到剪贴板')
+  }
+}
+
+const handleExport = async () => {
+  try {
+    // 确认导出
+    await ElMessageBox.confirm(
+      `确定要导出卡密吗？${specificationFilter.value ? '将导出当前筛选规格的所有卡密。' : '将导出所有卡密。'}`,
+      '确认导出',
+      {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'info'
+      }
+    )
+    
+    // 显示加载提示
+    const loadingMessage = ElMessage({
+      message: '正在获取卡密数据...',
+      type: 'info',
+      duration: 0
+    })
+    
+    try {
+      // 获取所有卡密数据（不分页）
+      const response = await api.admin.getCardKeyListWithDetails({
+        page: 1,
+        size: 10000, // 设置较大的size获取所有数据
+        keyword: searchQuery.value,
+        specificationId: specificationFilter.value
+      })
+      
+      if (response && response.data) {
+        const cardKeyList = response.data.records || response.data.content || response.data || []
+        
+        if (cardKeyList.length === 0) {
+          loadingMessage.close()
+          ElMessage.warning('没有找到可导出的卡密数据')
+          return
+        }
+        
+        // 提取卡密内容，每行一个
+        const cardKeyContent = cardKeyList.map(cardKey => cardKey.cardKey).join('\n')
+        
+        // 生成文件名
+        const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-')
+        const specName = specifications.value.find(spec => spec.id === specificationFilter.value)?.name || '全部'
+        const fileName = `卡密导出_${specName}_${timestamp}.txt`
+        
+        // 创建Blob并下载
+        const blob = new Blob([cardKeyContent], { type: 'text/plain;charset=utf-8' })
+        const url = URL.createObjectURL(blob)
+        const link = document.createElement('a')
+        link.href = url
+        link.download = fileName
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        URL.revokeObjectURL(url)
+        
+        loadingMessage.close()
+        ElMessage.success(`成功导出 ${cardKeyList.length} 个卡密`)
+      } else {
+        loadingMessage.close()
+        ElMessage.error('获取卡密数据失败')
+      }
+    } catch (error) {
+      loadingMessage.close()
+      ElMessage.error('导出卡密失败，请检查网络连接')
+    }
+  } catch (error) {
+    if (error !== 'cancel') {
+      ElMessage.error('导出卡密失败，请检查网络连接')
+    }
   }
 }
 

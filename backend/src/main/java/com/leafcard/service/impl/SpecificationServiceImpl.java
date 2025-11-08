@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -136,6 +137,21 @@ public class SpecificationServiceImpl extends ServiceImpl<SpecificationMapper, S
         // 执行分页查询
         IPage<Specification> specificationPage = this.page(page, queryWrapper);
         
+        // 获取当前页规格的ID列表
+        List<Integer> specificationIds = specificationPage.getRecords().stream()
+                .map(Specification::getId)
+                .collect(Collectors.toList());
+        
+        // 如果当前页没有规格数据，直接返回空结果
+        if (specificationIds.isEmpty()) {
+            Page<SpecificationDTO> resultPage = new Page<>(specificationPage.getCurrent(), specificationPage.getSize(), specificationPage.getTotal());
+            resultPage.setRecords(new ArrayList<>());
+            return resultPage;
+        }
+        
+        // 一次性查询所有规格的卡密统计信息（避免N+1查询）
+        Map<Integer, CardKeyStatistics> statisticsMap = getCardKeyStatisticsBySpecificationIds(specificationIds);
+        
         // 转换为DTO并添加卡密统计信息
         List<SpecificationDTO> dtoList = specificationPage.getRecords().stream().map(spec -> {
             SpecificationDTO dto = new SpecificationDTO();
@@ -152,22 +168,20 @@ public class SpecificationServiceImpl extends ServiceImpl<SpecificationMapper, S
             dto.setCreatedAt(spec.getCreatedAt());
             dto.setUpdatedAt(spec.getUpdatedAt());
             
-            // 统计该规格的卡密信息
-            QueryWrapper<CardKey> cardKeyQuery = new QueryWrapper<>();
-            cardKeyQuery.eq("specification_id", spec.getId());
-            
-            List<CardKey> cardKeys = cardKeyService.list(cardKeyQuery);
-            
-            // 计算各种状态的卡密数量
-            int totalKeys = cardKeys.size();
-            int usedKeys = (int) cardKeys.stream().filter(card -> "已使用".equals(card.getStatus())).count();
-            int unusedKeys = (int) cardKeys.stream().filter(card -> "未使用".equals(card.getStatus())).count();
-            int disabledKeys = (int) cardKeys.stream().filter(card -> "已禁用".equals(card.getStatus())).count();
-            
-            dto.setTotalKeys(totalKeys);
-            dto.setUsedKeys(usedKeys);
-            dto.setUnusedKeys(unusedKeys);
-            dto.setDisabledKeys(disabledKeys);
+            // 从统计Map中获取卡密统计信息
+            CardKeyStatistics stats = statisticsMap.get(spec.getId());
+            if (stats != null) {
+                dto.setTotalKeys(stats.getTotalKeys());
+                dto.setUsedKeys(stats.getUsedKeys());
+                dto.setUnusedKeys(stats.getUnusedKeys());
+                dto.setDisabledKeys(stats.getDisabledKeys());
+            } else {
+                // 如果没有统计信息，设为0
+                dto.setTotalKeys(0);
+                dto.setUsedKeys(0);
+                dto.setUnusedKeys(0);
+                dto.setDisabledKeys(0);
+            }
             
             return dto;
         }).collect(Collectors.toList());
@@ -177,6 +191,71 @@ public class SpecificationServiceImpl extends ServiceImpl<SpecificationMapper, S
         resultPage.setRecords(dtoList);
         
         return resultPage;
+    }
+    
+    /**
+     * 根据规格ID列表获取卡密统计信息
+     */
+    private Map<Integer, CardKeyStatistics> getCardKeyStatisticsBySpecificationIds(List<Integer> specificationIds) {
+        Map<Integer, CardKeyStatistics> statisticsMap = new HashMap<>();
+        
+        // 使用SQL查询一次性获取所有规格的卡密统计
+        QueryWrapper<CardKey> queryWrapper = new QueryWrapper<>();
+        queryWrapper.in("specification_id", specificationIds);
+        queryWrapper.select("specification_id", "status", "COUNT(*) as count");
+        queryWrapper.groupBy("specification_id", "status");
+        
+        List<Map<String, Object>> statisticsList = cardKeyService.listMaps(queryWrapper);
+        
+        // 初始化所有规格的统计信息
+        for (Integer specId : specificationIds) {
+            statisticsMap.put(specId, new CardKeyStatistics());
+        }
+        
+        // 填充统计信息
+        for (Map<String, Object> stat : statisticsList) {
+            Integer specId = (Integer) stat.get("specification_id");
+            String status = (String) stat.get("status");
+            Long count = (Long) stat.get("count");
+            
+            CardKeyStatistics stats = statisticsMap.get(specId);
+            if (stats != null) {
+                switch (status) {
+                    case "未使用":
+                        stats.setUnusedKeys(count.intValue());
+                        break;
+                    case "已使用":
+                        stats.setUsedKeys(count.intValue());
+                        break;
+                    case "已禁用":
+                        stats.setDisabledKeys(count.intValue());
+                        break;
+                }
+                // 计算总数
+                stats.setTotalKeys(stats.getUnusedKeys() + stats.getUsedKeys() + stats.getDisabledKeys());
+            }
+        }
+        
+        return statisticsMap;
+    }
+    
+    /**
+     * 卡密统计信息内部类
+     */
+    private static class CardKeyStatistics {
+        private int totalKeys = 0;
+        private int usedKeys = 0;
+        private int unusedKeys = 0;
+        private int disabledKeys = 0;
+        
+        public int getTotalKeys() { return totalKeys; }
+        public void setTotalKeys(int totalKeys) { this.totalKeys = totalKeys; }
+        public int getUsedKeys() { return usedKeys; }
+        public void setUsedKeys(int usedKeys) { this.usedKeys = usedKeys; }
+        public int getUnusedKeys() { return unusedKeys; }
+        public void setUnusedKeys(int unusedKeys) { this.unusedKeys = unusedKeys; }
+        public int getDisabledKeys() { return disabledKeys; }
+        public void setDisabledKeys(int disabledKeys) { this.disabledKeys = disabledKeys; }
     }
     
     @Override
