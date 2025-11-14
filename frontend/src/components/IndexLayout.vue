@@ -216,7 +216,7 @@ const handleStart = () => {
 const handleDownload = () => {
   try {
     // 打开指定的下载链接
-    window.open('https://gitee.com/Yangshengzhou/yang-shengzhou/releases/download/v2.0/WinQSB%202.0.rar', '_blank')
+    window.open('https://gitee.com/Yangshengzhou/yang-shengzhou/releases/download/v2.0/WinQSB.rar', '_blank')
     ElMessage.success('正在下载客户端...')
   } catch (error) {
     ElMessage.error('下载链接打开失败，请重试')
