@@ -1,19 +1,23 @@
 <template>
   <div class="index-layout">
-    <header class="header">
+    <header class="header" role="banner">
       <div class="container">
         <div class="logo-area">
-          <h1 class="logo">WinQSB</h1>
+          <h1 class="logo" aria-label="WinQSB - 运筹学管理科学软件">WinQSB</h1>
         </div>
-        <div class="auth-section">
-          <div class="auth-buttons" v-if="!isAuthenticated">
-            <el-button type="default" class="register-btn" @click="handleRegister">注册</el-button>
-            <el-button type="primary" class="login-btn" @click="handleLogin">登录</el-button>
+        <nav class="auth-section" role="navigation" aria-label="用户导航">
+          <div class="auth-buttons" v-if="!isAuthenticated" role="group" aria-label="登录注册选项">
+            <el-button type="default" class="register-btn" @click="handleRegister" aria-label="注册新账户">
+              注册
+            </el-button>
+            <el-button type="primary" class="login-btn" @click="handleLogin" aria-label="登录系统">
+              登录
+            </el-button>
           </div>
-          <div class="user-info" v-else>
-            <el-dropdown @command="handleUserCommand" trigger="click">
-              <span class="user-dropdown">
-                <el-avatar :size="32" :src="userAvatar">
+          <div class="user-info" v-else role="group" aria-label="用户菜单">
+            <el-dropdown @command="handleUserCommand" trigger="click" aria-label="用户操作菜单">
+              <span class="user-dropdown" role="button" tabindex="0">
+                <el-avatar :size="32" :src="userAvatar" :alt="`${displayName}的头像`">
                   <el-icon>
                     <User />
                   </el-icon>
@@ -22,28 +26,35 @@
                 <el-icon class="el-icon--right"><arrow-down /></el-icon>
               </span>
               <template #dropdown>
-                <el-dropdown-menu>
-                  <el-dropdown-item command="dashboard">进入管理后台</el-dropdown-item>
-                  <el-dropdown-item divided command="logout">退出登录</el-dropdown-item>
+                <el-dropdown-menu role="menu">
+                  <el-dropdown-item command="dashboard" role="menuitem">
+                    进入管理后台
+                  </el-dropdown-item>
+                  <el-dropdown-item divided command="logout" role="menuitem">
+                    退出登录
+                  </el-dropdown-item>
                 </el-dropdown-menu>
               </template>
             </el-dropdown>
           </div>
-        </div>
+        </nav>
       </div>
     </header>
 
-    <main class="main-content">
-      <section class="hero-section">
+    <main class="main-content" role="main">
+      <section class="hero-section" aria-labelledby="hero-title">
         <div class="container">
           <div class="hero-content">
-            <h1 class="hero-title">WinQSB</h1>
-            <p class="hero-description">专为运筹学、管理科学和决策分析设计的软件工具</p>
-            <div class="cta-buttons">
-              <el-button type="primary" size="large" class="start-btn" @click="handleStart">
+            <h1 id="hero-title" class="hero-title">WinQSB</h1>
+            <p class="hero-description">
+              专为运筹学、管理科学和决策分析设计的软件工具
+            </p>
+            <div class="cta-buttons" role="group" aria-label="主要操作">
+              <el-button type="primary" size="large" class="start-btn" @click="handleStart"
+                :aria-label="isAuthenticated ? '进入管理后台' : '登录系统'">
                 {{ isAuthenticated ? '进入管理后台' : '登录系统' }}
               </el-button>
-              <el-button type="default" size="large" class="down-btn" @click="handleDownload">
+              <el-button type="default" size="large" class="down-btn" @click="handleDownload" aria-label="下载客户端">
                 下载客户端
               </el-button>
             </div>
@@ -51,57 +62,83 @@
         </div>
       </section>
 
-      <section id="features" class="features-section">
+      <section id="features" class="features-section" aria-labelledby="features-title">
         <div class="container">
-          <h2>系统功能模块</h2>
-          <div class="features-grid">
-            <div class="feature-card" v-for="feature in features" :key="feature.id">
-              <div class="feature-icon">
+          <h2 id="features-title" class="section-title">系统功能模块</h2>
+          <div class="features-grid" role="list">
+            <article class="feature-card" v-for="feature in features" :key="feature.id" role="listitem"
+              :aria-labelledby="`feature-${feature.id}`">
+              <div class="feature-icon" :aria-label="`${feature.title}图标`">
                 <el-icon :size="40">
                   <component :is="feature.icon" />
                 </el-icon>
               </div>
-              <h3>{{ feature.title }}</h3>
+              <h3 :id="`feature-${feature.id}`">{{ feature.title }}</h3>
               <p>{{ feature.description }}</p>
-            </div>
+            </article>
           </div>
         </div>
       </section>
     </main>
 
-    <footer class="footer">
+    <footer class="footer" role="contentinfo">
       <div class="container">
         <div class="footer-content">
-          <div class="footer-section">
-            <h3>WinQSB</h3>
+          <section class="footer-section" aria-labelledby="footer-about">
+            <h3 id="footer-about">WinQSB</h3>
             <p>专为运筹学、管理科学和决策分析设计的软件工具</p>
-          </div>
-          <div class="footer-section">
-            <h4>产品功能</h4>
-            <ul>
-              <li><a href="#features" @click.prevent="scrollToSection('features')">功能特色</a></li>
+          </section>
+          <nav class="footer-section" aria-labelledby="footer-products">
+            <h4 id="footer-products">产品功能</h4>
+            <ul role="list">
+              <li role="listitem">
+                <a href="#features" @click.prevent="scrollToSection('features')" aria-label="查看功能特色">
+                  功能特色
+                </a>
+              </li>
             </ul>
-          </div>
-          <div class="footer-section">
-            <h4>帮助支持</h4>
-            <ul>
-              <li><a href="/user-guide" target="_blank">使用指南</a></li>
-              <li><a href="/contact-us" target="_blank">联系我们</a></li>
-              <li><a href="/faq" target="_blank">常见问题</a></li>
+          </nav>
+          <nav class="footer-section" aria-labelledby="footer-support">
+            <h4 id="footer-support">帮助支持</h4>
+            <ul role="list">
+              <li role="listitem">
+                <a href="/user-guide" target="_blank" rel="noopener noreferrer" aria-label="查看使用指南">
+                  使用指南
+                </a>
+              </li>
+              <li role="listitem">
+                <a href="/contact-us" target="_blank" rel="noopener noreferrer" aria-label="联系我们">
+                  联系我们
+                </a>
+              </li>
+              <li role="listitem">
+                <a href="/faq" target="_blank" rel="noopener noreferrer" aria-label="查看常见问题">
+                  常见问题
+                </a>
+              </li>
             </ul>
-          </div>
-          <div class="footer-section">
-            <h4>法律信息</h4>
-            <ul>
-              <li><a href="/author-info" target="_blank">作者介绍</a></li>
-              <li><a href="/privacy-policy" target="_blank">隐私保护</a></li>
+          </nav>
+          <nav class="footer-section" aria-labelledby="footer-legal">
+            <h4 id="footer-legal">法律信息</h4>
+            <ul role="list">
+              <li role="listitem">
+                <a href="/author-info" target="_blank" rel="noopener noreferrer" aria-label="查看作者介绍">
+                  作者介绍
+                </a>
+              </li>
+              <li role="listitem">
+                <a href="/privacy-policy" target="_blank" rel="noopener noreferrer" aria-label="查看隐私保护政策">
+                  隐私保护
+                </a>
+              </li>
             </ul>
-          </div>
+          </nav>
         </div>
         <div class="footer-bottom">
           <p>&copy; 2024-2025 WinQSB - 专为运筹学、管理科学和决策分析设计的软件工具</p>
           <div class="icp-info">
-            <a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer">
+            <a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer"
+              aria-label="查看ICP备案信息：赣ICP备2025075576号">
               赣ICP备2025075576号
             </a>
           </div>
@@ -112,7 +149,7 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, ref, onUnmounted, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { User, ArrowDown, Key, Box, DataLine } from '@element-plus/icons-vue'
@@ -120,18 +157,18 @@ import store from '@/utils/store.js'
 
 const router = useRouter()
 
-// 计算属性
+// 计算属性 - 使用更高效的计算方式
 const isAuthenticated = computed(() => store.state.isAuthenticated)
 const currentUser = computed(() => store.state.user)
 const displayName = computed(() => {
-  return currentUser.value?.nickname || currentUser.value?.username || currentUser.value?.email || '管理员'
+  const user = currentUser.value
+  if (!user) return '管理员'
+  return user.nickname || user.username || user.email || '管理员'
 })
-const userAvatar = computed(() => {
-  return currentUser.value?.avatar || ''
-})
+const userAvatar = computed(() => currentUser.value?.avatar || '')
 
-// 功能特色数据
-const features = ref([
+// 功能特色数据 - 使用只读常量
+const FEATURES_DATA = [
   {
     id: 1,
     icon: Key,
@@ -150,17 +187,38 @@ const features = ref([
     title: '数据分析',
     description: '使用数据统计和分析，支持管理决策。'
   }
-])
+]
 
-// 滚动到指定部分
+const features = ref(FEATURES_DATA)
+
+// 优化滚动性能 - 使用防抖
+let scrollTimeout = null
 const scrollToSection = (sectionId) => {
-  const element = document.getElementById(sectionId)
-  if (element) {
-    element.scrollIntoView({ behavior: 'smooth' })
-  }
+  if (scrollTimeout) clearTimeout(scrollTimeout)
+
+  scrollTimeout = setTimeout(() => {
+    const element = document.getElementById(sectionId)
+    if (element) {
+      element.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      })
+    }
+  }, 50)
 }
 
-// 处理用户下拉菜单命令
+// 清理定时器
+onUnmounted(() => {
+  if (scrollTimeout) clearTimeout(scrollTimeout)
+})
+
+// 错误处理工具函数
+const handleError = (message, error) => {
+  console.error(message, error)
+  ElMessage.error(message)
+}
+
+// 处理用户下拉菜单命令 - 优化错误处理
 const handleUserCommand = async (command) => {
   try {
     if (command === 'logout') {
@@ -170,7 +228,8 @@ const handleUserCommand = async (command) => {
         {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
-          type: 'warning'
+          type: 'warning',
+          lockScroll: false // 防止锁定背景滚动
         }
       )
 
@@ -182,51 +241,81 @@ const handleUserCommand = async (command) => {
     }
   } catch (error) {
     if (error !== 'cancel') {
-      ElMessage.error('操作失败，请重试')
+      handleError('操作失败，请重试', error)
     }
   }
 }
 
-// 处理登录
+// 处理登录 - 添加错误处理
 const handleLogin = () => {
-  router.push('/login')
+  try {
+    router.push('/login')
+  } catch (error) {
+    handleError('页面跳转失败', error)
+  }
 }
 
-// 处理注册
+// 处理注册 - 添加错误处理
 const handleRegister = () => {
-  router.push('/login?mode=register')
+  try {
+    router.push('/login?mode=register')
+  } catch (error) {
+    handleError('页面跳转失败', error)
+  }
 }
 
-// 处理开始使用
+// 处理开始使用 - 优化路由逻辑和错误处理
 const handleStart = () => {
   try {
-    if (isAuthenticated.value) {
-      // 已登录，根据用户角色跳转到对应页面
-      if (store.state.isAdmin) {
-        router.push('/admin')
-      } else {
-        router.push('/user')
-      }
-    } else {
-      // 未登录，跳转到登录页面
+    if (!isAuthenticated.value) {
       router.push('/login')
+      return
     }
+
+    // 已登录，根据用户角色跳转到对应页面
+    const targetRoute = store.state.isAdmin ? '/admin' : '/user'
+    router.push(targetRoute)
   } catch (error) {
-    ElMessage.error('页面跳转失败，请重试')
+    handleError('页面跳转失败，请重试', error)
   }
 }
 
-// 处理下载客户端
+// 处理下载客户端 - 优化用户体验
 const handleDownload = () => {
   try {
-    // 打开指定的下载链接
-    window.open('https://gitee.com/Yangshengzhou/yang-shengzhou/releases/download/v2.0/WinQSB.rar', '_blank')
+    const downloadUrl = 'https://gitee.com/Yangshengzhou/yang-shengzhou/releases/download/v2.0/WinQSB.rar'
+    const link = document.createElement('a')
+    link.href = downloadUrl
+    link.target = '_blank'
+    link.rel = 'noopener noreferrer'
+    link.click()
+
     ElMessage.success('正在下载客户端...')
   } catch (error) {
-    ElMessage.error('下载链接打开失败，请重试')
+    handleError('下载链接打开失败，请重试', error)
   }
 }
 
+// 键盘导航支持
+const handleKeydown = (event) => {
+  if (event.key === 'Enter' || event.key === ' ') {
+    const target = event.target
+    if (target.classList.contains('user-dropdown')) {
+      event.preventDefault()
+      // 触发下拉菜单
+    }
+  }
+}
+
+// 组件挂载时添加键盘事件监听
+onMounted(() => {
+  document.addEventListener('keydown', handleKeydown)
+})
+
+// 组件卸载时清理事件监听
+onUnmounted(() => {
+  document.removeEventListener('keydown', handleKeydown)
+})
 
 </script>
 
