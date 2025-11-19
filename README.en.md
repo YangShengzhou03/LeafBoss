@@ -17,12 +17,15 @@ LeafCard is a modern card verification backend management system built with a fr
 
 ### ✨ Key Features
 
-- 🚀 **Modern Frontend**: Vue 3 + Element Plus based interface
-- 🔒 **Stable Backend**: Spring Boot framework with reliable API services
-- 📱 **Responsive Design**: Multi-device compatibility
-- 🔐 **Authentication**: Complete user authentication and permission management
-- 📊 **Data Visualization**: Statistical analysis and reporting
-- 🛡️ **Security**: Secure and reliable card verification mechanism
+- 🎯 **Card Key Management**: Complete card key lifecycle management with creation, verification, activation, and deactivation
+- 📦 **Product Management**: Product information management with multi-specification support
+- 📋 **Specification Management**: Flexible specification definition for different durations and prices
+- 👥 **Admin Management**: Administrator account management with permission control
+- 📊 **Data Statistics**: Visual data reports with real-time system usage monitoring
+- 📝 **Operation Logs**: Complete operation audit logs for system operation tracking
+- 🔐 **Authentication**: JWT Token authentication mechanism for system security
+- 📱 **Responsive Design**: Multi-device compatibility for PC, tablet, and mobile
+- ⚡ **High Performance**: High-performance architecture based on Spring Boot 3 and Vue 3
 
 ## 🏗️ Software Architecture
 
@@ -39,22 +42,62 @@ LeafCard is a modern card verification backend management system built with a fr
 - **Spring Boot 3.1.0** - Java enterprise development framework
 - **MyBatis Plus 3.5.4.1** - Data persistence layer framework
 - **MySQL 8.0.33** - Relational database
-- **Maven** - Project build tool
+- **Maven 3.6+** - Project build tool
 - **Java 17** - Development language
+- **JWT 0.11.5** - JSON Web Token authentication
+- **Guava 32.1.2** - Google core libraries
 
 **Project Structure:**
 ```
 leaf-card/
 ├── frontend/                 # Frontend project
-│   ├── src/
+│   ├── public/              # Static resources
+│   │   ├── index.html       # HTML template
+│   │   └── favicon.ico      # Website icon
+│   ├── src/                 # Source code
 │   │   ├── components/      # Common components
+│   │   │   ├── Layout/      # Layout components
+│   │   │   ├── Card/        # Card key related components
+│   │   │   ├── Product/     # Product related components
+│   │   │   ├── Specification/ # Specification related components
+│   │   │   └── User/        # User related components
 │   │   ├── views/           # Page components
-│   │   ├── route/           # Routing configuration
+│   │   │   ├── Dashboard.vue # Dashboard
+│   │   │   ├── CardManagement.vue # Card key management
+│   │   │   ├── ProductManagement.vue # Product management
+│   │   │   ├── SpecificationManagement.vue # Specification management
+│   │   │   ├── OperationLog.vue # Operation logs
+│   │   │   └── UserManagement.vue # User management
+│   │   ├── router/          # Routing configuration
 │   │   ├── services/        # API services
-│   │   └── utils/           # Utility functions
-│   └── public/              # Static resources
+│   │   ├── utils/           # Utility functions
+│   │   ├── assets/          # Static assets
+│   │   ├── store/           # State management
+│   │   └── App.vue          # Root component
+│   ├── package.json         # Dependency configuration
+│   └── vue.config.js        # Vue configuration
 └── backend/                 # Backend project
-    └── src/main/java/       # Java source code
+    ├── src/main/java/       # Java source code
+    │   ├── controller/      # Controller layer
+    │   │   ├── AuthController.java # Authentication controller
+    │   │   ├── ProductController.java # Product controller
+    │   │   ├── SpecificationController.java # Specification controller
+    │   │   ├── CardKeyController.java # Card key controller
+    │   │   ├── OperationLogController.java # Operation log controller
+    │   │   └── AdminController.java # Admin controller
+    │   ├── service/         # Service layer
+    │   ├── repository/      # Data access layer
+    │   ├── entity/          # Entity classes
+    │   ├── dto/             # Data transfer objects
+    │   ├── config/          # Configuration classes
+    │   ├── interceptor/     # Interceptors
+    │   ├── annotation/      # Custom annotations
+    │   ├── enums/           # Enum classes
+    │   └── utils/           # Utility classes
+    ├── src/main/resources/  # Resource files
+    │   ├── application.properties # Application configuration
+    │   └── data.sql         # Initial data
+    └── pom.xml              # Maven configuration
 ```
 
 ## ⚙️ Installation
@@ -94,14 +137,32 @@ npm run build
 1. **Configure database**
 ```sql
 CREATE DATABASE leaf_card CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- Create user and grant privileges
+CREATE USER 'leafcard_user'@'%' IDENTIFIED BY 'your_password';
+GRANT ALL PRIVILEGES ON leaf_card.* TO 'leafcard_user'@'%';
+FLUSH PRIVILEGES;
+
+-- Execute initialization script
+USE leaf_card;
+SOURCE data.sql;
 ```
 
 2. **Modify database configuration**
 Edit `backend/src/main/resources/application.properties`:
 ```properties
+# Database configuration
 spring.datasource.url=jdbc:mysql://localhost:3306/leaf_card
-spring.datasource.username=your_username
+spring.datasource.username=leafcard_user
 spring.datasource.password=your_password
+
+# JWT configuration
+jwt.secret=your-jwt-secret-key
+jwt.expiration=86400
+
+# Server configuration
+server.port=8081
+server.servlet.context-path=/api
 ```
 
 3. **Compile and run backend**
@@ -117,21 +178,24 @@ java -jar target/leaf-card-backend-1.0.0.jar
 
 1. **Start Backend Service**
    - Ensure MySQL service is running
-   - Start backend application (default port 8080)
+   - Start backend application (default port 8081)
 
 2. **Start Frontend Service**
-   - Frontend development server (default port 8081)
-   - Access http://localhost:8081
+   - Frontend development server (default port 8080)
+   - Access http://localhost:8080
 
 3. **System Login**
-   - Default admin account: admin@leafcard.com / 123456
+   - Default admin account: admin@qq.com / 123456
    - Change default password on first use
 
 ### 📋 Main Function Modules
 
-- **👥 User Management**: User registration, login, permission management
-- **💳 Card Management**: Card creation, verification, status management
-- **📊 Data Statistics**: Usage statistics and report generation
+- **🎯 Card Key Management**: Complete card key lifecycle management with creation, verification, activation, and deactivation
+- **📦 Product Management**: Product information management with multi-specification support
+- **📋 Specification Management**: Flexible specification definition for different durations and prices
+- **👥 Admin Management**: Administrator account management with permission control
+- **📊 Data Statistics**: Visual data reports with real-time system usage monitoring
+- **📝 Operation Logs**: Complete operation audit logs for system operation tracking
 - **⚙️ System Settings**: System parameter configuration and permission settings
 
 ## 💻 Development Guide

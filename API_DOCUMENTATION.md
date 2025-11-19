@@ -2,7 +2,7 @@
 
 ## 文档概述
 
-本文档详细描述了 LeafCard 系统的 RESTful API 接口，包括认证管理、产品管理、规格管理、卡密管理、订单管理、支付管理、用户管理、系统管理等功能模块。
+本文档详细描述了 LeafCard 卡密管理系统的 RESTful API 接口，包括认证管理、产品管理、规格管理、卡密管理、操作日志、数据统计等功能模块。
 
 ## 快速开始
 
@@ -11,20 +11,21 @@
 确保您的开发环境满足以下要求：
 
 - **Java**: 17+
-- **Spring Boot**: 3.0+
-- **MySQL**: 8.0+
-- **Redis**: 6.0+
+- **Spring Boot**: 3.1.0
+- **MySQL**: 8.0.33+
+- **Maven**: 3.6+
+- **Node.js**: 16+ (前端开发)
 
 ### 获取访问令牌
 
-在调用 API 之前，您需要先获取访问令牌：
+在调用 API 之前，您需要先获取访问令牌。系统默认端口为8081：
 
 ```bash
-curl -X POST "http://localhost:8080/api/auth/login" \
+curl -X POST "http://localhost:8081/api/auth/login" \
   -H "Content-Type: application/json" \
   -d '{
-    "email": "admin@leafcard.com",
-    "password": "admin123"
+    "email": "admin@qq.com",
+    "password": "123456"
   }'
 ```
 
@@ -35,7 +36,7 @@ curl -X POST "http://localhost:8080/api/auth/login" \
     "message": "登录成功",
     "data": {
         "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-        "expiresIn": 3600
+        "expiresIn": 86400
     }
 }
 ```
@@ -51,12 +52,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ### 卡密验证示例
 
 ```bash
-curl -X POST "http://localhost:8080/api/cards/validate" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "cardNumber": "LC202401010001",
-    "cardPassword": "123456"
-  }'
+curl -X GET "http://localhost:8081/api/public/card-keys/verify/vD2Sbh1OXLLKPFBfB49JnCaV0atSlyQh"
 ```
 
 ## 公共卡密验证激活 API
@@ -72,7 +68,7 @@ curl -X POST "http://localhost:8080/api/cards/validate" \
 **请求示例**:
 ```bash
 # 验证卡密示例
-curl -X GET "http://120.55.50.51/api/public/card-keys/verify/vD2Sbh1OXLLKPFBfB49JnCaV0atSlyQh"
+curl -X GET "http://localhost:8081/api/public/card-keys/verify/vD2Sbh1OXLLKPFBfB49JnCaV0atSlyQh"
 ```
 
 **响应示例** (验证成功):
@@ -80,7 +76,14 @@ curl -X GET "http://120.55.50.51/api/public/card-keys/verify/vD2Sbh1OXLLKPFBfB49
 {
     "code": 200,
     "message": "验证成功",
-    "data": "VIP会员-月卡"
+    "data": {
+        "productName": "VIP会员",
+        "specificationName": "月卡",
+        "durationDays": 30,
+        "status": "已激活",
+        "activateTime": "2024-01-15T14:30:00",
+        "expireTime": "2024-02-14T14:30:00"
+    }
 }
 ```
 
@@ -125,7 +128,8 @@ curl -X GET "http://120.55.50.51/api/public/card-keys/verify/vD2Sbh1OXLLKPFBfB49
 
 ### 环境配置
 
-- **开发环境**: http://localhost:8080
+- **开发环境**: http://localhost:8081
+- **前端服务**: http://localhost:8080
 - **测试环境**: http://test.leafcard.com
 - **生产环境**: http://api.leafcard.com
 
@@ -191,8 +195,8 @@ curl -X GET "http://120.55.50.51/api/public/card-keys/verify/vD2Sbh1OXLLKPFBfB49
 **请求参数**:
 ```json
 {
-    "email": "admin@leafcard.com",
-    "password": "admin123"
+    "email": "admin@qq.com",
+    "password": "123456"
 }
 ```
 
@@ -203,7 +207,7 @@ curl -X GET "http://120.55.50.51/api/public/card-keys/verify/vD2Sbh1OXLLKPFBfB49
     "message": "登录成功",
     "data": {
         "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-        "expiresIn": 3600
+        "expiresIn": 86400
     },
     "timestamp": 1705315200000
 }
@@ -224,10 +228,9 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
     "code": 200,
     "message": "success",
     "data": {
-        "id": 1,
+        "id": "550e8400-e29b-41d4-a716-446655440000",
         "username": "admin",
-        "email": "admin@leafcard.com",
-        "passwordHash": "123456",
+        "email": "admin@qq.com",
         "status": "active",
         "lastLoginTime": "2024-01-15T14:30:00",
         "createdAt": "2024-01-01T00:00:00",
@@ -250,10 +253,9 @@ Content-Type: application/json
 **请求参数**:
 ```json
 {
-    "id": "1",
-    "email": "updated_admin@leafcard.com",
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "email": "updated_admin@qq.com",
     "username": "updated_admin",
-    "passwordHash": "new_password",
     "status": "active",
     "lastLoginTime": "2024-01-15T14:30:00",
     "createdAt": "2024-01-01T00:00:00",
@@ -280,9 +282,9 @@ Content-Type: application/json
 **请求参数**:
 ```json
 {
-    "email": "newuser@leafcard.com",
+    "email": "newuser@qq.com",
     "username": "newuser",
-    "passwordHash": "123456",
+    "password": "123456",
     "status": "active"
 }
 ```
@@ -437,6 +439,99 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
     "data": true,
     "timestamp": 1705315200000
 }
+```
+
+## 操作日志管理 API
+
+### 获取操作日志列表
+
+**接口地址**: `GET /api/operation-logs`
+
+**请求头**:
+```
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+**查询参数**:
+- `page` (可选): 页码，默认1
+- `size` (可选): 页大小，默认10
+- `startDate` (可选): 开始日期 (格式: yyyy-MM-dd)
+- `endDate` (可选): 结束日期 (格式: yyyy-MM-dd)
+- `operationType` (可选): 操作类型 (LOGIN, CARD_KEY, PRODUCT, SPECIFICATION, USER, SYSTEM)
+- `adminId` (可选): 管理员ID
+
+**响应示例**:
+```json
+{
+    "code": 200,
+    "message": "success",
+    "data": {
+        "records": [
+            {
+                "id": 1,
+                "operationType": "LOGIN",
+                "description": "管理员登录成功",
+                "ipAddress": "192.168.1.100",
+                "createdAt": "2024-01-15T14:30:00"
+            }
+        ],
+        "total": 100,
+        "size": 10,
+        "current": 1,
+        "pages": 10
+    }
+}
+```
+
+### 获取操作日志统计
+
+**接口地址**: `GET /api/operation-logs/stats`
+
+**请求头**:
+```
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+**查询参数**:
+- `startDate` (可选): 开始日期 (格式: yyyy-MM-dd)
+- `endDate` (可选): 结束日期 (格式: yyyy-MM-dd)
+
+**响应示例**:
+```json
+{
+    "code": 200,
+    "message": "success",
+    "data": {
+        "totalCount": 150,
+        "typeStats": {
+            "LOGIN": 45,
+            "CARD_KEY": 60,
+            "PRODUCT": 20,
+            "SPECIFICATION": 15,
+            "USER": 8,
+            "SYSTEM": 2
+        }
+    }
+}
+```
+
+### 清空操作日志
+
+**接口地址**: `DELETE /api/operation-logs`
+
+**请求头**:
+```
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+**响应示例**:
+```json
+{
+    "code": 200,
+    "message": "日志清空成功",
+    "data": true
+}
+```
 ```
 
 ## 产品管理 API
