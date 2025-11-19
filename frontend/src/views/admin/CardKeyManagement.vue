@@ -121,7 +121,10 @@ const total = ref(0)
 
 // 直接使用后端返回的分页数据，不需要前端再次分页
 const pagedCardKeys = computed(() => {
-  return cardKeys.value
+  if (!statusFilter.value) {
+    return cardKeys.value
+  }
+  return cardKeys.value.filter(cardKey => cardKey.status === statusFilter.value)
 })
 
 const getStatusTagType = (status) => {
@@ -162,7 +165,12 @@ const loadCardKeys = async () => {
       }))
 
       cardKeys.value = newCardKeys
-      total.value = response.data.total || response.data.totalElements || cardKeyList.length
+      // 当有状态筛选时，更新总数为过滤后的数量
+      if (statusFilter.value) {
+        total.value = newCardKeys.filter(cardKey => cardKey.status === statusFilter.value).length
+      } else {
+        total.value = response.data.total || response.data.totalElements || cardKeyList.length
+      }
     } else {
       cardKeys.value = []
       total.value = 0
