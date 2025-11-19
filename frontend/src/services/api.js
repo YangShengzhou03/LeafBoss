@@ -58,7 +58,8 @@ const AdminService = {
       page: params.page || 1,
       size: params.size || 10,
       keyword: params.keyword,
-      specificationId: params.specificationId
+      specificationId: params.specificationId,
+      status: params.status
     })
   },
 

@@ -27,7 +27,7 @@ public interface CardKeyService extends IService<CardKey> {
     /**
      * 获取包含商品和规格名称的卡密列表（支持分页）
      */
-    IPage<CardKeyDTO> getCardKeyListWithDetails(Page<CardKey> pageParam, String keyword, Long specificationId);
+    IPage<CardKeyDTO> getCardKeyListWithDetails(Page<CardKey> pageParam, String keyword, Long specificationId, String status);
     
     /**
      * 激活卡密

@@ -66,9 +66,10 @@ public class CardKeyController {
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) String keyword,
-            @RequestParam(required = false) Long specificationId) {
+            @RequestParam(required = false) Long specificationId,
+            @RequestParam(required = false) String status) {
         Page<CardKey> pageParam = new Page<>(page, size);
-        IPage<CardKeyDTO> cardKeyPage = cardKeyService.getCardKeyListWithDetails(pageParam, keyword, specificationId);
+        IPage<CardKeyDTO> cardKeyPage = cardKeyService.getCardKeyListWithDetails(pageParam, keyword, specificationId, status);
         return Result.success(cardKeyPage);
     }
 

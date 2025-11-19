@@ -48,8 +48,13 @@ public class CardKeyServiceImpl extends ServiceImpl<CardKeyMapper, CardKey> impl
     }
 
     @Override
-    public IPage<CardKeyDTO> getCardKeyListWithDetails(Page<CardKey> pageParam, String keyword, Long specificationId) {
+    public IPage<CardKeyDTO> getCardKeyListWithDetails(Page<CardKey> pageParam, String keyword, Long specificationId, String status) {
         QueryWrapper<CardKey> queryWrapper = new QueryWrapper<>();
+        
+        // 根据状态筛选
+        if (status != null && !status.trim().isEmpty()) {
+            queryWrapper.eq("status", status);
+        }
         
         // 根据规格ID筛选
         if (specificationId != null) {
