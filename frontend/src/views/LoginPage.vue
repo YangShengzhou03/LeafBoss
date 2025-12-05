@@ -13,7 +13,7 @@
         <!-- Logo区域 -->
         <div class="logo-section">
           <div class="logo">
-            <span class="logo-text">枫</span>
+            <span class="logo-text">羽</span>
           </div>
           <h1 class="app-title">LeafCard</h1>
           <p class="subtitle">管理员系统</p>
