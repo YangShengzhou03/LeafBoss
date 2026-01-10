@@ -19,7 +19,10 @@ LeafBoss is a modern business operation support system built with a frontend-bac
 - 🎯 **Card Key Management**: Complete card key lifecycle management with creation, verification, activation, and deactivation
 - 📦 **Product Management**: Product information management with multi-specification support
 - 📋 **Specification Management**: Flexible specification definition for different durations and prices
+- 🏢 **Company Management**: Company information management with comment statistics
+- 💬 **Review Management**: User review management with filtering by company and card key
 - 👥 **Admin Management**: Administrator account management with permission control
+- 👤 **Customer User Management**: Customer user information management with status control
 - 📊 **Data Statistics**: Visual data reports with real-time system usage monitoring
 - 📝 **Operation Logs**: Complete operation audit logs for system operation tracking
 - 🔐 **Authentication**: JWT Token authentication mechanism for system security
@@ -63,12 +66,16 @@ leaf-boss/
 │   │   │   │   │   ├── CardKeyGenerate.vue    # Card key generation
 │   │   │   │   │   ├── CardKeyManagement.vue  # Card key management
 │   │   │   │   │   └── CardKeyVerify.vue      # Card key verification
+│   │   │   │   ├── jobs/              # Business management pages
+│   │   │   │   │   ├── BossReviewManagement.vue  # Review management
+│   │   │   │   │   └── CompanyManagement.vue    # Company management
 │   │   │   │   ├── DashboardPage.vue          # Dashboard
 │   │   │   │   ├── LogsPage.vue               # Operation logs
 │   │   │   │   ├── ProductManagement.vue      # Product management
 │   │   │   │   ├── ProductSpecManagement.vue  # Specification management
 │   │   │   │   ├── ProfilePage.vue            # Profile
-│   │   │   │   └── UsersPage.vue              # User management
+│   │   │   │   ├── AdminsPage.vue            # Admin management
+│   │   │   │   └── CustomerUsersPage.vue      # User management
 │   │   │   └── index/                 # Home pages
 │   │   │       ├── AuthorInfoPage.vue         # Author info
 │   │   │       ├── ContactUsPage.vue          # Contact us
@@ -195,7 +202,10 @@ java -jar target/leaf-boss-backend-1.0.0.jar
 - **🎯 Card Key Management**: Complete card key lifecycle management with creation, verification, activation, and deactivation
 - **📦 Product Management**: Product information management with multi-specification support
 - **📋 Specification Management**: Flexible specification definition for different durations and prices
+- **🏢 Company Management**: Company information management with comment statistics
+- **💬 Review Management**: User review management with filtering by company and card key
 - **👥 Admin Management**: Administrator account management with permission control
+- **👤 Customer User Management**: Customer user information management with status control
 - **📊 Data Statistics**: Visual data reports with real-time system usage monitoring
 - **📝 Operation Logs**: Complete operation audit logs for system operation tracking
 - **⚙️ System Settings**: System parameter configuration and permission settings

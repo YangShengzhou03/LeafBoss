@@ -559,4 +559,95 @@ onMounted(() => {
 :deep(.el-dialog__body) {
   padding-top: 20px;
 }
+
+@media screen and (max-width: 768px) {
+  .search-bar {
+    padding: 16px;
+  }
+
+  .search-bar :deep(.el-col) {
+    margin-bottom: 12px;
+  }
+
+  .search-bar :deep(.el-col:last-child) {
+    margin-bottom: 0;
+  }
+
+  .search-bar :deep(.button-group) {
+    flex-direction: column;
+    gap: 8px;
+    align-items: stretch;
+  }
+
+  .search-bar :deep(.button-group .el-button) {
+    width: 100%;
+  }
+
+  .table-container {
+    overflow-x: auto;
+  }
+
+  .table-container :deep(.el-table) {
+    font-size: 12px;
+  }
+
+  .table-container :deep(.el-table th),
+  .table-container :deep(.el-table td) {
+    padding: 8px 4px;
+  }
+
+  .table-container :deep(.el-button) {
+    padding: 4px 8px;
+    font-size: 12px;
+  }
+
+  .pagination-container {
+    justify-content: center;
+    padding: 12px;
+  }
+
+  .pagination-container :deep(.el-pagination) {
+    font-size: 12px;
+  }
+
+  .pagination-container :deep(.el-pagination__sizes),
+  .pagination-container :deep(.el-pagination__jump) {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .card-header {
+    font-size: 14px;
+  }
+
+  .search-bar :deep(.el-input__inner) {
+    font-size: 14px;
+  }
+
+  .table-container :deep(.el-table) {
+    font-size: 11px;
+  }
+
+  :deep(.el-dialog) {
+    width: 95% !important;
+    margin: 0 auto;
+  }
+
+  :deep(.el-dialog__header) {
+    padding: 16px;
+  }
+
+  :deep(.el-dialog__body) {
+    padding: 16px;
+  }
+
+  :deep(.el-dialog__footer) {
+    padding: 12px 16px;
+  }
+
+  :deep(.el-form-item__label) {
+    font-size: 14px;
+  }
+}
 </style>

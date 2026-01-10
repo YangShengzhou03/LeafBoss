@@ -390,14 +390,86 @@ onMounted(() => {
     margin-bottom: 12px;
   }
 
+  .filter-section :deep(.el-col) {
+    margin-bottom: 12px;
+  }
+
+  .filter-section :deep(.el-col:last-child) {
+    margin-bottom: 0;
+  }
+
   .action-buttons {
     flex-direction: column;
     gap: 8px;
+    width: 100%;
+  }
+
+  .action-buttons :deep(.el-button) {
+    width: 100%;
   }
 
   .header-actions {
     flex-direction: column;
     gap: 5px;
+  }
+
+  .table-container {
+    overflow-x: auto;
+  }
+
+  .logs-card :deep(.el-table) {
+    font-size: 12px;
+  }
+
+  .logs-card :deep(.el-table th),
+  .logs-card :deep(.el-table td) {
+    padding: 8px 4px;
+  }
+
+  .pagination-container {
+    justify-content: center;
+    padding: 12px 0;
+  }
+
+  .pagination-container :deep(.el-pagination) {
+    font-size: 12px;
+  }
+
+  .pagination-container :deep(.el-pagination__sizes),
+  .pagination-container :deep(.el-pagination__jump) {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .card-header {
+    font-size: 14px;
+  }
+
+  .filter-section :deep(.el-date-editor),
+  .filter-section :deep(.el-select) {
+    width: 100%;
+  }
+
+  .logs-card :deep(.el-table) {
+    font-size: 11px;
+  }
+
+  :deep(.el-dialog) {
+    width: 95% !important;
+    margin: 0 auto;
+  }
+
+  :deep(.el-dialog__header) {
+    padding: 16px;
+  }
+
+  :deep(.el-dialog__body) {
+    padding: 16px;
+  }
+
+  :deep(.el-dialog__footer) {
+    padding: 12px 16px;
   }
 }
 </style>

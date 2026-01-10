@@ -106,6 +106,27 @@
               </el-menu-item>
             </el-sub-menu>
 
+            <el-sub-menu index="jobs-management">
+              <template #title>
+                <el-icon>
+                  <Briefcase />
+                </el-icon>
+                <span>海投助手</span>
+              </template>
+              <el-menu-item index="/admin/jobs/companies">
+                <el-icon>
+                  <OfficeBuilding />
+                </el-icon>
+                <template #title>公司管理</template>
+              </el-menu-item>
+              <el-menu-item index="/admin/jobs/boss-reviews">
+                <el-icon>
+                  <ChatDotRound />
+                </el-icon>
+                <template #title>评论管理</template>
+              </el-menu-item>
+            </el-sub-menu>
+
             <el-menu-item index="/admin/logs">
               <el-icon>
                 <Document />
@@ -131,7 +152,7 @@
 import { computed, onMounted, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { User, UserFilled, ArrowDown, Monitor, Document, Key, Goods, List, Operation, Check, Plus } from '@element-plus/icons-vue'
+import { User, UserFilled, ArrowDown, Monitor, Document, Key, Goods, List, Operation, Check, Plus, Briefcase, OfficeBuilding, ChatDotRound } from '@element-plus/icons-vue'
 import store from '@/utils/store.js'
 
 const router = useRouter()

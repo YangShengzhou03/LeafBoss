@@ -15,7 +15,10 @@
 - **🎯 授权密钥管理** - 完整的授权密钥生命周期管理，支持创建、验证、激活、禁用
 - **📦 产品管理** - 产品信息管理，支持多规格配置
 - **📋 规格管理** - 灵活的规格定义，支持不同时长和价格的授权方案
+- **🏢 公司管理** - 公司信息管理，支持评论统计
+- **💬 评论管理** - 用户评论管理，支持按公司和卡密筛选
 - **👥 管理员管理** - 管理员账户管理，支持权限控制
+- **👤 客户用户管理** - 客户用户信息管理，支持状态控制
 - **📊 数据统计** - 可视化数据报表，实时监控系统使用情况
 - **📝 操作日志** - 完整的操作审计日志，追踪系统操作记录
 - **🔒 安全认证** - JWT Token认证机制，保障系统安全
@@ -97,8 +100,8 @@ npm install
 #### 配置环境变量
 编辑 `frontend/.env.development`：
 ```env
-VUE_APP_API_BASE_URL=http://localhost:8081/api
-VUE_APP_TITLE=LeafBoss - 业务运营支撑系统
+VUE_APP_API_BASE_URL=http://localhost:8081
+VUE_APP_TITLE=LEAF-BOSS 业务运营支撑系统 (Development)
 ```
 
 #### 启动前端服务
@@ -137,10 +140,25 @@ npm run build
 - 不同时长和价格的授权方案
 - 规格状态管理
 
+#### 公司管理
+- 公司信息维护
+- 公司评论统计
+- 公司状态管理
+
+#### 评论管理
+- 用户评论查看
+- 按公司和卡密筛选
+- 评论删除管理
+
 #### 管理员管理
 - 管理员账户管理
 - 管理员信息维护
 - 权限控制
+
+#### 客户用户管理
+- 客户用户信息维护
+- 用户状态管理
+- 用户查询和筛选
 
 #### 操作日志
 - 完整的操作审计
@@ -214,6 +232,9 @@ leaf-boss/
 │   │   │   │   │   ├── CardKeyGenerate.vue    # 卡密生成
 │   │   │   │   │   ├── CardKeyManagement.vue  # 卡密管理
 │   │   │   │   │   └── CardKeyVerify.vue      # 卡密验证
+│   │   │   │   ├── jobs/              # 业务管理页面
+│   │   │   │   │   ├── BossReviewManagement.vue  # 评论管理
+│   │   │   │   │   └── CompanyManagement.vue    # 公司管理
 │   │   │   │   ├── DashboardPage.vue          # 仪表盘
 │   │   │   │   ├── LogsPage.vue               # 操作日志
 │   │   │   │   ├── ProductManagement.vue      # 商品管理
@@ -238,10 +259,14 @@ leaf-boss/
 │   │   ├── controller/                # 控制器层
 │   │   │   ├── AuthController.java    # 认证控制器
 │   │   │   ├── AdminController.java  # 管理员控制器
+│   │   │   ├── BossReviewController.java # 评论控制器
 │   │   │   ├── CardKeyController.java # 卡密控制器
+│   │   │   ├── CompanyController.java # 公司控制器
+│   │   │   ├── CustomerUserController.java # 客户用户控制器
 │   │   │   ├── DashboardController.java # 仪表盘控制器
 │   │   │   ├── OperationLogController.java # 操作日志控制器
 │   │   │   ├── ProductController.java # 产品控制器
+│   │   │   ├── PublicBossReviewController.java # 公共评论控制器
 │   │   │   ├── PublicCardKeyController.java # 公共卡密控制器
 │   │   │   ├── SpecificationController.java # 规格控制器
 │   │   │   └── UserController.java    # 用户控制器

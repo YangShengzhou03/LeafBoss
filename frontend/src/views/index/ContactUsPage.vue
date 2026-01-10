@@ -30,7 +30,7 @@
               <div class="contact-method">
                 <h3>开源项目</h3>
                 <p>欢迎访问我们的开源项目，参与贡献和讨论</p>
-                <a href="https://gitee.com/Yangshengzhou/leaf-card" target="_blank" class="contact-link">查看源码</a>
+                <a href="https://gitee.com/Yangshengzhou/leaf-boss" target="_blank" class="contact-link">查看源码</a>
               </div>
             </div>
           </section>

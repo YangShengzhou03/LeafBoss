@@ -1,25 +1,214 @@
 # LeafBoss API 文档
 
-## 文档概述
+## 基础信息
 
-本文档详细描述了 LeafBoss 业务运营支撑系统的 RESTful API 接口，包括认证管理、产品管理、规格管理、卡密管理、操作日志、数据统计等功能模块。
+### 环境配置
 
-## 快速开始
+- **开发环境**: http://localhost:8081
+- **前端服务**: http://localhost:8080
+- **字符编码**: UTF-8
+- **时间格式**: yyyy-MM-dd HH:mm:ss
+- **时区**: Asia/Shanghai
 
-### 环境准备
+### 通用响应格式
 
-确保您的开发环境满足以下要求：
+#### 成功响应
+```json
+{
+    "code": 200,
+    "message": "success",
+    "data": {}
+}
+```
 
-- **Java**: 17+
-- **Spring Boot**: 3.1.0
-- **MySQL**: 8.0.33+
-- **Maven**: 3.6+
-- **Node.js**: 16+ (前端开发)
+#### 错误响应
+```json
+{
+    "code": 400,
+    "message": "参数错误",
+    "data": null
+}
+```
+
+#### 分页响应
+```json
+{
+    "code": 200,
+    "message": "success",
+    "data": {
+        "records": [],
+        "total": 100,
+        "size": 10,
+        "current": 1,
+        "pages": 10
+    }
+}
+```
+
+---
+
+## 公共 API（无需认证）
+
+### 1. 验证并激活卡密
+
+**接口地址**: `GET /api/public/card-keys/verify/{cardKey}`
+
+**说明**: 验证安装卡密，验证成功时自动激活（未使用→已使用）
+
+**请求示例**:
+```bash
+curl -X GET "http://localhost:8081/api/public/card-keys/verify/vD2Sbh1OXLLKPFBfB49JnCaV0atSlyQh"
+```
+
+**成功响应**:
+```json
+{
+    "code": 200,
+    "message": "验证成功",
+    "data": "VIP会员-月卡"
+}
+```
+
+**失败响应**:
+```json
+{
+    "code": 404,
+    "message": "卡密不存在，请检查卡密是否正确或获取有效卡密",
+    "data": null
+}
+```
+
+**失败响应（卡密已被使用）**:
+```json
+{
+    "code": 400,
+    "message": "该卡密已被使用，请确认是否已在其他设备使用",
+    "data": null
+}
+```
+
+**失败响应（卡密已禁用）**:
+```json
+{
+    "code": 400,
+    "message": "该卡密已被禁用，请联系开发者了解原因",
+    "data": null
+}
+```
+
+---
+
+### 2. 创建评论
+
+**接口地址**: `POST /api/public/boss-reviews`
+
+**说明**: 用户通过卡密和公司名发表评论，每个卡密只能对每个公司评论一次
+
+**请求参数**:
+```json
+{
+    "card_key": "vD2Sbh1OXLLKPFBfB49JnCaV0atSlyQh",
+    "company_name": "测试公司",
+    "content": "非常好的服务"
+}
+```
+
+**请求示例**:
+```bash
+curl -X POST "http://localhost:8081/api/public/boss-reviews" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "card_key": "vD2Sbh1OXLLKPFBfB49JnCaV0atSlyQh",
+    "company_name": "杨圣洲",
+    "content": "服务非常好，推荐！"
+  }'
+```
+
+**成功响应**:
+```json
+{
+    "code": 200,
+    "message": "评论发布成功",
+    "data": true
+}
+```
+
+**失败响应**:
+```json
+{
+    "code": 400,
+    "message": "该卡密未使用，无法发表评论",
+    "data": null
+}
+```
+
+---
+
+### 3. 查询公司评论
+
+**接口地址**: `GET /api/public/boss-reviews`
+
+**说明**: 根据公司名称查询该公司的所有评论，支持分页
+
+**查询参数**:
+- `company_name` (必填): 公司名称
+- `page` (可选): 页码，默认1
+- `size` (可选): 页大小，默认10
+
+**请求示例**:
+```bash
+curl -X GET "http://localhost:8081/api/public/boss-reviews?company_name=杨圣洲&page=1&size=10"
+```
+
+**成功响应**:
+```json
+{
+    "code": 200,
+    "message": "评论列表查询成功",
+    "data": {
+        "page": 1,
+        "size": 10,
+        "total": 1,
+        "records": [
+            {
+                "id": 1,
+                "cardKey": "vD2Sbh1OXLLKPFBfB49JnCaV0atSlyQh",
+                "companyId": 1,
+                "companyName": "杨圣洲",
+                "content": "服务非常好，推荐！",
+                "createdAt": "2024-01-15T14:30:00"
+            }
+        ]
+    }
+}
+```
+
+**失败响应**:
+```json
+{
+    "code": 400,
+    "message": "公司名不能为空",
+    "data": null
+}
+```
+
+---
+
+## 管理后台 API（需要认证）
+
+### 认证说明
+
+所有管理后台 API 都需要在请求头中携带 JWT Token：
+
+```
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
 
 ### 获取访问令牌
 
-在调用 API 之前，您需要先获取访问令牌。系统默认端口为8081：
+**接口地址**: `POST /api/auth/login`
 
+**请求示例**:
 ```bash
 curl -X POST "http://localhost:8081/api/auth/login" \
   -H "Content-Type: application/json" \
@@ -29,7 +218,7 @@ curl -X POST "http://localhost:8081/api/auth/login" \
   }'
 ```
 
-**响应示例**：
+**响应示例**:
 ```json
 {
     "code": 200,
@@ -49,147 +238,13 @@ curl -X POST "http://localhost:8081/api/auth/login" \
 }
 ```
 
-### 使用访问令牌
-
-在后续的 API 请求中，需要在请求头中添加 Authorization 字段：
-
-```
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-```
-
-### 授权密钥验证示例
-
-```bash
-curl -X GET "http://localhost:8081/api/public/card-keys/verify/vD2Sbh1OXLLKPFBfB49JnCaV0atSlyQh"
-```
-
-## 公共卡密验证激活 API
-
-### 验证并激活安装卡密
-
-**接口地址**: `GET /api/public/card-keys/verify/{cardKey}`
-
-**请求头**: 无需认证
-
-**说明**: 验证安装卡密，验证成功时会自动使用该卡密（将未使用状态变为已使用）。此接口主要用于外部系统集成验证卡密有效性。
-
-**请求示例**:
-```bash
-# 验证卡密示例
-curl -X GET "http://localhost:8081/api/public/card-keys/verify/vD2Sbh1OXLLKPFBfB49JnCaV0atSlyQh"
-```
-
-**响应示例** (验证成功):
-```json
-{
-    "code": 200,
-    "message": "验证成功",
-    "data": "VIP会员-月卡"
-}
-```
-
-**响应示例** (验证失败 - 卡密不存在):
-```json
-{
-    "code": 404,
-    "message": "卡密不存在，请检查卡密是否正确或获取有效卡密",
-    "data": null
-}
-```
-
-**响应示例** (验证失败 - 卡密已被使用):
-```json
-{
-    "code": 400,
-    "message": "该卡密已被使用，请确认是否已在其他设备使用",
-    "data": null
-}
-```
-
-**响应示例** (验证失败 - 卡密已禁用):
-```json
-{
-    "code": 400,
-    "message": "该卡密已被禁用，请联系开发者了解原因",
-    "data": null
-}
-```
-
-**使用场景说明**:
-- **核销场景**: 用户在前端输入卡密进行验证和激活
-- **集成场景**: 第三方系统通过API验证卡密有效性
-- **批量验证**: 支持通过脚本批量验证卡密状态
-
-**注意事项**:
-- 验证成功后卡密状态会自动变为"已使用"
-- 每个卡密只能验证激活一次
-- 建议在生产环境使用HTTPS协议确保安全
-
-## 基础信息
-
-### 环境配置
-
-- **开发环境**: http://localhost:8081
-- **前端服务**: http://localhost:8080
-
-### 通用配置
-
-- **字符编码**: UTF-8
-- **时间格式**: yyyy-MM-dd HH:mm:ss
-- **时区**: Asia/Shanghai
-
-## 通用响应格式
-
-### 成功响应
-
-```json
-{
-    "code": 200,
-    "message": "success",
-    "data": {
-        // 具体数据内容
-    },
-    "timestamp": 1705315200000
-}
-```
-
-### 错误响应
-
-```json
-{
-    "code": 400,
-    "message": "参数错误",
-    "data": null,
-    "timestamp": 1705315200000
-}
-```
-
-### 分页响应
-
-```json
-{
-    "code": 200,
-    "message": "success",
-    "data": {
-        "records": [
-            // 数据列表
-        ],
-        "total": 100,
-        "size": 10,
-        "current": 1,
-        "pages": 10
-    },
-    "timestamp": 1705315200000
-}
-```
+---
 
 ## 认证管理 API
 
 ### 1. 用户登录
 
 **接口地址**: `POST /api/auth/login`
-
-**请求头**: 无需认证
 
 **请求参数**:
 ```json
@@ -206,11 +261,20 @@ curl -X GET "http://localhost:8081/api/public/card-keys/verify/vD2Sbh1OXLLKPFBfB
     "message": "登录成功",
     "data": {
         "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-        "expiresIn": 86400
-    },
-    "timestamp": 1705315200000
+        "user": {
+            "id": "550e8400-e29b-41d4-a716-446655440000",
+            "username": "admin",
+            "email": "admin@qq.com",
+            "status": "active",
+            "lastLoginTime": "2024-01-15T14:30:00",
+            "createdAt": "2024-01-01T00:00:00",
+            "updatedAt": "2024-01-15T14:30:00"
+        }
+    }
 }
 ```
+
+---
 
 ### 2. 获取当前用户信息
 
@@ -234,10 +298,11 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
         "lastLoginTime": "2024-01-15T14:30:00",
         "createdAt": "2024-01-01T00:00:00",
         "updatedAt": "2024-01-15T14:30:00"
-    },
-    "timestamp": 1705315200000
+    }
 }
 ```
+
+---
 
 ### 3. 更新当前用户信息
 
@@ -267,16 +332,15 @@ Content-Type: application/json
 {
     "code": 200,
     "message": "用户信息更新成功",
-    "data": true,
-    "timestamp": 1705315200000
+    "data": true
 }
 ```
+
+---
 
 ### 4. 用户注册
 
 **接口地址**: `POST /api/auth/register`
-
-**请求头**: 无需认证
 
 **请求参数**:
 ```json
@@ -293,10 +357,11 @@ Content-Type: application/json
 {
     "code": 200,
     "message": "注册成功",
-    "data": true,
-    "timestamp": 1705315200000
+    "data": true
 }
 ```
+
+---
 
 ### 5. 用户登出
 
@@ -312,35 +377,36 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 {
     "code": 200,
     "message": "登出成功",
-    "data": true,
-    "timestamp": 1705315200000
+    "data": true
 }
 ```
 
+---
+
 ## 管理员管理 API
 
-### 获取管理员列表
+### 1. 获取管理员列表
 
 **接口地址**: `GET /api/admins`
-
-**请求头**:
-```
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-```
 
 **查询参数**:
 - `page` (可选): 页码，默认1
 - `size` (可选): 页大小，默认10
+- `keyword` (可选): 关键词（用户名或邮箱）
+- `status` (可选): 状态
 
 **响应示例**:
 ```json
 {
     "code": 200,
-    "message": "success",
+    "message": "管理员列表查询成功",
     "data": {
+        "page": 1,
+        "size": 10,
+        "total": 1,
         "records": [
             {
-                "id": 1,
+                "id": "550e8400-e29b-41d4-a716-446655440000",
                 "username": "admin",
                 "email": "admin@qq.com",
                 "status": "active",
@@ -348,24 +414,16 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
                 "createdAt": "2024-01-01T00:00:00",
                 "updatedAt": "2024-01-15T14:30:00"
             }
-        ],
-        "total": 1,
-        "size": 10,
-        "current": 1,
-        "pages": 1
+        ]
     }
 }
 ```
 
-### 创建管理员
+---
+
+### 2. 创建管理员
 
 **接口地址**: `POST /api/admins`
-
-**请求头**:
-```
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-Content-Type: application/json
-```
 
 **请求参数**:
 ```json
@@ -382,20 +440,15 @@ Content-Type: application/json
 {
     "code": 200,
     "message": "管理员创建成功",
-    "data": true,
-    "timestamp": 1705315200000
+    "data": true
 }
 ```
 
-### 更新管理员
+---
+
+### 3. 更新管理员
 
 **接口地址**: `PUT /api/admins/{id}`
-
-**请求头**:
-```
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-Content-Type: application/json
-```
 
 **请求参数**:
 ```json
@@ -416,14 +469,118 @@ Content-Type: application/json
 {
     "code": 200,
     "message": "管理员更新成功",
-    "data": true,
-    "timestamp": 1705315200000
+    "data": true
 }
 ```
 
-### 删除管理员
+---
+
+### 4. 删除管理员
 
 **接口地址**: `DELETE /api/admins/{id}`
+
+**响应示例**:
+```json
+{
+    "code": 200,
+    "message": "管理员删除成功",
+    "data": true
+}
+```
+
+---
+
+### 5. 重置管理员密码（需要验证码）
+
+**接口地址**: `POST /api/admins/reset-password`
+
+**请求参数**:
+```json
+{
+    "email": "admin@qq.com",
+    "verificationCode": "123456",
+    "newPassword": "newpassword123"
+}
+```
+
+**响应示例**:
+```json
+{
+    "code": 200,
+    "message": "密码重置成功",
+    "data": true
+}
+```
+
+---
+
+### 6. 管理员直接重置用户密码（无需验证码）
+
+**接口地址**: `POST /api/admins/admin-reset-password`
+
+**请求参数**:
+```json
+{
+    "email": "admin@qq.com",
+    "newPassword": "newpassword123"
+}
+```
+
+**响应示例**:
+```json
+{
+    "code": 200,
+    "message": "密码重置成功",
+    "data": true
+}
+```
+
+---
+
+### 7. 发送重置密码验证码
+
+**接口地址**: `POST /api/admins/send-reset-code`
+
+**请求参数**:
+```json
+{
+    "email": "admin@qq.com"
+}
+```
+
+**响应示例**:
+```json
+{
+    "code": 200,
+    "message": "验证码已发送，请输入123456",
+    "data": true
+}
+```
+
+---
+
+### 8. 获取管理员统计信息
+
+**接口地址**: `GET /api/admins/statistics`
+
+**响应示例**:
+```json
+{
+    "code": 200,
+    "message": "统计信息获取成功",
+    "data": {
+        "totalAdmins": 5,
+        "recentAdmins": 2,
+        "activeAdmins": 4
+    }
+}
+```
+
+---
+
+### 9. 获取当前用户信息
+
+**接口地址**: `GET /api/admins/info`
 
 **请求头**:
 ```
@@ -434,30 +591,92 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```json
 {
     "code": 200,
-    "message": "管理员删除成功",
-    "data": true,
-    "timestamp": 1705315200000
+    "message": "success",
+    "data": {
+        "id": "550e8400-e29b-41d4-a716-446655440000",
+        "username": "admin",
+        "email": "admin@qq.com",
+        "status": "active",
+        "lastLoginTime": "2024-01-15T14:30:00",
+        "createdAt": "2024-01-01T00:00:00",
+        "updatedAt": "2024-01-15T14:30:00"
+    }
 }
 ```
 
-## 操作日志管理 API
+---
 
-### 获取操作日志列表
+### 10. 更新当前用户信息
 
-**接口地址**: `GET /api/operation-logs`
+**接口地址**: `PUT /api/admins/info`
 
 **请求头**:
 ```
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+Content-Type: application/json
 ```
+
+**请求参数**:
+```json
+{
+    "username": "admin",
+    "email": "admin@qq.com",
+    "password": "newpassword"
+}
+```
+
+**响应示例**:
+```json
+{
+    "code": 200,
+    "message": "用户信息更新成功",
+    "data": true
+}
+```
+
+---
+
+### 11. 修改当前用户密码
+
+**接口地址**: `PUT /api/admins/password`
+
+**请求头**:
+```
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+Content-Type: application/json
+```
+
+**请求参数**:
+```json
+{
+    "oldPassword": "123456",
+    "newPassword": "newpassword"
+}
+```
+
+**响应示例**:
+```json
+{
+    "code": 200,
+    "message": "密码修改成功",
+    "data": true
+}
+```
+
+---
+
+## 操作日志管理 API
+
+### 1. 获取操作日志列表
+
+**接口地址**: `GET /api/operation-logs`
 
 **查询参数**:
 - `page` (可选): 页码，默认1
 - `size` (可选): 页大小，默认10
-- `startDate` (可选): 开始日期 (格式: yyyy-MM-dd)
-- `endDate` (可选): 结束日期 (格式: yyyy-MM-dd)
-- `operationType` (可选): 操作类型 (LOGIN, CARD_KEY, PRODUCT, SPECIFICATION, USER, SYSTEM)
-- `adminId` (可选): 管理员ID
+- `startDate` (可选): 开始日期 (yyyy-MM-dd)
+- `endDate` (可选): 结束日期 (yyyy-MM-dd)
+- `operationType` (可选): 操作类型
 
 **响应示例**:
 ```json
@@ -482,18 +701,15 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 }
 ```
 
-### 获取操作日志统计
+---
+
+### 2. 获取日志统计信息
 
 **接口地址**: `GET /api/operation-logs/stats`
 
-**请求头**:
-```
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-```
-
 **查询参数**:
-- `startDate` (可选): 开始日期 (格式: yyyy-MM-dd)
-- `endDate` (可选): 结束日期 (格式: yyyy-MM-dd)
+- `startDate` (可选): 开始日期 (yyyy-MM-dd)
+- `endDate` (可选): 结束日期 (yyyy-MM-dd)
 
 **响应示例**:
 ```json
@@ -514,14 +730,46 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 }
 ```
 
-### 清空操作日志
+---
+
+### 3. 根据操作类型查询操作日志
+
+**接口地址**: `GET /api/operation-logs/type/{operationType}`
+
+**响应示例**:
+```json
+{
+    "code": 200,
+    "message": "success",
+    "data": [
+        {
+            "id": 1,
+            "operationType": "LOGIN",
+            "description": "管理员登录成功",
+            "ipAddress": "192.168.1.100",
+            "createdAt": "2024-01-15T14:30:00"
+        }
+    ]
+}
+```
+
+---
+
+### 4. 导出操作日志
+
+**接口地址**: `GET /api/operation-logs/export`
+
+**查询参数**:
+- `startDate` (可选): 开始日期 (yyyy-MM-dd)
+- `endDate` (可选): 结束日期 (yyyy-MM-dd)
+
+**响应**: 返回Excel文件下载
+
+---
+
+### 5. 清空操作日志
 
 **接口地址**: `DELETE /api/operation-logs`
-
-**请求头**:
-```
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-```
 
 **响应示例**:
 ```json
@@ -532,16 +780,37 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 }
 ```
 
+---
+
+### 6. 记录操作日志
+
+**接口地址**: `POST /api/operation-logs`
+
+**请求参数**:
+```json
+{
+    "operationType": "操作类型",
+    "description": "操作描述",
+    "ipAddress": "IP地址"
+}
+```
+
+**响应示例**:
+```json
+{
+    "code": 200,
+    "message": "操作日志记录成功",
+    "data": true
+}
+```
+
+---
+
 ## 产品管理 API
 
-### 分页查询产品列表
+### 1. 分页查询产品列表
 
 **接口地址**: `GET /api/products`
-
-**请求头**:
-```
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-```
 
 **查询参数**:
 - `page` (可选): 页码，默认1
@@ -570,19 +839,15 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
         "size": 10,
         "current": 1,
         "pages": 1
-    },
-    "timestamp": 1705315200000
+    }
 }
 ```
 
-### 根据ID查询产品
+---
+
+### 2. 根据ID查询产品
 
 **接口地址**: `GET /api/products/{id}`
-
-**请求头**:
-```
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-```
 
 **响应示例**:
 ```json
@@ -597,31 +862,23 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
         "status": "active",
         "createdAt": "2024-01-01T00:00:00",
         "updatedAt": "2024-01-01T00:00:00"
-    },
-    "timestamp": 1705315200000
+    }
 }
 ```
 
-### 创建产品
+---
+
+### 3. 创建产品
 
 **接口地址**: `POST /api/products`
-
-**请求头**:
-```
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-Content-Type: application/json
-```
 
 **请求参数**:
 ```json
 {
-    "id": null,
     "name": "新产品",
     "description": "新产品描述",
     "category": "virtual",
-    "status": "active",
-    "createdAt": null,
-    "updatedAt": null
+    "status": "active"
 }
 ```
 
@@ -630,20 +887,15 @@ Content-Type: application/json
 {
     "code": 200,
     "message": "产品创建成功",
-    "data": true,
-    "timestamp": 1705315200000
+    "data": true
 }
 ```
 
-### 更新产品
+---
+
+### 4. 更新产品
 
 **接口地址**: `PUT /api/products/{id}`
-
-**请求头**:
-```
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-Content-Type: application/json
-```
 
 **请求参数**:
 ```json
@@ -652,9 +904,7 @@ Content-Type: application/json
     "name": "更新后的产品名",
     "description": "更新后的描述",
     "category": "virtual",
-    "status": "active",
-    "createdAt": "2024-01-01T00:00:00",
-    "updatedAt": "2024-01-15T14:30:00"
+    "status": "active"
 }
 ```
 
@@ -663,38 +913,30 @@ Content-Type: application/json
 {
     "code": 200,
     "message": "产品更新成功",
-    "data": true,
-    "timestamp": 1705315200000
+    "data": true
 }
 ```
 
-### 删除产品
+---
+
+### 5. 删除产品
 
 **接口地址**: `DELETE /api/products/{id}`
-
-**请求头**:
-```
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-```
 
 **响应示例**:
 ```json
 {
     "code": 200,
     "message": "产品删除成功",
-    "data": true,
-    "timestamp": 1705315200000
+    "data": true
 }
 ```
 
-### 获取产品统计信息
+---
+
+### 6. 获取产品统计信息
 
 **接口地址**: `GET /api/products/statistics`
-
-**请求头**:
-```
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-```
 
 **响应示例**:
 ```json
@@ -707,19 +949,15 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
         "inactiveProducts": 2,
         "virtualProducts": 6,
         "physicalProducts": 4
-    },
-    "timestamp": 1705315200000
+    }
 }
 ```
 
-### 根据分类获取产品
+---
+
+### 7. 根据分类获取产品
 
 **接口地址**: `GET /api/products/category/{category}`
-
-**请求头**:
-```
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-```
 
 **响应示例**:
 ```json
@@ -736,25 +974,23 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
             "createdAt": "2024-01-01T00:00:00",
             "updatedAt": "2024-01-01T00:00:00"
         }
-    ],
-    "timestamp": 1705315200000
+    ]
 }
 ```
 
+---
+
 ## 规格管理 API
 
-### 分页查询规格列表
+### 1. 分页查询规格列表
 
 **接口地址**: `GET /api/specifications`
-
-**请求头**:
-```
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-```
 
 **查询参数**:
 - `page` (可选): 页码，默认1
 - `size` (可选): 页大小，默认10
+- `keyword` (可选): 关键词
+- `productId` (可选): 产品ID
 
 **响应示例**:
 ```json
@@ -780,19 +1016,15 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
         "size": 10,
         "current": 1,
         "pages": 1
-    },
-    "timestamp": 1705315200000
+    }
 }
 ```
 
-### 根据ID查询规格
+---
+
+### 2. 根据ID查询规格
 
 **接口地址**: `GET /api/specifications/{id}`
-
-**请求头**:
-```
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-```
 
 **响应示例**:
 ```json
@@ -810,20 +1042,16 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
         "status": "active",
         "createdAt": "2024-01-01T00:00:00",
         "updatedAt": "2024-01-01T00:00:00"
-    },
-    "timestamp": 1705315200000
+    }
 }
 ```
 
-### 根据产品ID查询规格列表
+---
+
+### 3. 根据产品ID查询规格列表
 
 **接口地址**: `GET /api/specifications/product/{productId}`
 
-**请求头**:
-```
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-```
-
 **响应示例**:
 ```json
 {
@@ -842,20 +1070,16 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
             "createdAt": "2024-01-01T00:00:00",
             "updatedAt": "2024-01-01T00:00:00"
         }
-    ],
-    "timestamp": 1705315200000
+    ]
 }
 ```
 
-### 根据状态查询规格列表
+---
+
+### 4. 根据状态查询规格列表
 
 **接口地址**: `GET /api/specifications/status/{status}`
 
-**请求头**:
-```
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-```
-
 **响应示例**:
 ```json
 {
@@ -874,34 +1098,26 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
             "createdAt": "2024-01-01T00:00:00",
             "updatedAt": "2024-01-01T00:00:00"
         }
-    ],
-    "timestamp": 1705315200000
+    ]
 }
 ```
 
-### 创建规格
+---
+
+### 5. 创建规格
 
 **接口地址**: `POST /api/specifications`
-
-**请求头**:
-```
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-Content-Type: application/json
-```
 
 **请求参数**:
 ```json
 {
-    "id": null,
     "productId": 1,
     "name": "季卡",
     "description": "VIP会员专属季卡，享受专属权益",
     "durationDays": 90,
     "price": 79.9,
     "stockQuantity": 500,
-    "status": "active",
-    "createdAt": null,
-    "updatedAt": null
+    "status": "active"
 }
 ```
 
@@ -914,15 +1130,11 @@ Content-Type: application/json
 }
 ```
 
-### 更新规格
+---
+
+### 6. 更新规格
 
 **接口地址**: `PUT /api/specifications/{id}`
-
-**请求头**:
-```
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-Content-Type: application/json
-```
 
 **请求参数**:
 ```json
@@ -934,9 +1146,7 @@ Content-Type: application/json
     "durationDays": 60,
     "price": 49.9,
     "stockQuantity": 800,
-    "status": "active",
-    "createdAt": "2024-01-01T00:00:00",
-    "updatedAt": "2024-01-15T14:30:00"
+    "status": "active"
 }
 ```
 
@@ -949,14 +1159,11 @@ Content-Type: application/json
 }
 ```
 
-### 删除规格
+---
+
+### 7. 删除规格
 
 **接口地址**: `DELETE /api/specifications/{id}`
-
-**请求头**:
-```
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-```
 
 **响应示例**:
 ```json
@@ -967,14 +1174,11 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 }
 ```
 
-### 获取规格统计信息
+---
+
+### 8. 获取规格统计信息
 
 **接口地址**: `GET /api/specifications/statistics`
-
-**请求头**:
-```
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-```
 
 **响应示例**:
 ```json
@@ -990,14 +1194,11 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 }
 ```
 
-### 获取规格DTO列表（包含卡密统计信息）
+---
+
+### 9. 获取规格DTO列表（包含卡密统计信息）
 
 **接口地址**: `GET /api/specifications/dto`
-
-**请求头**:
-```
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-```
 
 **响应示例**:
 ```json
@@ -1021,18 +1222,59 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
             "unusedKeys": 300
         }
     ]
-}```
+}
+```
+
+---
+
+### 10. 分页获取规格DTO列表（包含卡密统计信息）
+
+**接口地址**: `GET /api/specifications/dto/pagination`
+
+**查询参数**:
+- `page` (可选): 页码，默认1
+- `size` (可选): 页大小，默认10
+- `keyword` (可选): 关键词
+- `productId` (可选): 产品ID
+
+**响应示例**:
+```json
+{
+    "code": 200,
+    "message": "success",
+    "data": {
+        "records": [
+            {
+                "id": 1,
+                "productId": 1,
+                "name": "月卡",
+                "description": "VIP会员专属月卡，享受专属权益",
+                "durationDays": 30,
+                "price": 29.9,
+                "stockQuantity": 1000,
+                "status": "active",
+                "createdAt": "2024-01-01T00:00:00",
+                "updatedAt": "2024-01-01T00:00:00",
+                "totalKeys": 500,
+                "usedKeys": 200,
+                "unusedKeys": 300
+            }
+        ],
+        "total": 8,
+        "size": 10,
+        "current": 1,
+        "pages": 1
+    }
+}
+```
+
+---
 
 ## 卡密管理 API
 
-### 分页查询卡密列表
+### 1. 分页查询卡密列表
 
 **接口地址**: `GET /api/card-keys`
-
-**请求头**:
-```
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-```
 
 **查询参数**:
 - `page` (可选): 页码，默认1
@@ -1059,6 +1301,49 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
                 "updatedAt": "2024-01-01T00:00:00"
             }
         ],
+        "total": 100,
+        "size": 10,
+        "current": 1,
+        "pages": 10
+    }
+}
+```
+
+---
+
+### 2. 获取包含商品和规格名称的卡密列表
+
+**接口地址**: `GET /api/card-keys/with-details`
+
+**查询参数**:
+- `page` (可选): 页码，默认1
+- `size` (可选): 页大小，默认10
+- `keyword` (可选): 关键词
+- `specificationId` (可选): 规格ID
+- `status` (可选): 卡密状态
+
+**响应示例**:
+```json
+{
+    "code": 200,
+    "message": "success",
+    "data": {
+        "records": [
+            {
+                "id": 1,
+                "cardKey": "LEAF-2024-001-ABCD-EFGH",
+                "specificationId": 1,
+                "specificationName": "月卡",
+                "productName": "VIP会员",
+                "status": "未使用",
+                "userId": null,
+                "userEmail": null,
+                "activateTime": null,
+                "expireTime": null,
+                "createdAt": "2024-01-01T00:00:00",
+                "updatedAt": "2024-01-01T00:00:00"
+            }
+        ],
         "total": 10,
         "size": 10,
         "current": 1,
@@ -1067,47 +1352,11 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 }
 ```
 
-### 获取包含商品和规格名称的卡密列表
+---
 
-**接口地址**: `GET /api/card-keys/with-details`
-
-**请求头**:
-```
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-```
-
-**响应示例**:
-```json
-{
-    "code": 200,
-    "message": "success",
-    "data": [
-        {
-            "id": 1,
-            "cardKey": "LEAF-2024-001-ABCD-EFGH",
-            "specificationId": 1,
-            "specificationName": "月卡",
-            "productName": "VIP会员",
-            "status": "未使用",
-            "userId": null,
-            "userEmail": null,
-            "activateTime": null,
-            "expireTime": null,
-            "createdAt": "2024-01-01T00:00:00",
-            "updatedAt": "2024-01-01T00:00:00"
-        }
-    ]
-}
-```
-
-### 搜索卡密
+### 3. 搜索卡密
 
 **接口地址**: `GET /api/card-keys/search`
-
-**请求头**:
-```
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-```
 
 **查询参数**:
 - `cardKey` (必填): 卡密关键字
@@ -1132,20 +1381,17 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 }
 ```
 
-### 验证卡密
+---
+
+### 4. 验证卡密
 
 **接口地址**: `GET /api/card-keys/verify/{cardKey}`
 
-**请求头**:
-```
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-```
-
-**响应示例** (验证成功):
+**响应示例**:
 ```json
 {
     "code": 200,
-    "message": "验证成功",
+    "message": "success",
     "data": {
         "id": 1,
         "cardKey": "LEAF-2024-001-ABCD-EFGH",
@@ -1166,62 +1412,11 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 }
 ```
 
-**响应示例** (验证失败 - 卡密不存在):
-```json
-{
-    "code": 404,
-    "message": "卡密不存在，请检查卡密是否正确或获取有效卡密",
-    "data": null
-}
-```
+---
 
-**响应示例** (验证失败 - 卡密已被使用):
-```json
-{
-    "code": 400,
-    "message": "该卡密已被使用，请确认是否已在其他设备使用",
-    "data": null
-}
-```
-
-**响应示例** (验证失败 - 卡密已禁用):
-```json
-{
-    "code": 400,
-    "message": "该卡密已被禁用，请联系开发者了解原因",
-    "data": null
-}
-```
-
-**响应示例**:
-```json
-{
-    "code": 200,
-    "message": "success",
-    "data": {
-        "id": 1,
-        "cardKey": "LEAF-2024-001-ABCD-EFGH",
-        "specificationId": 1,
-        "status": "未使用",
-        "userId": null,
-        "userEmail": null,
-        "activateTime": null,
-        "expireTime": null,
-        "createdAt": "2024-01-01T00:00:00",
-        "updatedAt": "2024-01-01T00:00:00"
-    }
-}
-```
-
-### 激活卡密
+### 5. 激活卡密
 
 **接口地址**: `POST /api/card-keys/activate`
-
-**请求头**:
-```
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-Content-Type: application/json
-```
 
 **请求参数**:
 ```json
@@ -1239,15 +1434,11 @@ Content-Type: application/json
 }
 ```
 
-### 禁用卡密
+---
+
+### 6. 禁用卡密
 
 **接口地址**: `POST /api/card-keys/disable`
-
-**请求头**:
-```
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-Content-Type: application/json
-```
 
 **请求参数**:
 ```json
@@ -1265,14 +1456,11 @@ Content-Type: application/json
 }
 ```
 
-### 获取卡密统计信息
+---
+
+### 7. 获取卡密统计信息
 
 **接口地址**: `GET /api/card-keys/statistics`
-
-**请求头**:
-```
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-```
 
 **响应示例**:
 ```json
@@ -1288,15 +1476,11 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 }
 ```
 
-### 创建卡密
+---
+
+### 8. 创建卡密
 
 **接口地址**: `POST /api/card-keys`
-
-**请求头**:
-```
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-Content-Type: application/json
-```
 
 **请求参数**:
 ```json
@@ -1316,15 +1500,12 @@ Content-Type: application/json
 }
 ```
 
-### 删除卡密（通过ID）
+---
+
+### 9. 删除卡密（通过ID）
 
 **接口地址**: `DELETE /api/card-keys/{id}`
 
-**请求头**:
-```
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-```
-
 **响应示例**:
 ```json
 {
@@ -1334,15 +1515,12 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 }
 ```
 
-### 删除卡密（通过卡密字符串）
+---
+
+### 10. 删除卡密（通过卡密字符串）
 
 **接口地址**: `DELETE /api/card-keys/by-card-key/{cardKey}`
 
-**请求头**:
-```
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-```
-
 **响应示例**:
 ```json
 {
@@ -1352,15 +1530,11 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 }
 ```
 
-### 批量生成卡密
+---
+
+### 11. 批量生成卡密
 
 **接口地址**: `POST /api/card-keys/batch-generate`
-
-**请求头**:
-```
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-Content-Type: application/json
-```
 
 **请求参数**:
 ```json
@@ -1380,15 +1554,11 @@ Content-Type: application/json
 }
 ```
 
-### 切换卡密状态
+---
+
+### 12. 切换卡密状态
 
 **接口地址**: `POST /api/card-keys/{cardKey}/status`
-
-**请求头**:
-```
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-Content-Type: application/json
-```
 
 **请求参数**:
 ```json
@@ -1406,14 +1576,11 @@ Content-Type: application/json
 }
 ```
 
-### 批量删除已使用卡密
+---
+
+### 13. 批量删除已使用卡密
 
 **接口地址**: `DELETE /api/card-keys/batch-delete-used`
-
-**请求头**:
-```
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-```
 
 **响应示例**:
 ```json
@@ -1424,23 +1591,18 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 }
 ```
 
-## 操作日志 API
+---
 
-### 分页查询操作日志列表（支持时间范围筛选）
+## 公司管理 API
 
-**接口地址**: `GET /api/operation-logs`
+### 1. 分页查询公司列表
 
-**请求头**:
-```
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-```
+**接口地址**: `GET /api/companies`
 
 **查询参数**:
 - `page` (可选): 页码，默认1
 - `size` (可选): 页大小，默认10
-- `startDate` (可选): 开始日期，格式：yyyy-MM-dd
-- `endDate` (可选): 结束日期，格式：yyyy-MM-dd
-- `operationType` (可选): 操作类型
+- `name` (可选): 公司名称（模糊查询）
 
 **响应示例**:
 ```json
@@ -1451,9 +1613,133 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
         "records": [
             {
                 "id": 1,
-                "operationType": "LOGIN",
-                "description": "管理员登录成功",
-                "ipAddress": "192.168.1.100",
+                "name": "测试公司",
+                "description": "这是一家测试公司",
+                "commentCount": 5,
+                "createdAt": "2024-01-01T00:00:00",
+                "updatedAt": "2024-01-15T14:30:00"
+            }
+        ],
+        "total": 10,
+        "size": 10,
+        "current": 1,
+        "pages": 1
+    }
+}
+```
+
+---
+
+### 2. 根据ID查询公司
+
+**接口地址**: `GET /api/companies/{id}`
+
+**响应示例**:
+```json
+{
+    "code": 200,
+    "message": "success",
+    "data": {
+        "id": 1,
+        "name": "测试公司",
+        "description": "这是一家测试公司",
+        "commentCount": 5,
+        "createdAt": "2024-01-01T00:00:00",
+        "updatedAt": "2024-01-15T14:30:00"
+    }
+}
+```
+
+---
+
+### 3. 创建公司
+
+**接口地址**: `POST /api/companies`
+
+**请求参数**:
+```json
+{
+    "name": "新公司",
+    "description": "公司描述",
+    "commentCount": 0
+}
+```
+
+**响应示例**:
+```json
+{
+    "code": 200,
+    "message": "公司创建成功",
+    "data": true
+}
+```
+
+---
+
+### 4. 更新公司
+
+**接口地址**: `PUT /api/companies/{id}`
+
+**请求参数**:
+```json
+{
+    "name": "更新后的公司名",
+    "description": "更新后的描述",
+    "commentCount": 5
+}
+```
+
+**响应示例**:
+```json
+{
+    "code": 200,
+    "message": "公司更新成功",
+    "data": true
+}
+```
+
+---
+
+### 5. 删除公司
+
+**接口地址**: `DELETE /api/companies/{id}`
+
+**响应示例**:
+```json
+{
+    "code": 200,
+    "message": "公司删除成功",
+    "data": true
+}
+```
+
+---
+
+## 评论管理 API
+
+### 1. 分页查询评论列表
+
+**接口地址**: `GET /api/boss-reviews`
+
+**查询参数**:
+- `page` (可选): 页码，默认1
+- `size` (可选): 页大小，默认10
+- `companyId` (可选): 公司ID
+- `cardKey` (可选): 卡密
+
+**响应示例**:
+```json
+{
+    "code": 200,
+    "message": "success",
+    "data": {
+        "records": [
+            {
+                "id": 1,
+                "cardKey": "vD2Sbh1OXLLKPFBfB49JnCaV0atSlyQh",
+                "companyId": 1,
+                "companyName": "测试公司",
+                "content": "非常好的服务",
                 "createdAt": "2024-01-15T14:30:00"
             }
         ],
@@ -1465,18 +1751,11 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 }
 ```
 
-### 获取日志统计信息
+---
 
-**接口地址**: `GET /api/operation-logs/stats`
+### 2. 根据ID查询评论
 
-**请求头**:
-```
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-```
-
-**查询参数**:
-- `startDate` (可选): 开始日期，格式：yyyy-MM-dd
-- `endDate` (可选): 结束日期，格式：yyyy-MM-dd
+**接口地址**: `GET /api/boss-reviews/{id}`
 
 **响应示例**:
 ```json
@@ -1484,94 +1763,127 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
     "code": 200,
     "message": "success",
     "data": {
-        "totalCount": 150,
-        "typeStats": {
-            "LOGIN": 45,
-            "CARD_KEY": 60,
-            "PRODUCT": 20,
-            "SPECIFICATION": 15,
-            "USER": 8,
-            "SYSTEM": 2
-        }
+        "id": 1,
+        "cardKey": "vD2Sbh1OXLLKPFBfB49JnCaV0atSlyQh",
+        "companyId": 1,
+        "companyName": "测试公司",
+        "content": "非常好的服务",
+        "createdAt": "2024-01-15T14:30:00"
     }
 }
 ```
 
-### 根据操作类型查询操作日志
+---
 
-**接口地址**: `GET /api/operation-logs/type/{operationType}`
+### 3. 创建评论
 
-**请求头**:
+**接口地址**: `POST /api/boss-reviews`
+
+**请求参数**:
+```json
+{
+    "cardKey": "vD2Sbh1OXLLKPFBfB49JnCaV0atSlyQh",
+    "companyId": 1,
+    "content": "非常好的服务"
+}
 ```
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
+**响应示例**:
+```json
+{
+    "code": 200,
+    "message": "评论发布成功",
+    "data": true
+}
 ```
+
+---
+
+### 4. 删除评论
+
+**接口地址**: `DELETE /api/boss-reviews/{id}`
+
+**响应示例**:
+```json
+{
+    "code": 200,
+    "message": "评论删除成功",
+    "data": true
+}
+```
+
+---
+
+## 客户用户管理 API
+
+### 1. 分页查询用户列表
+
+**接口地址**: `GET /api/users`
+
+**查询参数**:
+- `page` (可选): 页码，默认1
+- `size` (可选): 页大小，默认10
+- `keyword` (可选): 关键词（用户名或邮箱）
+- `status` (可选): 用户状态
+
+**响应示例**:
+```json
+{
+    "code": 200,
+    "message": "用户列表查询成功",
+    "data": {
+        "page": 1,
+        "size": 10,
+        "total": 10,
+        "records": [
+            {
+                "id": "1",
+                "username": "testuser",
+                "email": "test@example.com",
+                "status": "active",
+                "createdAt": "2024-01-01T00:00:00",
+                "updatedAt": "2024-01-15T14:30:00"
+            }
+        ]
+    }
+}
+```
+
+---
+
+### 2. 根据ID查询用户
+
+**接口地址**: `GET /api/users/{id}`
 
 **响应示例**:
 ```json
 {
     "code": 200,
     "message": "success",
-    "data": [
-        {
-            "id": 1,
-            "operationType": "LOGIN",
-            "description": "管理员登录成功",
-            "ipAddress": "192.168.1.100",
-            "createdAt": "2024-01-15T14:30:00"
-        }
-    ]
+    "data": {
+        "id": "1",
+        "username": "testuser",
+        "email": "test@example.com",
+        "status": "active",
+        "createdAt": "2024-01-01T00:00:00",
+        "updatedAt": "2024-01-15T14:30:00"
+    }
 }
 ```
 
-### 导出操作日志
+---
 
-**接口地址**: `GET /api/operation-logs/export`
+### 3. 创建用户
 
-**请求头**:
-```
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-```
-
-**查询参数**:
-- `startDate` (可选): 开始日期，格式：yyyy-MM-dd
-- `endDate` (可选): 结束日期，格式：yyyy-MM-dd
-
-**响应**: 返回Excel文件下载
-
-### 清空操作日志
-
-**接口地址**: `DELETE /api/operation-logs`
-
-**请求头**:
-```
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-```
-
-**响应示例**:
-```json
-{
-    "code": 200,
-    "message": "日志清空成功",
-    "data": true
-}
-```
-
-### 记录操作日志
-
-**接口地址**: `POST /api/operation-logs`
-
-**请求头**:
-```
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-Content-Type: application/json
-```
+**接口地址**: `POST /api/users`
 
 **请求参数**:
 ```json
 {
-    "operationType": "操作类型",
-    "description": "操作描述",
-    "ipAddress": "IP地址"
+    "username": "newuser",
+    "email": "newuser@example.com",
+    "passwordHash": "123456",
+    "status": "active"
 }
 ```
 
@@ -1579,21 +1891,80 @@ Content-Type: application/json
 ```json
 {
     "code": 200,
-    "message": "操作日志记录成功",
+    "message": "用户创建成功",
     "data": true
 }
 ```
+
+---
+
+### 4. 更新用户
+
+**接口地址**: `PUT /api/users/{id}`
+
+**请求参数**:
+```json
+{
+    "username": "updateduser",
+    "email": "updated@example.com",
+    "status": "active"
+}
+```
+
+**响应示例**:
+```json
+{
+    "code": 200,
+    "message": "用户更新成功",
+    "data": true
+}
+```
+
+---
+
+### 5. 删除用户
+
+**接口地址**: `DELETE /api/users/{id}`
+
+**响应示例**:
+```json
+{
+    "code": 200,
+    "message": "用户删除成功",
+    "data": true
+}
+```
+
+---
+
+### 6. 重置用户密码
+
+**接口地址**: `POST /api/users/reset-password`
+
+**请求参数**:
+```json
+{
+    "email": "test@example.com",
+    "newPassword": "123456"
+}
+```
+
+**响应示例**:
+```json
+{
+    "code": 200,
+    "message": "密码重置成功",
+    "data": true
+}
+```
+
+---
 
 ## 仪表盘管理 API
 
 ### 获取仪表盘统计数据
 
 **接口地址**: `GET /api/admin/stats`
-
-**请求头**:
-```
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-```
 
 **响应示例**:
 ```json
@@ -1614,275 +1985,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 }
 ```
 
-## 用户管理 API
-
-### 获取用户存储信息
-
-**接口地址**: `GET /api/user/storage`
-
-**请求头**:
-```
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-```
-
-**响应示例**:
-```json
-{
-    "code": 200,
-    "message": "success",
-    "data": {
-        "storageQuota": 1073741824,
-        "usedStorage": 104857600,
-        "availableStorage": 968885024,
-        "usagePercentage": 10
-    }
-}
-```
-
-### 更新用户信息
-
-**接口地址**: `PUT /api/user/profile`
-
-**请求头**:
-```
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-Content-Type: application/json
-```
-
-**请求参数**:
-```json
-{
-    "username": "admin",
-    "email": "admin@example.com",
-    "phone": "13800138000"
-}
-```
-
-**响应示例**:
-```json
-{
-    "code": 200,
-    "message": "用户信息更新成功",
-    "data": true
-}
-```
-
-### 更新用户密码
-
-**接口地址**: `PUT /api/user/password`
-
-**请求头**:
-```
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-Content-Type: application/json
-```
-
-**请求参数**:
-```json
-{
-    "oldPassword": "123456",
-    "newPassword": "654321"
-}
-```
-
-**响应示例**:
-```json
-{
-    "code": 200,
-    "message": "密码更新成功",
-    "data": true
-}
-```
-
-## 💻 前端请求示例
-
-### Vue.js + Axios 示例
-
-```javascript
-import Server from '../utils/Server'
-
-// 管理员服务示例
-const AdminService = {
-  // 管理员登录
-  login(data) {
-    return Server.post('/api/auth/login', data)
-  },
-
-  // 管理员注册
-  register(data) {
-    return Server.post('/api/auth/register', data)
-  },
-
-  // 获取仪表盘统计数据
-  getDashboardStats() {
-    return Server.get('/api/admin/stats')
-  },
-
-  // 获取管理员列表
-  getUserList(params) {
-    return Server.get('/api/admins', { 
-      page: params.page || 1, 
-      size: params.size || 10 
-    })
-  },
-
-  // 获取操作日志列表
-  getLogList(params) {
-    return Server.get('/api/operation-logs', {
-      page: params.page || 1,
-      size: params.size || 10,
-      startDate: params.startDate,
-      endDate: params.endDate,
-      operationType: params.operationType
-    })
-  },
-
-  // 导出操作日志
-  exportLogs(params) {
-    return Server.get('/api/operation-logs/export', {
-      startDate: params.startDate,
-      endDate: params.endDate
-    }, { responseType: 'blob' })
-  },
-
-  // 获取包含商品和规格名称的卡密列表
-  getCardKeyListWithDetails() {
-    return Server.get('/api/card-keys/with-details')
-  },
-
-  // 生成卡密
-  generateCardKey(data) {
-    return Server.post('/api/card-keys', data)
-  },
-
-  // 切换卡密状态
-  toggleCardKeyStatus(id, status) {
-    return Server.post(`/api/card-keys/${id}/status`, { status })
-  },
-
-  // 禁用卡密
-  disableCardKey(id) {
-    return Server.post(`/api/card-keys/${id}/disable`)
-  },
-
-  // 删除卡密
-  deleteCardKey(id) {
-    return Server.delete(`/api/card-keys/${id}`)
-  },
-
-  // 获取产品列表
-  getProductList(params) {
-    return Server.get('/api/products', {
-      page: params.page || 1,
-      size: params.size || 10,
-      category: params.category,
-      status: params.status
-    })
-  },
-
-  // 创建产品
-  createProduct(data) {
-    return Server.post('/api/products', data)
-  },
-
-  // 编辑产品
-  editProduct(id, data) {
-    return Server.put(`/api/products/${id}`, data)
-  },
-
-  // 删除产品
-  deleteProduct(id) {
-    return Server.delete(`/api/products/${id}`)
-  },
-
-  // 获取规格列表
-  getSpecList(params) {
-    return Server.get('/api/specifications', {
-      page: params.page || 1,
-      size: params.size || 10
-    })
-  },
-
-  // 创建规格
-  createSpec(data) {
-    return Server.post('/api/specifications', data)
-  },
-
-  // 编辑规格
-  editSpec(id, data) {
-    return Server.put(`/api/specifications/${id}`, data)
-  },
-
-  // 删除规格
-  deleteSpec(id) {
-    return Server.delete(`/api/specifications/${id}`)
-  },
-
-  // 根据ID获取规格
-  getSpecificationById(id) {
-    return Server.get(`/api/specifications/${id}`)
-  }
-}
-
-// 用户服务示例
-const UserService = {
-  // 用户登录
-  login(data) {
-    return Server.post('/api/auth/login', data)
-  },
-
-  // 用户登出
-  logout() {
-    return Server.post('/api/auth/logout')
-  },
-
-  // 用户注册
-  register(data) {
-    return Server.post('/api/auth/register', data)
-  },
-
-  // 获取当前用户信息
-  getCurrentUser() {
-    return Server.get('/api/auth/me')
-  },
-
-  // 获取存储信息
-  getStorageInfo() {
-    return Server.get('/api/user/storage')
-  }
-}
-
-// 使用示例
-async function exampleUsage() {
-  try {
-    // 管理员登录
-    const loginResponse = await AdminService.login({
-      email: 'admin@example.com',
-      password: 'password123'
-    })
-    console.log('登录成功:', loginResponse.data)
-
-    // 获取产品列表
-    const productsResponse = await AdminService.getProductList({
-      page: 1,
-      size: 10
-    })
-    console.log('产品列表:', productsResponse.data)
-
-    // 获取卡密列表
-    const cardKeysResponse = await AdminService.getCardKeyListWithDetails()
-    console.log('卡密列表:', cardKeysResponse.data)
-
-  } catch (error) {
-    console.error('API调用失败:', error)
-  }
-}
-
-export default {
-  admin: AdminService,
-  user: UserService
-}
-```
+---
 
 ## 错误码说明
 
@@ -1898,387 +2001,7 @@ export default {
 | 405 | 方法不允许 | 请求方法不被支持 | 使用GET访问POST接口 |
 | 500 | 服务器内部错误 | 服务器内部处理错误 | 数据库连接失败、系统异常 |
 
-### 业务错误码（data.code）
-
-| 错误码 | 说明 | 描述 |
-|--------|------|------|
-| 1001 | 卡密不存在 | 指定的卡密在系统中不存在 |
-| 1002 | 卡密已使用 | 卡密已被激活使用 |
-| 1003 | 卡密已禁用 | 卡密已被管理员禁用 |
-| 1004 | 产品不存在 | 指定的产品不存在 |
-| 1005 | 规格不存在 | 指定的规格不存在 |
-| 1006 | 库存不足 | 规格库存不足 |
-| 2001 | 用户不存在 | 用户账号不存在 |
-| 2002 | 密码错误 | 用户密码错误 |
-| 2003 | 账号已禁用 | 用户账号已被禁用 |
-
-## 常见问题解答
-
-### Q: 如何获取访问令牌？
-A: 使用管理员账号登录获取token：
-```bash
-curl -X POST "http://localhost:8081/api/auth/login" \
-  -H "Content-Type: application/json" \
-  -d '{"email": "admin@qq.com", "password": "123456"}'
-```
-
-### Q: 卡密验证失败怎么办？
-A: 检查以下情况：
-1. 卡密是否正确输入
-2. 卡密是否已被使用（错误码：1002）
-3. 卡密是否被禁用（错误码：1003）
-4. 网络连接是否正常
-
-### Q: 如何批量验证卡密？
-A: 可以使用脚本循环调用验证接口：
-```bash
-#!/bin/bash
-card_keys=("KEY1" "KEY2" "KEY3")
-for key in "${card_keys[@]}"; do
-  curl -X GET "http://localhost:8081/api/public/card-keys/verify/$key"
-  echo ""
-  sleep 1  # 避免请求过于频繁
-
-done
-```
-
-### Q: 生产环境如何配置？
-A: 生产环境配置：
-- 基础URL: `http://localhost:8081/api`
-- 端口: 8081
-- 建议配置HTTPS确保安全
-- 配置数据库连接池和缓存
-
-### Q: 如何监控API使用情况？
-A: 可以通过操作日志API监控：
-- 查看操作日志：`GET /api/operation-logs`
-- 获取统计信息：`GET /api/operation-logs/stats`
-- 导出日志数据：`GET /api/operation-logs/export`
-
-### Q: 如何处理高并发请求？
-A: 建议措施：
-1. 使用连接池管理数据库连接
-2. 对频繁查询的数据添加缓存
-3. 使用负载均衡分发请求
-4. 设置合理的超时时间和重试机制
-
-## 部署说明
-
-### 后端部署
-
-1. 配置数据库连接信息
-2. 执行数据库初始化脚本
-3. 打包项目：`mvn clean package`
-4. 运行：`java -jar target/leaf-boss-backend-1.0.0.jar`
-
-### 前端部署
-
-1. 安装依赖：`npm install`
-2. 构建项目：`npm run build`
-3. 部署到Web服务器
-
-## 注意事项
-
-1. 所有时间字段使用ISO 8601格式
-2. 金额字段使用数字类型，单位为元
-3. 分页查询默认页码为1，页大小为10
-4. 生产环境请配置HTTPS和安全的认证方式
-
-## 生产环境部署指南
-
-### 服务器环境要求
-
-- **操作系统**: CentOS 7+/Ubuntu 18.04+
-- **Java**: JDK 17+
-- **数据库**: MySQL 8.0+
-- **内存**: 最低4GB，推荐8GB+
-- **磁盘空间**: 最低20GB可用空间
-- **网络**: 公网IP，开放80/443端口
-
-### 部署前准备
-
-1. **安装Java环境**
-```bash
-# 下载并安装JDK 17
-wget https://download.java.net/java/GA/jdk17.0.2/dfd4a8d0985749f896bed50d7138ee7f/8/GPL/openjdk-17.0.2_linux-x64_bin.tar.gz
-tar -xzf openjdk-17.0.2_linux-x64_bin.tar.gz
-sudo mv jdk-17.0.2 /usr/local/
-
-# 配置环境变量
-echo 'export JAVA_HOME=/usr/local/jdk-17.0.2' >> ~/.bashrc
-echo 'export PATH=$JAVA_HOME/bin:$PATH' >> ~/.bashrc
-source ~/.bashrc
-```
-
-2. **配置数据库**
-```sql
--- 创建数据库和用户
-CREATE DATABASE leafcard CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-CREATE USER 'leafcard_user'@'%' IDENTIFIED BY 'your_secure_password';
-GRANT ALL PRIVILEGES ON leafcard.* TO 'leafcard_user'@'%';
-FLUSH PRIVILEGES;
-```
-
-3. **上传部署文件**
-```bash
-# 创建项目目录
-sudo mkdir -p /root/project/backend
-sudo mkdir -p /root/project/frontend
-
-# 上传后端jar包和配置文件
-# backend.jar 和 application.yml 需要上传到 /root/project/backend/
-```
-
-### 生产环境部署脚本
-
-```bash
-# 停止当前可能运行的进程
-ps -ef | grep backend.jar | grep -v grep | awk '{print $2}' | xargs kill -9
-
-# 重新启动后端服务（使用生产环境配置）
-cd /root/project/backend
-nohup ./jdk-17.0.17+10-jre/bin/java -jar backend.jar \
-  --spring.config.location=file:./application.yml \
-  --spring.profiles.active=prod > backend.log 2>&1 &
-
-# 查看启动日志确认服务状态
-tail -f backend.log
-```
-
-### 完整的部署脚本（推荐使用）
-
-```bash
-#!/bin/bash
-
-# LeafCard 生产环境部署脚本
-# 使用方法：./deploy.sh
-
-set -e
-
-echo "=== LeafCard 生产环境部署开始 ==="
-
-# 检查Java环境
-if ! command -v java &> /dev/null; then
-    echo "错误: Java未安装，请先安装JDK 17+"
-    exit 1
-fi
-
-JAVA_VERSION=$(java -version 2>&1 | head -n 1 | cut -d'"' -f2)
-echo "Java版本: $JAVA_VERSION"
-
-# 检查项目目录
-PROJECT_DIR="/root/project/backend"
-if [ ! -d "$PROJECT_DIR" ]; then
-    echo "错误: 项目目录不存在: $PROJECT_DIR"
-    exit 1
-fi
-
-cd "$PROJECT_DIR"
-
-# 检查必要的文件
-if [ ! -f "backend.jar" ]; then
-    echo "错误: backend.jar 文件不存在"
-    exit 1
-fi
-
-if [ ! -f "application.yml" ]; then
-    echo "错误: application.yml 配置文件不存在"
-    exit 1
-fi
-
-echo "停止当前运行的服务..."
-
-# 停止当前进程
-pkill -f "backend.jar" || true
-sleep 3
-
-# 确保进程已停止
-if pgrep -f "backend.jar" > /dev/null; then
-    echo "强制停止残留进程..."
-    pkill -9 -f "backend.jar"
-    sleep 2
-fi
-
-echo "启动后端服务..."
-
-# 启动服务
-nohup java -jar backend.jar \
-    --spring.config.location=file:./application.yml \
-    --spring.profiles.active=prod > backend.log 2>&1 &
-
-# 记录进程ID
-echo $! > backend.pid
-
-echo "等待服务启动..."
-sleep 10
-
-# 检查服务状态
-if pgrep -f "backend.jar" > /dev/null; then
-    echo "✅ 服务启动成功"
-    echo "进程ID: $(cat backend.pid)"
-    echo "日志文件: $PROJECT_DIR/backend.log"
-    
-    # 显示最近日志
-    echo "=== 最近日志输出 ==="
-    tail -20 backend.log
-else
-    echo "❌ 服务启动失败"
-    echo "=== 错误日志 ==="
-    tail -50 backend.log
-    exit 1
-fi
-
-echo "=== 部署完成 ==="
-echo "服务地址: http://your-server-ip:8080"
-echo "API文档: http://your-server-ip:8080/swagger-ui.html"
-```
-
-### 系统服务配置（可选）
-
-创建systemd服务文件 `/etc/systemd/system/leafcard.service`：
-
-```ini
-[Unit]
-Description=LeafCard Backend Service
-After=network.target
-
-[Service]
-Type=simple
-User=root
-WorkingDirectory=/root/project/backend
-ExecStart=/usr/local/jdk-17.0.2/bin/java -jar backend.jar --spring.config.location=file:./application.yml --spring.profiles.active=prod
-ExecStop=/bin/kill -15 $MAINPID
-Restart=on-failure
-RestartSec=10
-
-[Install]
-WantedBy=multi-user.target
-```
-
-使用systemd管理服务：
-```bash
-# 重新加载systemd配置
-sudo systemctl daemon-reload
-
-# 启用服务开机自启
-sudo systemctl enable leafcard
-
-# 启动服务
-sudo systemctl start leafcard
-
-# 查看服务状态
-sudo systemctl status leafcard
-
-# 查看服务日志
-sudo journalctl -u leafcard -f
-```
-
-### 监控和维护
-
-1. **日志监控**
-```bash
-# 实时查看日志
-tail -f /root/project/backend/backend.log
-
-# 查看错误日志
-grep -i error /root/project/backend/backend.log
-
-# 查看访问日志
-grep "GET\|POST" /root/project/backend/backend.log
-```
-
-2. **性能监控**
-```bash
-# 查看内存使用
-ps aux --sort=-%mem | head -10
-
-# 查看磁盘空间
-df -h
-
-# 查看网络连接
-netstat -an | grep :8080
-```
-
-3. **备份脚本**
-```bash
-#!/bin/bash
-# 数据库备份脚本
-BACKUP_DIR="/backup/leafcard"
-DATE=$(date +%Y%m%d_%H%M%S)
-
-mkdir -p $BACKUP_DIR
-
-# 备份数据库
-mysqldump -u leafcard_user -p'your_password' leafcard > $BACKUP_DIR/leafcard_$DATE.sql
-
-# 备份配置文件
-tar -czf $BACKUP_DIR/config_$DATE.tar.gz /root/project/backend/application.yml
-
-echo "备份完成: $BACKUP_DIR/leafcard_$DATE.sql"
-```
-
-### 故障排除
-
-1. **服务无法启动**
-   - 检查Java版本是否为17+
-   - 检查application.yml配置文件
-   - 查看backend.log错误信息
-
-2. **数据库连接失败**
-   - 检查数据库服务是否运行
-   - 验证数据库连接信息
-   - 检查防火墙设置
-
-3. **内存不足**
-   - 增加JVM内存参数：`-Xmx2g -Xms1g`
-   - 监控系统内存使用情况
-
-4. **端口被占用**
-   - 检查8080端口是否被其他进程占用
-   - 修改application.yml中的server.port配置
-
-### 安全建议
-
-1. **防火墙配置**
-```bash
-# 只开放必要端口
-sudo ufw allow 22    # SSH
-sudo ufw allow 80    # HTTP
-sudo ufw allow 443   # HTTPS
-sudo ufw enable
-```
-
-2. **SSL证书配置**
-   - 使用Let's Encrypt获取免费SSL证书
-   - 配置Nginx反向代理和HTTPS
-
-3. **定期更新**
-   - 定期更新系统和依赖包
-   - 监控安全公告
-   - 定期备份数据
-
-## 版本历史
-
-### v1.0.0 (2024-01-15)
-- 初始版本发布
-- 支持产品管理、规格管理、卡密管理
-- 完整的API文档
-- 生产环境部署支持
-
-### v1.1.0 (计划中)
-- 支付集成功能
-- 订单管理
-- 用户管理增强
-- 性能优化
-
-## 技术支持
-
-- **文档**: 本文档
-- **问题反馈**: 创建GitHub Issue
-- **紧急支持**: 联系开发团队
-- **社区**: 加入开发者社区讨论
-
 ---
 
-*最后更新: 2025-01-10*  
-*文档版本: v2.0.0*
+*最后更新: 2026-01-10*  
+*文档版本: v3.0.0*

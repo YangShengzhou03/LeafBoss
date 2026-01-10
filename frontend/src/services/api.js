@@ -118,6 +118,80 @@ const AdminService = {
 
   getSpecificationDTOs() {
     return Server.get('/api/specifications/dto')
+  },
+
+  getCompanyList(params) {
+    return Server.get('/api/companies', {
+      page: params.page || 1,
+      size: params.size || 10,
+      name: params.name
+    })
+  },
+
+  createCompany(data) {
+    return Server.post('/api/companies', data)
+  },
+
+  editCompany(id, data) {
+    return Server.put(`/api/companies/${id}`, data)
+  },
+
+  deleteCompany(id) {
+    return Server.delete(`/api/companies/${id}`)
+  },
+
+  getBossReviewList(params) {
+    return Server.get('/api/boss-reviews', {
+      page: params.page || 1,
+      size: params.size || 10,
+      companyId: params.companyId,
+      cardKey: params.cardKey
+    })
+  },
+
+  createBossReview(data) {
+    return Server.post('/api/boss-reviews', data)
+  },
+
+  deleteBossReview(id) {
+    return Server.delete(`/api/boss-reviews/${id}`)
+  },
+
+  getCustomerUserList(params) {
+    return Server.get('/api/users', {
+      page: params.page || 1,
+      size: params.size || 10,
+      keyword: params.keyword,
+      status: params.status
+    })
+  },
+
+  createCustomerUser(data) {
+    return Server.post('/api/users', data)
+  },
+
+  updateCustomerUser(id, data) {
+    return Server.put(`/api/users/${id}`, data)
+  },
+
+  deleteCustomerUser(id) {
+    return Server.delete(`/api/users/${id}`)
+  },
+
+  resetCustomerUserPassword(data) {
+    return Server.post('/api/users/reset-password', data)
+  },
+
+  createPublicReview(data) {
+    return Server.post('/api/public/boss-reviews', data)
+  },
+
+  getPublicReviews(params) {
+    return Server.get('/api/public/boss-reviews', {
+      company_name: params.company_name,
+      page: params.page || 1,
+      size: params.size || 10
+    })
   }
 }
 

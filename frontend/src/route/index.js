@@ -119,6 +119,24 @@ const routes = [
           requiresAuth: true
         }
       },
+      {
+        path: 'jobs/companies',
+        name: 'CompanyManagement',
+        component: () => import('@/views/admin/jobs/CompanyManagement.vue'),
+        meta: {
+          title: 'LEAF-BOSS - 公司管理',
+          requiresAuth: true
+        }
+      },
+      {
+        path: 'jobs/boss-reviews',
+        name: 'BossReviewManagement',
+        component: () => import('@/views/admin/jobs/BossReviewManagement.vue'),
+        meta: {
+          title: 'LEAF-BOSS - 评论管理',
+          requiresAuth: true
+        }
+      },
     ]
   },
 

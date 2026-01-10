@@ -75,13 +75,55 @@ CREATE TABLE card_keys (
 -- 操作日志表
 CREATE TABLE operation_logs (
     id INT PRIMARY KEY AUTO_INCREMENT COMMENT '日志唯一标识符',
-    operation_type ENUM('LOGIN', 'CARD_KEY', 'PRODUCT', 'SPECIFICATION', 'USER', 'SYSTEM') NOT NULL COMMENT '操作类型',
+    operation_type ENUM('LOGIN', 'CARD_KEY', 'PRODUCT', 'SPECIFICATION', 'USER', 'SYSTEM', 'BOSS_REVIEW', 'COMPANY') NOT NULL COMMENT '操作类型',
     description TEXT COMMENT '描述',
     ip_address VARCHAR(50) COMMENT 'IP地址',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '创建时间',
     INDEX idx_operation_type (operation_type),
     INDEX idx_created_at (created_at)
 ) ENGINE=InnoDB COMMENT='操作日志表';
+
+-- 用户表
+CREATE TABLE users (
+    id CHAR(36) PRIMARY KEY DEFAULT (UUID()) COMMENT '用户唯一标识符',
+    username VARCHAR(50) UNIQUE NOT NULL COMMENT '用户名',
+    email VARCHAR(100) UNIQUE COMMENT '邮箱',
+    password_hash VARCHAR(255) COMMENT '密码哈希',
+    phone VARCHAR(20) COMMENT '电话',
+    birthday DATE COMMENT '出生日期',
+    education ENUM('小学', '初中', '高中', '大专', '本科', '硕士', '博士', '其他') COMMENT '学历',
+    gender ENUM('男', '女') COMMENT '性别',
+    status ENUM('active', 'inactive') DEFAULT 'active' NOT NULL COMMENT '状态',
+    registered_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '注册时间',
+    last_login_time DATETIME COMMENT '最后登录时间',
+    last_login_ip VARCHAR(50) COMMENT '最后登录IP',
+    INDEX idx_username (username),
+    INDEX idx_email (email),
+    INDEX idx_phone (phone),
+    INDEX idx_status (status)
+) ENGINE=InnoDB COMMENT='用户表';
+
+-- 公司表
+CREATE TABLE companies (
+    id INT PRIMARY KEY AUTO_INCREMENT COMMENT '公司唯一标识符',
+    name VARCHAR(100) NOT NULL COMMENT '公司名',
+    comment_count INT DEFAULT 0 COMMENT '评论总数',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '创建时间',
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL COMMENT '最后更新时间',
+    INDEX idx_name (name)
+) ENGINE=InnoDB COMMENT='公司表';
+
+-- Boss评论表
+CREATE TABLE boss_reviews (
+    id CHAR(36) PRIMARY KEY DEFAULT (UUID()) COMMENT '评论唯一标识符',
+    card_key CHAR(36) NOT NULL COMMENT '发评论用户所持卡密',
+    company_id INT NOT NULL COMMENT '公司ID',
+    content TEXT NOT NULL COMMENT '评论内容',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '评论时间',
+    FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE,
+    INDEX idx_company_id (company_id),
+    INDEX idx_created_at (created_at)
+) ENGINE=InnoDB COMMENT='Boss评论表';
 
 -- 初始化管理员账号
 INSERT INTO admins (username, email, password_hash, status) VALUES

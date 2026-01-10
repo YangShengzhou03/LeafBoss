@@ -58,7 +58,7 @@
                 </el-tag>
               </template>
             </el-table-column>
-            <el-table-column prop="createdAt" label="注册时间" min-width="160" align="center"
+            <el-table-column prop="registeredAt" label="注册时间" min-width="160" align="center"
               :show-overflow-tooltip="true" />
             <el-table-column prop="lastLoginTime" label="最后登录时间" min-width="160" align="center"
               :show-overflow-tooltip="true" />
@@ -180,7 +180,7 @@ const loadUsers = async () => {
       params.status = statusFilter.value
     }
 
-    const response = await api.admin.getUserList(params)
+    const response = await api.admin.getCustomerUserList(params)
 
     if (response && response.data) {
       users.value = response.data.records || response.data.content || []
@@ -220,7 +220,7 @@ const resetPassword = async (user) => {
       }
     )
 
-    await api.user.adminResetPassword({
+    await api.admin.resetCustomerUserPassword({
       email: user.email,
       newPassword: '123456'
     })
@@ -260,7 +260,7 @@ const saveUser = async () => {
     const userData = {
       username: userForm.username,
       email: userForm.email,
-      status: userForm.status === 'active' ? 1 : 0
+      status: userForm.status
     }
 
     if (!editingUser.value && userForm.password) {
@@ -268,9 +268,9 @@ const saveUser = async () => {
     }
 
     if (editingUser.value) {
-      await api.user.updateUser(editingUser.value.id, userData)
+      await api.admin.updateCustomerUser(editingUser.value.id, userData)
     } else {
-      await api.user.createUser(userData)
+      await api.admin.createCustomerUser(userData)
     }
 
     ElMessage.success(editingUser.value ? '用户更新成功' : '用户添加成功')
@@ -294,10 +294,9 @@ const addUser = () => {
 const toggleUserStatus = async (user) => {
   try {
     const newStatus = user.status === 'active' ? 'inactive' : 'active'
-    const enabled = newStatus === 'active'
 
-    await api.user.updateUser(user.id, {
-      status: enabled ? 1 : 0
+    await api.admin.updateCustomerUser(user.id, {
+      status: newStatus
     })
 
     ElMessage.success(`用户已${newStatus === 'active' ? '启用' : '禁用'}`)
@@ -320,7 +319,7 @@ const deleteUser = async (user) => {
       }
     )
 
-    await api.user.deleteUser(user.id)
+    await api.admin.deleteCustomerUser(user.id)
     ElMessage.success('用户删除成功')
     loadUsers()
   } catch (error) {
@@ -568,5 +567,96 @@ onMounted(() => {
 
 :deep(.el-dialog__body) {
   padding-top: 20px;
+}
+
+@media screen and (max-width: 768px) {
+  .search-bar {
+    padding: 16px;
+  }
+
+  .search-bar :deep(.el-col) {
+    margin-bottom: 12px;
+  }
+
+  .search-bar :deep(.el-col:last-child) {
+    margin-bottom: 0;
+  }
+
+  .search-bar :deep(.button-group) {
+    flex-direction: column;
+    gap: 8px;
+    align-items: stretch;
+  }
+
+  .search-bar :deep(.button-group .el-button) {
+    width: 100%;
+  }
+
+  .table-container {
+    overflow-x: auto;
+  }
+
+  .table-container :deep(.el-table) {
+    font-size: 12px;
+  }
+
+  .table-container :deep(.el-table th),
+  .table-container :deep(.el-table td) {
+    padding: 8px 4px;
+  }
+
+  .table-container :deep(.el-button) {
+    padding: 4px 8px;
+    font-size: 12px;
+  }
+
+  .pagination-container {
+    justify-content: center;
+    padding: 12px;
+  }
+
+  .pagination-container :deep(.el-pagination) {
+    font-size: 12px;
+  }
+
+  .pagination-container :deep(.el-pagination__sizes),
+  .pagination-container :deep(.el-pagination__jump) {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .card-header {
+    font-size: 14px;
+  }
+
+  .search-bar :deep(.el-input__inner) {
+    font-size: 14px;
+  }
+
+  .table-container :deep(.el-table) {
+    font-size: 11px;
+  }
+
+  :deep(.el-dialog) {
+    width: 95% !important;
+    margin: 0 auto;
+  }
+
+  :deep(.el-dialog__header) {
+    padding: 16px;
+  }
+
+  :deep(.el-dialog__body) {
+    padding: 16px;
+  }
+
+  :deep(.el-dialog__footer) {
+    padding: 12px 16px;
+  }
+
+  :deep(.el-form-item__label) {
+    font-size: 14px;
+  }
 }
 </style>
