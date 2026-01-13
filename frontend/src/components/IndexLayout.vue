@@ -45,7 +45,7 @@
       <section class="hero-section" aria-labelledby="hero-title">
         <div class="container">
           <div class="hero-content">
-            <h1 id="hero-title" class="hero-title">LeafBoss</h1>
+            <h1 id="hero-title" class="hero-title">LEAF-BOSS</h1>
             <p class="hero-description">
               专业的业务运营支撑系统
             </p>

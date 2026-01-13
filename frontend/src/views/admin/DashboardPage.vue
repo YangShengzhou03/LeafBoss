@@ -93,11 +93,29 @@
         </el-row>
 
         <el-row :gutter="20" class="charts-row">
-          <el-col :span="24">
+          <el-col :span="12">
             <el-card class="chart-card">
               <template #header>
                 <div class="chart-header">
                   <span>未使用卡密占比</span>
+                </div>
+              </template>
+              <div class="chart-container">
+                <div v-if="specDistribution.length === 0" class="no-data">
+                  <el-empty description="暂无数据" :image-size="80" />
+                </div>
+                <div v-else class="chart-content">
+                  <v-chart :option="pieChartOption" style="height: 300px;" />
+                </div>
+              </div>
+            </el-card>
+          </el-col>
+
+          <el-col :span="12">
+            <el-card class="chart-card">
+              <template #header>
+                <div class="chart-header">
+                  <span>已使用卡密占比</span>
                 </div>
               </template>
               <div class="chart-container">

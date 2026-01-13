@@ -4,7 +4,7 @@
     <div class="admin-layout">
       <header class="admin-header">
         <div class="header-left">
-          <h1 class="logo">LeafBoss - 业务运营支撑系统</h1>
+          <h1 class="logo">LEAFBOSS - 业务运营支撑系统</h1>
         </div>
         <div class="header-right">
           <el-dropdown @command="handleCommand" trigger="click">
