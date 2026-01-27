@@ -4,43 +4,39 @@ import com.baomidou.mybatisplus.annotation.*;
 
 import java.time.LocalDateTime;
 
-/**
- * 规格实体类
- */
 @TableName("specifications")
 public class Specification {
-    
+
     @TableId(type = IdType.AUTO)
     private Integer id;
-    
+
     @TableField("product_id")
     private Integer productId;
-    
+
     @TableField("name")
     private String name;
-    
+
     @TableField("description")
     private String description;
-    
+
     @TableField("duration_days")
     private Integer durationDays;
-    
+
     @TableField("price")
     private Double price;
-    
+
     @TableField("stock_quantity")
     private Integer stockQuantity;
-    
+
     @TableField("status")
     private String status;
-    
+
     @TableField("created_at")
     private LocalDateTime createdAt;
-    
+
     @TableField("updated_at")
     private LocalDateTime updatedAt;
 
-    // Getter and Setter methods
     public Integer getId() {
         return id;
     }

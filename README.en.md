@@ -10,28 +10,28 @@
 
 </div>
 
-## 📋 Description
+## Description
 
 LeafBoss is a modern business operation support system built with a frontend-backend separation architecture. It provides comprehensive card key management, product management, specification management, user authentication, and permission control functionalities.
 
-### ✨ Key Features
+### Key Features
 
-- 🎯 **Card Key Management**: Complete card key lifecycle management with creation, verification, activation, and deactivation
-- 📦 **Product Management**: Product information management with multi-specification support
-- 📋 **Specification Management**: Flexible specification definition for different durations and prices
-- 🏢 **Company Management**: Company information management with comment statistics
-- 💬 **Review Management**: User review management with filtering by company and card key
-- 👥 **Admin Management**: Administrator account management with permission control
-- 👤 **Customer User Management**: Customer user information management with status control
-- 📊 **Data Statistics**: Visual data reports with real-time system usage monitoring
-- 📝 **Operation Logs**: Complete operation audit logs for system operation tracking
-- 🔐 **Authentication**: JWT Token authentication mechanism for system security
-- 📱 **Responsive Design**: Multi-device compatibility for PC, tablet, and mobile
-- ⚡ **High Performance**: High-performance architecture based on Spring Boot 3 and Vue 3
+- **Card Key Management**: Complete card key lifecycle management with creation, verification, activation, and deactivation
+- **Product Management**: Product information management with multi-specification support
+- **Specification Management**: Flexible specification definition for different durations and prices
+- **Company Management**: Company information management with comment statistics
+- **Review Management**: User review management with filtering by company and card key
+- **Admin Management**: Administrator account management with permission control
+- **Customer User Management**: Customer user information management with status control
+- **Data Statistics**: Visual data reports with real-time system usage monitoring
+- **Operation Logs**: Complete operation audit logs for system operation tracking
+- **Authentication**: JWT Token authentication mechanism for system security
+- **Responsive Design**: Multi-device compatibility for PC, tablet, and mobile
+- **High Performance**: High-performance architecture based on Spring Boot 3 and Vue 3
 
-## 🏗️ Software Architecture
+## Software Architecture
 
-### 🔧 Technology Stack
+### Technology Stack
 
 #### Frontend Technology Stack
 - **Vue 3.4.0** - Progressive JavaScript Framework
@@ -93,10 +93,12 @@ leaf-boss/
     │   ├── controller/      # Controller layer
     │   │   ├── AuthController.java    # Authentication controller
     │   │   ├── AdminController.java  # Admin controller
+    │   │   ├── BossReviewController.java # Review controller
     │   │   ├── CardKeyController.java # Card key controller
     │   │   ├── DashboardController.java # Dashboard controller
     │   │   ├── OperationLogController.java # Operation log controller
     │   │   ├── ProductController.java # Product controller
+    │   │   ├── PublicBossReviewController.java # Public review controller
     │   │   ├── PublicCardKeyController.java # Public card key controller
     │   │   ├── SpecificationController.java # Specification controller
     │   │   └── UserController.java    # User controller
@@ -113,15 +115,15 @@ leaf-boss/
     └── pom.xml              # Maven configuration
 ```
 
-## ⚙️ Installation
+## Installation
 
-### 📋 Environment Requirements
+### Environment Requirements
 - **Node.js 16+** (Frontend)
 - **Java 17+** (Backend)
 - **MySQL 8.0+** (Database)
 - **Maven 3.6+** (Backend build)
 
-### 🖥️ Frontend Installation
+### Frontend Installation
 
 1. **Navigate to frontend directory**
 ```bash
@@ -145,7 +147,7 @@ npm run dev
 npm run build
 ```
 
-### 🔧 Backend Installation
+### Backend Installation
 
 1. **Configure database**
 ```sql
@@ -181,9 +183,9 @@ mvn clean package
 java -jar target/leaf-boss-backend-1.0.0.jar
 ```
 
-## 🚀 Quick Start
+## Quick Start
 
-### 🔧 Getting Started
+### Getting Started
 
 1. **Start Backend Service**
    - Ensure MySQL service is running
@@ -197,22 +199,22 @@ java -jar target/leaf-boss-backend-1.0.0.jar
    - Default admin account: admin@qq.com / 123456
    - Change default password on first use
 
-### 📋 Main Function Modules
+### Main Function Modules
 
-- **🎯 Card Key Management**: Complete card key lifecycle management with creation, verification, activation, and deactivation
-- **📦 Product Management**: Product information management with multi-specification support
-- **📋 Specification Management**: Flexible specification definition for different durations and prices
-- **🏢 Company Management**: Company information management with comment statistics
-- **💬 Review Management**: User review management with filtering by company and card key
-- **👥 Admin Management**: Administrator account management with permission control
-- **👤 Customer User Management**: Customer user information management with status control
-- **📊 Data Statistics**: Visual data reports with real-time system usage monitoring
-- **📝 Operation Logs**: Complete operation audit logs for system operation tracking
-- **⚙️ System Settings**: System parameter configuration and permission settings
+- **Card Key Management**: Complete card key lifecycle management with creation, verification, activation, and deactivation
+- **Product Management**: Product information management with multi-specification support
+- **Specification Management**: Flexible specification definition for different durations and prices
+- **Company Management**: Company information management with comment statistics
+- **Review Management**: User review management with filtering by company and card key
+- **Admin Management**: Administrator account management with permission control
+- **Customer User Management**: Customer user information management with status control
+- **Data Statistics**: Visual data reports with real-time system usage monitoring
+- **Operation Logs**: Complete operation audit logs for system operation tracking
+- **System Settings**: System parameter configuration and permission settings
 
-## 💻 Development Guide
+## Development Guide
 
-### 🖥️ Frontend Development
+### Frontend Development
 
 ```bash
 # Development mode (with hot reload)
@@ -225,7 +227,7 @@ npm run lint
 npm run build
 ```
 
-### 🔧 Backend Development
+### Backend Development
 
 ```bash
 # Compile project
@@ -238,9 +240,9 @@ mvn test
 mvn clean package
 ```
 
-## 🚀 Deployment
+## Deployment
 
-### 📦 Production Environment Deployment
+### Production Environment Deployment
 
 1. **Frontend Deployment**
    - Execute `npm run build` to generate dist directory
@@ -252,7 +254,7 @@ mvn clean package
    - Deploy using systemd or Docker
    - Configure production database connection
 
-### 🐳 Docker Deployment (Optional)
+### Docker Deployment (Optional)
 
 ```dockerfile
 # Frontend Dockerfile
@@ -264,13 +266,13 @@ FROM openjdk:17-jre-slim
 COPY target/leaf-boss-backend-1.0.0.jar /app.jar
 ```
 
-## 🤝 Contribution
+## Contribution
 
 We welcome contributions of all kinds!
 
-### 📝 How to Contribute
+### How to Contribute
 
-1. **Fork the repository**
+1. **Fork repository**
 2. **Create feature branch**
    ```bash
    git checkout -b feature/AmazingFeature
@@ -279,65 +281,65 @@ We welcome contributions of all kinds!
    ```bash
    git commit -m 'Add some AmazingFeature'
    ```
-4. **Push to the branch**
+4. **Push to branch**
    ```bash
    git push origin feature/AmazingFeature
    ```
 5. **Open a Pull Request**
 
-### 📋 Contribution Guidelines
+### Contribution Guidelines
 
-- ✅ Follow code standards
-- ✅ Write clear commit messages
-- ✅ Add appropriate test cases
-- ✅ Update relevant documentation
+- Follow code standards
+- Write clear commit messages
+- Add appropriate test cases
+- Update relevant documentation
 
-## 📋 Version History
+## Version History
 
-### 📊 Release Overview
+### Release Overview
 
 | Version | Release Date | Key Features |
 |---------|--------------|--------------|
-| **v2.0.0** | 2025-01-10 | LeafCard upgraded to LeafBoss Business Operation Support System |
+| **v2.0.0** | 2026-01-18 | LeafCard upgraded to LeafBoss Business Operation Support System |
 | **v1.0.0** | 2024-10-27 | LeafCard Card Management System officially launched |
 
-### 📝 Detailed Changelog
+### Detailed Changelog
 
-#### v2.0.0 (2025-01-10)
-- 🎉 System upgraded from LeafCard to LeafBoss Business Operation Support System
-- 🔄 Refactored system architecture, expanded to comprehensive business operation support system
-- 📝 Updated all documentation and configuration files
-- 🎨 Optimized UI design, improved user experience
-- 🔒 Enhanced security verification mechanism
-- 👥 Added personnel management module, supporting administrator and regular user management
-- 📦 Optimized product specification management functionality
+#### v2.0.0 (2026-01-18)
+- System upgraded from LeafCard to LeafBoss Business Operation Support System
+- Refactored system architecture, expanded to comprehensive business operation support system
+- Updated all documentation and configuration files
+- Optimized UI design, improved user experience
+- Enhanced security verification mechanism
+- Added personnel management module, supporting administrator and regular user management
+- Optimized product specification management functionality
 
 #### v1.0.0 (2024-10-27)
-- 🎉 LeafCard Card Management System officially launched
-- 🔐 Complete user authentication system
-- 💳 Basic card management functionality
-- 📈 Basic data statistics functionality
+- LeafCard Card Management System officially launched
+- Complete user authentication system
+- Basic card management functionality
+- Basic data statistics functionality
 
-### 🎯 Development Timeline
+### Development Timeline
 
 - **Project Conception** (January 2024) - Conceived a lightweight, easy-to-use card management system based on analysis of existing card management systems
 - **Technology Selection** (February 2024) - Selected Vue 3 + Spring Boot 3 technology stack, began system architecture design
 - **Core Development** (March-July 2024) - Completed frontend and backend core functionality development, including card management, user management, permission control, etc.
 - **Official Launch** (October 27, 2024) - LeafCard Card Management System officially launched, providing services to users
-- **System Upgrade** (January 10, 2025) - LeafCard upgraded to LeafBoss Business Operation Support System, supporting comprehensive systems
+- **System Upgrade** (January 18, 2026) - LeafCard upgraded to LeafBoss Business Operation Support System, supporting comprehensive systems
 
-## 📄 License
+## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under MIT License - see [LICENSE](LICENSE) file for details.
 
-## 📞 Contact
+## Contact
 
 - **GitHub Repository**: [https://github.com/YangShengzhou03/LeafBoss](https://github.com/YangShengzhou03/LeafBoss)
 - **Issue Tracker**: [GitHub Issues](https://github.com/YangShengzhou03/LeafBoss/issues)
 - **Email**: dev@leafboss.com
 - **Project Homepage**: [https://github.com/YangShengzhou03/LeafBoss](https://github.com/YangShengzhou03/LeafBoss)
 
-## 📊 Project Statistics
+## Project Statistics
 
 ![GitHub Release](https://img.shields.io/github/v/release/YangShengzhou03/LeafBoss?style=flat-square)
 ![GitHub Last Commit](https://img.shields.io/github/last-commit/YangShengzhou03/LeafBoss?style=flat-square)
@@ -346,13 +348,13 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-## 🙏 Thank You!
+## Thank You!
 
-**Thank you for using LeafBoss!** 🍁
+**Thank you for using LeafBoss!**
 
 <div align="center">
 
-If this project helps you, please give it a ⭐ Star!
+If this project helps you, please give it a Star support!
 
 [![Star History Chart](https://api.star-history.com/svg?repos=YangShengzhou03/LeafBoss&type=Date)](https://star-history.com/#YangShengzhou03/LeafBoss&Date)
 

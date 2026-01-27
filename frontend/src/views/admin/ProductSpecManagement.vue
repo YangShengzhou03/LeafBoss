@@ -227,7 +227,6 @@ const loadProducts = async () => {
 const loadSpecs = async () => {
   loading.value = true
   try {
-    // 使用DTO接口获取包含卡密统计信息的规格数据
     const response = await api.admin.getSpecListDTO({
       page: currentPage.value,
       size: pageSize.value,
@@ -236,7 +235,6 @@ const loadSpecs = async () => {
     })
 
     if (response && response.data) {
-      // 正确解析分页响应结构
       const pageData = response.data
       const specList = pageData.records || pageData.content || pageData.list || []
 

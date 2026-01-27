@@ -397,7 +397,7 @@ onMounted(() => {
     loginForm.rememberPassword = true
 
     if (loginForm.email === 'admin@leaf.com') {
-      loginForm.email = 'admin@leafcard.com'
+      loginForm.email = 'admin@leafboss.com'
     }
   }
 })

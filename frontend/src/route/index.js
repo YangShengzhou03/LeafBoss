@@ -8,7 +8,7 @@ const routes = [
     name: 'Login',
     component: () => import('@/views/LoginPage.vue'),
     meta: {
-      title: '管理员登录 - LeafCard',
+      title: '管理员登录 - LEAF-BOSS',
       requiresAuth: false
     }
   },
@@ -18,7 +18,7 @@ const routes = [
     name: 'HomePage',
     component: () => import('@/components/IndexLayout.vue'),
     meta: {
-      title: 'LeafCard - 轻羽卡管系统',
+      title: 'LEAF-BOSS - 业务运营支撑系统',
       requiresAuth: false
     }
   },

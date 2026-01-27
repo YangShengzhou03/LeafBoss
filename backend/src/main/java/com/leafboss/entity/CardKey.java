@@ -4,43 +4,39 @@ import com.baomidou.mybatisplus.annotation.*;
 
 import java.time.LocalDateTime;
 
-/**
- * 卡密实体类
- */
 @TableName("card_keys")
 public class CardKey {
-    
+
     @TableId(type = IdType.AUTO)
     private Integer id;
-    
+
     @TableField("card_key")
     private String cardKey;
-    
+
     @TableField("specification_id")
     private Integer specificationId;
-    
+
     @TableField("status")
     private String status;
-    
+
     @TableField("user_email")
     private String userEmail;
-    
+
     @TableField("user_id")
     private String userId;
-    
+
     @TableField("activate_time")
     private LocalDateTime activateTime;
-    
+
     @TableField("expire_time")
     private LocalDateTime expireTime;
-    
+
     @TableField("created_at")
     private LocalDateTime createdAt;
-    
+
     @TableField("updated_at")
     private LocalDateTime updatedAt;
 
-    // Getter and Setter methods
     public Integer getId() {
         return id;
     }

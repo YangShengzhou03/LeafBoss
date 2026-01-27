@@ -94,7 +94,7 @@ export default {
   name: 'PrivacyPolicyPage',
   setup() {
     onMounted(() => {
-      document.title = '隐私政策 - LeafCard';
+      document.title = '隐私政策 - LEAF-BOSS';
     });
   }
 }

@@ -49,18 +49,20 @@
 
 ## 公共 API（无需认证）
 
-### 1. 验证并激活卡密
+### 卡密验证接口
+
+#### 验证并激活卡密
 
 **接口地址**: `GET /api/public/card-keys/verify/{cardKey}`
 
-**说明**: 验证安装卡密，验证成功时自动激活（未使用→已使用）
+**功能说明**: 验证安装卡密，验证成功时自动激活（未使用→已使用）
 
 **请求示例**:
 ```bash
 curl -X GET "http://localhost:8081/api/public/card-keys/verify/vD2Sbh1OXLLKPFBfB49JnCaV0atSlyQh"
 ```
 
-**成功响应**:
+**成功响应示例**:
 ```json
 {
     "code": 200,
@@ -69,7 +71,7 @@ curl -X GET "http://localhost:8081/api/public/card-keys/verify/vD2Sbh1OXLLKPFBfB
 }
 ```
 
-**失败响应**:
+**失败响应示例**:
 ```json
 {
     "code": 404,
@@ -98,11 +100,13 @@ curl -X GET "http://localhost:8081/api/public/card-keys/verify/vD2Sbh1OXLLKPFBfB
 
 ---
 
-### 2. 创建评论
+### 评论管理接口
+
+#### 创建评论
 
 **接口地址**: `POST /api/public/boss-reviews`
 
-**说明**: 用户通过卡密和公司名发表评论，每个卡密只能对每个公司评论一次
+**功能说明**: 用户通过卡密和公司名发表评论，每个卡密只能对每个公司评论一次
 
 **请求参数**:
 ```json
@@ -124,7 +128,7 @@ curl -X POST "http://localhost:8081/api/public/boss-reviews" \
   }'
 ```
 
-**成功响应**:
+**成功响应示例**:
 ```json
 {
     "code": 200,
@@ -133,7 +137,7 @@ curl -X POST "http://localhost:8081/api/public/boss-reviews" \
 }
 ```
 
-**失败响应**:
+**失败响应示例**:
 ```json
 {
     "code": 400,
@@ -142,13 +146,11 @@ curl -X POST "http://localhost:8081/api/public/boss-reviews" \
 }
 ```
 
----
-
-### 3. 查询公司评论
+#### 查询公司评论
 
 **接口地址**: `GET /api/public/boss-reviews`
 
-**说明**: 根据公司名称查询该公司的所有评论，支持分页
+**功能说明**: 根据公司名称查询该公司的所有评论，支持分页
 
 **查询参数**:
 - `company_name` (必填): 公司名称
@@ -160,7 +162,7 @@ curl -X POST "http://localhost:8081/api/public/boss-reviews" \
 curl -X GET "http://localhost:8081/api/public/boss-reviews?company_name=杨圣洲&page=1&size=10"
 ```
 
-**成功响应**:
+**成功响应示例**:
 ```json
 {
     "code": 200,
@@ -183,7 +185,7 @@ curl -X GET "http://localhost:8081/api/public/boss-reviews?company_name=杨圣�
 }
 ```
 
-**失败响应**:
+**失败响应示例**:
 ```json
 {
     "code": 400,
@@ -242,7 +244,7 @@ curl -X POST "http://localhost:8081/api/auth/login" \
 
 ## 认证管理 API
 
-### 1. 用户登录
+### 用户登录
 
 **接口地址**: `POST /api/auth/login`
 
@@ -274,9 +276,7 @@ curl -X POST "http://localhost:8081/api/auth/login" \
 }
 ```
 
----
-
-### 2. 获取当前用户信息
+### 获取当前用户信息
 
 **接口地址**: `GET /api/auth/me`
 
@@ -302,9 +302,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 }
 ```
 
----
-
-### 3. 更新当前用户信息
+### 更新当前用户信息
 
 **接口地址**: `PUT /api/auth/me`
 
@@ -336,9 +334,7 @@ Content-Type: application/json
 }
 ```
 
----
-
-### 4. 用户注册
+### 用户注册
 
 **接口地址**: `POST /api/auth/register`
 
@@ -361,9 +357,7 @@ Content-Type: application/json
 }
 ```
 
----
-
-### 5. 用户登出
+### 用户登出
 
 **接口地址**: `POST /api/auth/logout`
 
@@ -385,7 +379,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
 ## 管理员管理 API
 
-### 1. 获取管理员列表
+### 获取管理员列表
 
 **接口地址**: `GET /api/admins`
 
@@ -419,9 +413,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 }
 ```
 
----
-
-### 2. 创建管理员
+### 创建管理员
 
 **接口地址**: `POST /api/admins`
 
@@ -444,9 +436,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 }
 ```
 
----
-
-### 3. 更新管理员
+### 更新管理员
 
 **接口地址**: `PUT /api/admins/{id}`
 
@@ -473,9 +463,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 }
 ```
 
----
-
-### 4. 删除管理员
+### 删除管理员
 
 **接口地址**: `DELETE /api/admins/{id}`
 
@@ -488,9 +476,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 }
 ```
 
----
-
-### 5. 重置管理员密码（需要验证码）
+### 重置管理员密码（需要验证码）
 
 **接口地址**: `POST /api/admins/reset-password`
 
@@ -512,9 +498,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 }
 ```
 
----
-
-### 6. 管理员直接重置用户密码（无需验证码）
+### 管理员直接重置用户密码（无需验证码）
 
 **接口地址**: `POST /api/admins/admin-reset-password`
 
@@ -535,9 +519,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 }
 ```
 
----
-
-### 7. 发送重置密码验证码
+### 发送重置密码验证码
 
 **接口地址**: `POST /api/admins/send-reset-code`
 
@@ -557,9 +539,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 }
 ```
 
----
-
-### 8. 获取管理员统计信息
+### 获取管理员统计信息
 
 **接口地址**: `GET /api/admins/statistics`
 
@@ -576,9 +556,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 }
 ```
 
----
-
-### 9. 获取当前用户信息
+### 获取当前用户信息
 
 **接口地址**: `GET /api/admins/info`
 
@@ -604,9 +582,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 }
 ```
 
----
-
-### 10. 更新当前用户信息
+### 更新当前用户信息
 
 **接口地址**: `PUT /api/admins/info`
 
@@ -634,9 +610,7 @@ Content-Type: application/json
 }
 ```
 
----
-
-### 11. 修改当前用户密码
+### 修改当前用户密码
 
 **接口地址**: `PUT /api/admins/password`
 
@@ -667,7 +641,7 @@ Content-Type: application/json
 
 ## 操作日志管理 API
 
-### 1. 获取操作日志列表
+### 获取操作日志列表
 
 **接口地址**: `GET /api/operation-logs`
 
@@ -701,9 +675,7 @@ Content-Type: application/json
 }
 ```
 
----
-
-### 2. 获取日志统计信息
+### 获取日志统计信息
 
 **接口地址**: `GET /api/operation-logs/stats`
 
@@ -730,9 +702,7 @@ Content-Type: application/json
 }
 ```
 
----
-
-### 3. 根据操作类型查询操作日志
+### 根据操作类型查询操作日志
 
 **接口地址**: `GET /api/operation-logs/type/{operationType}`
 
@@ -753,9 +723,7 @@ Content-Type: application/json
 }
 ```
 
----
-
-### 4. 导出操作日志
+### 导出操作日志
 
 **接口地址**: `GET /api/operation-logs/export`
 
@@ -765,9 +733,7 @@ Content-Type: application/json
 
 **响应**: 返回Excel文件下载
 
----
-
-### 5. 清空操作日志
+### 清空操作日志
 
 **接口地址**: `DELETE /api/operation-logs`
 
@@ -780,9 +746,7 @@ Content-Type: application/json
 }
 ```
 
----
-
-### 6. 记录操作日志
+### 记录操作日志
 
 **接口地址**: `POST /api/operation-logs`
 
@@ -808,7 +772,7 @@ Content-Type: application/json
 
 ## 产品管理 API
 
-### 1. 分页查询产品列表
+### 分页查询产品列表
 
 **接口地址**: `GET /api/products`
 
@@ -843,9 +807,7 @@ Content-Type: application/json
 }
 ```
 
----
-
-### 2. 根据ID查询产品
+### 根据ID查询产品
 
 **接口地址**: `GET /api/products/{id}`
 
@@ -866,9 +828,7 @@ Content-Type: application/json
 }
 ```
 
----
-
-### 3. 创建产品
+### 创建产品
 
 **接口地址**: `POST /api/products`
 
@@ -891,9 +851,7 @@ Content-Type: application/json
 }
 ```
 
----
-
-### 4. 更新产品
+### 更新产品
 
 **接口地址**: `PUT /api/products/{id}`
 
@@ -917,9 +875,7 @@ Content-Type: application/json
 }
 ```
 
----
-
-### 5. 删除产品
+### 删除产品
 
 **接口地址**: `DELETE /api/products/{id}`
 
@@ -932,9 +888,7 @@ Content-Type: application/json
 }
 ```
 
----
-
-### 6. 获取产品统计信息
+### 获取产品统计信息
 
 **接口地址**: `GET /api/products/statistics`
 
@@ -953,9 +907,7 @@ Content-Type: application/json
 }
 ```
 
----
-
-### 7. 根据分类获取产品
+### 根据分类获取产品
 
 **接口地址**: `GET /api/products/category/{category}`
 
@@ -982,7 +934,7 @@ Content-Type: application/json
 
 ## 规格管理 API
 
-### 1. 分页查询规格列表
+### 分页查询规格列表
 
 **接口地址**: `GET /api/specifications`
 
@@ -1020,9 +972,7 @@ Content-Type: application/json
 }
 ```
 
----
-
-### 2. 根据ID查询规格
+### 根据ID查询规格
 
 **接口地址**: `GET /api/specifications/{id}`
 
@@ -1046,9 +996,7 @@ Content-Type: application/json
 }
 ```
 
----
-
-### 3. 根据产品ID查询规格列表
+### 根据产品ID查询规格列表
 
 **接口地址**: `GET /api/specifications/product/{productId}`
 
@@ -1074,9 +1022,7 @@ Content-Type: application/json
 }
 ```
 
----
-
-### 4. 根据状态查询规格列表
+### 根据状态查询规格列表
 
 **接口地址**: `GET /api/specifications/status/{status}`
 
@@ -1102,9 +1048,7 @@ Content-Type: application/json
 }
 ```
 
----
-
-### 5. 创建规格
+### 创建规格
 
 **接口地址**: `POST /api/specifications`
 
@@ -1130,9 +1074,7 @@ Content-Type: application/json
 }
 ```
 
----
-
-### 6. 更新规格
+### 更新规格
 
 **接口地址**: `PUT /api/specifications/{id}`
 
@@ -1159,9 +1101,7 @@ Content-Type: application/json
 }
 ```
 
----
-
-### 7. 删除规格
+### 删除规格
 
 **接口地址**: `DELETE /api/specifications/{id}`
 
@@ -1174,9 +1114,7 @@ Content-Type: application/json
 }
 ```
 
----
-
-### 8. 获取规格统计信息
+### 获取规格统计信息
 
 **接口地址**: `GET /api/specifications/statistics`
 
@@ -1194,9 +1132,7 @@ Content-Type: application/json
 }
 ```
 
----
-
-### 9. 获取规格DTO列表（包含卡密统计信息）
+### 获取规格DTO列表（包含卡密统计信息）
 
 **接口地址**: `GET /api/specifications/dto`
 
@@ -1225,9 +1161,7 @@ Content-Type: application/json
 }
 ```
 
----
-
-### 10. 分页获取规格DTO列表（包含卡密统计信息）
+### 分页获取规格DTO列表（包含卡密统计信息）
 
 **接口地址**: `GET /api/specifications/dto/pagination`
 
@@ -1272,7 +1206,7 @@ Content-Type: application/json
 
 ## 卡密管理 API
 
-### 1. 分页查询卡密列表
+### 分页查询卡密列表
 
 **接口地址**: `GET /api/card-keys`
 
@@ -1309,9 +1243,7 @@ Content-Type: application/json
 }
 ```
 
----
-
-### 2. 获取包含商品和规格名称的卡密列表
+### 获取包含商品和规格名称的卡密列表
 
 **接口地址**: `GET /api/card-keys/with-details`
 
@@ -1352,9 +1284,7 @@ Content-Type: application/json
 }
 ```
 
----
-
-### 3. 搜索卡密
+### 搜索卡密
 
 **接口地址**: `GET /api/card-keys/search`
 
@@ -1381,9 +1311,7 @@ Content-Type: application/json
 }
 ```
 
----
-
-### 4. 验证卡密
+### 验证卡密
 
 **接口地址**: `GET /api/card-keys/verify/{cardKey}`
 
@@ -1412,9 +1340,7 @@ Content-Type: application/json
 }
 ```
 
----
-
-### 5. 激活卡密
+### 激活卡密
 
 **接口地址**: `POST /api/card-keys/activate`
 
@@ -1434,9 +1360,7 @@ Content-Type: application/json
 }
 ```
 
----
-
-### 6. 禁用卡密
+### 禁用卡密
 
 **接口地址**: `POST /api/card-keys/disable`
 
@@ -1456,9 +1380,7 @@ Content-Type: application/json
 }
 ```
 
----
-
-### 7. 获取卡密统计信息
+### 获取卡密统计信息
 
 **接口地址**: `GET /api/card-keys/statistics`
 
@@ -1476,9 +1398,7 @@ Content-Type: application/json
 }
 ```
 
----
-
-### 8. 创建卡密
+### 创建卡密
 
 **接口地址**: `POST /api/card-keys`
 
@@ -1500,9 +1420,7 @@ Content-Type: application/json
 }
 ```
 
----
-
-### 9. 删除卡密（通过ID）
+### 删除卡密（通过ID）
 
 **接口地址**: `DELETE /api/card-keys/{id}`
 
@@ -1515,9 +1433,7 @@ Content-Type: application/json
 }
 ```
 
----
-
-### 10. 删除卡密（通过卡密字符串）
+### 删除卡密（通过卡密字符串）
 
 **接口地址**: `DELETE /api/card-keys/by-card-key/{cardKey}`
 
@@ -1530,9 +1446,7 @@ Content-Type: application/json
 }
 ```
 
----
-
-### 11. 批量生成卡密
+### 批量生成卡密
 
 **接口地址**: `POST /api/card-keys/batch-generate`
 
@@ -1554,9 +1468,7 @@ Content-Type: application/json
 }
 ```
 
----
-
-### 12. 切换卡密状态
+### 切换卡密状态
 
 **接口地址**: `POST /api/card-keys/{cardKey}/status`
 
@@ -1576,9 +1488,7 @@ Content-Type: application/json
 }
 ```
 
----
-
-### 13. 批量删除已使用卡密
+### 批量删除已使用卡密
 
 **接口地址**: `DELETE /api/card-keys/batch-delete-used`
 
@@ -1595,7 +1505,7 @@ Content-Type: application/json
 
 ## 公司管理 API
 
-### 1. 分页查询公司列表
+### 分页查询公司列表
 
 **接口地址**: `GET /api/companies`
 
@@ -1628,9 +1538,7 @@ Content-Type: application/json
 }
 ```
 
----
-
-### 2. 根据ID查询公司
+### 根据ID查询公司
 
 **接口地址**: `GET /api/companies/{id}`
 
@@ -1650,9 +1558,7 @@ Content-Type: application/json
 }
 ```
 
----
-
-### 3. 创建公司
+### 创建公司
 
 **接口地址**: `POST /api/companies`
 
@@ -1674,9 +1580,7 @@ Content-Type: application/json
 }
 ```
 
----
-
-### 4. 更新公司
+### 更新公司
 
 **接口地址**: `PUT /api/companies/{id}`
 
@@ -1698,9 +1602,7 @@ Content-Type: application/json
 }
 ```
 
----
-
-### 5. 删除公司
+### 删除公司
 
 **接口地址**: `DELETE /api/companies/{id}`
 
@@ -1717,7 +1619,7 @@ Content-Type: application/json
 
 ## 评论管理 API
 
-### 1. 分页查询评论列表
+### 分页查询评论列表
 
 **接口地址**: `GET /api/boss-reviews`
 
@@ -1751,9 +1653,7 @@ Content-Type: application/json
 }
 ```
 
----
-
-### 2. 根据ID查询评论
+### 根据ID查询评论
 
 **接口地址**: `GET /api/boss-reviews/{id}`
 
@@ -1773,9 +1673,7 @@ Content-Type: application/json
 }
 ```
 
----
-
-### 3. 创建评论
+### 创建评论
 
 **接口地址**: `POST /api/boss-reviews`
 
@@ -1797,9 +1695,7 @@ Content-Type: application/json
 }
 ```
 
----
-
-### 4. 删除评论
+### 删除评论
 
 **接口地址**: `DELETE /api/boss-reviews/{id}`
 
@@ -1816,7 +1712,7 @@ Content-Type: application/json
 
 ## 客户用户管理 API
 
-### 1. 分页查询用户列表
+### 分页查询用户列表
 
 **接口地址**: `GET /api/users`
 
@@ -1849,9 +1745,7 @@ Content-Type: application/json
 }
 ```
 
----
-
-### 2. 根据ID查询用户
+### 根据ID查询用户
 
 **接口地址**: `GET /api/users/{id}`
 
@@ -1871,9 +1765,7 @@ Content-Type: application/json
 }
 ```
 
----
-
-### 3. 创建用户
+### 创建用户
 
 **接口地址**: `POST /api/users`
 
@@ -1896,9 +1788,7 @@ Content-Type: application/json
 }
 ```
 
----
-
-### 4. 更新用户
+### 更新用户
 
 **接口地址**: `PUT /api/users/{id}`
 
@@ -1920,9 +1810,7 @@ Content-Type: application/json
 }
 ```
 
----
-
-### 5. 删除用户
+### 删除用户
 
 **接口地址**: `DELETE /api/users/{id}`
 
@@ -1935,9 +1823,7 @@ Content-Type: application/json
 }
 ```
 
----
-
-### 6. 重置用户密码
+### 重置用户密码
 
 **接口地址**: `POST /api/users/reset-password`
 
@@ -2003,5 +1889,5 @@ Content-Type: application/json
 
 ---
 
-*最后更新: 2026-01-10*  
+*最后更新: 2026-01-18*  
 *文档版本: v3.0.0*

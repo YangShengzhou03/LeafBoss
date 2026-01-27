@@ -132,7 +132,7 @@
           </nav>
         </div>
         <div class="footer-bottom">
-          <p>&copy; 2024-2025 LeafBoss - 业务运营支撑系统</p>
+          <p>&copy; 2024-2026 LEAF-BOSS - 业务运营支撑系统</p>
           <div class="icp-info">
             <a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer"
               aria-label="查看ICP备案信息：赣ICP备2025075576号">
@@ -156,7 +156,6 @@ import store from '@/utils/store.js'
 
 const router = useRouter()
 
-// 计算属性 - 使用更高效的计算方式
 const isAuthenticated = computed(() => store.state.isAuthenticated)
 const currentUser = computed(() => store.state.user)
 const displayName = computed(() => {
@@ -166,7 +165,6 @@ const displayName = computed(() => {
 })
 const userAvatar = computed(() => currentUser.value?.avatar || '')
 
-// 功能特色数据 - 使用只读常量
 const FEATURES_DATA = [
   {
     id: 1,
@@ -190,7 +188,6 @@ const FEATURES_DATA = [
 
 const features = ref(FEATURES_DATA)
 
-// 优化滚动性能 - 使用防抖
 let scrollTimeout = null
 const scrollToSection = (sectionId) => {
   if (scrollTimeout) clearTimeout(scrollTimeout)
@@ -206,18 +203,15 @@ const scrollToSection = (sectionId) => {
   }, 50)
 }
 
-// 清理定时器
 onUnmounted(() => {
   if (scrollTimeout) clearTimeout(scrollTimeout)
 })
 
-// 错误处理工具函数
 const handleError = (message, error) => {
   console.error(message, error)
   ElMessage.error(message)
 }
 
-// 处理用户下拉菜单命令 - 优化错误处理
 const handleUserCommand = async (command) => {
   try {
     if (command === 'logout') {
@@ -228,7 +222,7 @@ const handleUserCommand = async (command) => {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning',
-          lockScroll: false // 防止锁定背景滚动
+          lockScroll: false
         }
       )
 
@@ -245,7 +239,6 @@ const handleUserCommand = async (command) => {
   }
 }
 
-// 处理登录 - 添加错误处理
 const handleLogin = () => {
   try {
     router.push('/login')
@@ -254,7 +247,6 @@ const handleLogin = () => {
   }
 }
 
-// 处理注册 - 添加错误处理
 const handleRegister = () => {
   try {
     router.push('/login?mode=register')
@@ -263,7 +255,6 @@ const handleRegister = () => {
   }
 }
 
-// 处理开始使用 - 优化路由逻辑和错误处理
 const handleStart = () => {
   try {
     if (!isAuthenticated.value) {
@@ -271,7 +262,6 @@ const handleStart = () => {
       return
     }
 
-    // 已登录，根据用户角色跳转到对应页面
     const targetRoute = store.state.isAdmin ? '/admin' : '/user'
     router.push(targetRoute)
   } catch (error) {
@@ -279,23 +269,19 @@ const handleStart = () => {
   }
 }
 
-// 键盘导航支持
 const handleKeydown = (event) => {
   if (event.key === 'Enter' || event.key === ' ') {
     const target = event.target
     if (target.classList.contains('user-dropdown')) {
       event.preventDefault()
-      // 触发下拉菜单
     }
   }
 }
 
-// 组件挂载时添加键盘事件监听
 onMounted(() => {
   document.addEventListener('keydown', handleKeydown)
 })
 
-// 组件卸载时清理事件监听
 onUnmounted(() => {
   document.removeEventListener('keydown', handleKeydown)
 })

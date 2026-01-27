@@ -4,34 +4,30 @@ import com.baomidou.mybatisplus.annotation.*;
 
 import java.time.LocalDateTime;
 
-/**
- * 产品实体类
- */
 @TableName("products")
 public class Product {
-    
+
     @TableId(type = IdType.AUTO)
     private Integer id;
-    
+
     @TableField("name")
     private String name;
-    
+
     @TableField("description")
     private String description;
-    
+
     @TableField("category")
     private String category;
-    
+
     @TableField("status")
     private String status;
-    
+
     @TableField("created_at")
     private LocalDateTime createdAt;
-    
+
     @TableField("updated_at")
     private LocalDateTime updatedAt;
 
-    // Getter and Setter methods
     public Integer getId() {
         return id;
     }

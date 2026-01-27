@@ -4,7 +4,7 @@
     <header class="page-header">
       <div class="container">
         <h1>关于作者</h1>
-        <p>LeafBoss 业务运营支撑系统开发者简介</p>
+        <p>LeafBoss 业务运营支撑系统 · 独立开发者技术实践与产品探索</p>
       </div>
     </header>
 
@@ -36,10 +36,10 @@
                     <span class="tag">Microservices</span>
                   </div>
                   <p class="profile-bio">
-                    独立开发者，热爱从零到一打造实用的产品。热爱探索新的技术和创意，
-                    喜欢专研用户需求，然后自己动手把想法变成现实——从界面设计到前后端开发，
-                    再到部署上线，整个流程都能独立搞定。作品有LeafBoss、LeafView、Lucky_SMS等项目，
-                    享受把创意落地为实用工具的成就感。
+                    全栈独立开发者，专注于从零到一构建实用产品。热衷于技术探索与创新实践，
+                    深入研究用户需求，独立完成从产品设计、前后端开发到部署上线的全流程。
+                    已成功打造 LeafBoss、LeafSort、Lucky_SMS 等多个项目，
+                    致力于将创意转化为高效、实用的工具产品，为用户创造真实价值。
                   </p>
                 </div>
               </div>
@@ -56,36 +56,36 @@
                 <div class="timeline-item">
                     <div class="timeline-marker"></div>
                     <div class="timeline-content">
-                      <h3>项目构思(2024年1月)</h3>
-                      <p>基于对现有卡管理系统的分析，构思开发一个轻量级、易用的卡管系统</p>
+                      <h3>项目构思 · 2024年1月</h3>
+                      <p>深入分析现有业务运营支撑系统痛点，构思打造轻量级、高可用的业务运营支撑系统</p>
                     </div>
                   </div>
                 <div class="timeline-item">
                     <div class="timeline-marker"></div>
                     <div class="timeline-content">
-                      <h3>技术选型(2024年2月)</h3>
-                      <p>确定使用Vue 3 + Spring Boot 3的技术栈，开始系统架构设计</p>
+                      <h3>技术选型 · 2024年2月</h3>
+                      <p>确定采用 Vue 3 + Spring Boot 3 现代化技术栈，完成系统架构设计与技术方案论证</p>
                     </div>
                   </div>
                 <div class="timeline-item">
                     <div class="timeline-marker"></div>
                     <div class="timeline-content">
-                      <h3>核心开发(2024年3月-7月)</h3>
-                      <p>完成前后端核心功能开发，包括卡管理、用户管理、权限控制等</p>
+                      <h3>核心开发 · 2024年3月-7月</h3>
+                      <p>完成前后端核心功能开发，实现卡管理、用户管理、权限控制等关键模块</p>
                     </div>
                   </div>
                 <div class="timeline-item">
                     <div class="timeline-marker"></div>
                     <div class="timeline-content">
-                      <h3>测试优化(2024年8月-9月)</h3>
-                      <p>进行系统测试和性能优化，完善用户体验</p>
+                    <h3>正式发布 · 2024年10月27日</h3>
+                    <p>LEAF-BOSS 业务运营支撑系统正式上线，开始为用户提供稳定服务</p>
                     </div>
                   </div>
                 <div class="timeline-item">
                   <div class="timeline-marker"></div>
                   <div class="timeline-content">
-                    <h3>正式发布(2024年10月27日)</h3>
-                    <p>LeafCard轻羽卡管系统正式上线，为用户提供服务</p>
+                    <h3>全面重构 · 2026年1月18日</h3>
+                    <p>系统全面架构升级，正式更名为 LeafBoss，大幅提升性能与用户体验</p>
                   </div>
                 </div>
               </div>

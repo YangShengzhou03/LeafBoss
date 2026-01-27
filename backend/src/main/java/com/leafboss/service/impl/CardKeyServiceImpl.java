@@ -21,15 +21,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-/**
- * 卡密服务实现类
- */
 @Service
 public class CardKeyServiceImpl extends ServiceImpl<CardKeyMapper, CardKey> implements CardKeyService {
 
     @Autowired
     private SpecificationService specificationService;
-    
+
     @Autowired
     private ProductService productService;
 
@@ -50,18 +47,15 @@ public class CardKeyServiceImpl extends ServiceImpl<CardKeyMapper, CardKey> impl
     @Override
     public IPage<CardKeyDTO> getCardKeyListWithDetails(Page<CardKey> pageParam, String keyword, Long specificationId, String status) {
         QueryWrapper<CardKey> queryWrapper = new QueryWrapper<>();
-        
-        // 根据状态筛选
+
         if (status != null && !status.trim().isEmpty()) {
             queryWrapper.eq("status", status);
         }
-        
-        // 根据规格ID筛选
+
         if (specificationId != null) {
             queryWrapper.eq("specification_id", specificationId);
         }
-        
-        // 根据关键词筛选（卡密或用户邮箱）
+
         if (keyword != null && !keyword.trim().isEmpty()) {
             queryWrapper.and(wrapper -> wrapper
                 .like("card_key", keyword)
@@ -69,11 +63,9 @@ public class CardKeyServiceImpl extends ServiceImpl<CardKeyMapper, CardKey> impl
                 .like("user_email", keyword)
             );
         }
-        
-        // 使用分页查询
+
         Page<CardKey> cardKeyPage = baseMapper.selectPage(pageParam, queryWrapper);
-        
-        // 转换为DTO列表
+
         List<CardKeyDTO> dtoList = cardKeyPage.getRecords().stream().map(cardKey -> {
             CardKeyDTO dto = new CardKeyDTO();
             dto.setId(cardKey.getId());
@@ -86,15 +78,13 @@ public class CardKeyServiceImpl extends ServiceImpl<CardKeyMapper, CardKey> impl
             dto.setExpireTime(cardKey.getExpireTime());
             dto.setCreatedAt(cardKey.getCreatedAt());
             dto.setUpdatedAt(cardKey.getUpdatedAt());
-            
-            // 获取规格信息
+
             if (cardKey.getSpecificationId() != null) {
                 Specification spec = specificationService.getById(cardKey.getSpecificationId());
                 if (spec != null) {
                     dto.setSpecificationName(spec.getName());
                     dto.setProductId(spec.getProductId());
-                    
-                    // 获取商品信息
+
                     if (spec.getProductId() != null) {
                         Product product = productService.getById(spec.getProductId());
                         if (product != null) {
@@ -103,14 +93,13 @@ public class CardKeyServiceImpl extends ServiceImpl<CardKeyMapper, CardKey> impl
                     }
                 }
             }
-            
+
             return dto;
         }).collect(Collectors.toList());
-        
-        // 创建分页结果
+
         Page<CardKeyDTO> resultPage = new Page<>(cardKeyPage.getCurrent(), cardKeyPage.getSize(), cardKeyPage.getTotal());
         resultPage.setRecords(dtoList);
-        
+
         return resultPage;
     }
 
@@ -120,16 +109,14 @@ public class CardKeyServiceImpl extends ServiceImpl<CardKeyMapper, CardKey> impl
         if (card == null || !"未使用".equals(card.getStatus())) {
             return false;
         }
-        
+
         card.setStatus("已使用");
         card.setUserId(userId);
         card.setUserEmail(userEmail);
         card.setActivateTime(LocalDateTime.now());
-        
-        // 设置过期时间（这里需要根据规格的duration_days计算）
-        // 实际项目中应该查询规格表获取duration_days
+
         card.setExpireTime(LocalDateTime.now().plusDays(30));
-        
+
         return updateById(card);
     }
 
@@ -139,7 +126,7 @@ public class CardKeyServiceImpl extends ServiceImpl<CardKeyMapper, CardKey> impl
         if (card == null) {
             return false;
         }
-        
+
         card.setStatus("已禁用");
         return updateById(card);
     }
@@ -147,32 +134,30 @@ public class CardKeyServiceImpl extends ServiceImpl<CardKeyMapper, CardKey> impl
     @Override
     public Object getCardStatistics() {
         List<CardKey> allCards = baseMapper.selectList(null);
-        
+
         Map<String, Integer> statistics = new HashMap<>();
         statistics.put("total", allCards.size());
         statistics.put("unused", (int) allCards.stream().filter(card -> "未使用".equals(card.getStatus())).count());
         statistics.put("used", (int) allCards.stream().filter(card -> "已使用".equals(card.getStatus())).count());
         statistics.put("disabled", (int) allCards.stream().filter(card -> "已禁用".equals(card.getStatus())).count());
-        
+
         return statistics;
     }
-    
+
     @Override
     public boolean batchGenerateCardKeys(String productId, Integer quantity, String prefix) {
         if (quantity == null || quantity <= 0 || quantity > 1000) {
             return false;
         }
-        
+
         try {
-            // 生成指定数量的卡密
             for (int i = 0; i < quantity; i++) {
                 CardKey cardKey = new CardKey();
-                
-                // 生成卡密字符串（前缀 + 随机字符）
+
                 String cardKeyStr = generateCardKeyString(prefix);
-                
+
                 cardKey.setCardKey(cardKeyStr);
-                cardKey.setSpecificationId(null); // 暂时不关联规格
+                cardKey.setSpecificationId(null);
                 cardKey.setStatus("未使用");
                 cardKey.setUserId(null);
                 cardKey.setUserEmail(null);
@@ -180,57 +165,49 @@ public class CardKeyServiceImpl extends ServiceImpl<CardKeyMapper, CardKey> impl
                 cardKey.setExpireTime(null);
                 cardKey.setCreatedAt(LocalDateTime.now());
                 cardKey.setUpdatedAt(LocalDateTime.now());
-                
-                // 保存卡密
+
                 baseMapper.insert(cardKey);
             }
-            
+
             return true;
         } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
     }
-    
-    /**
-     * 生成卡密字符串
-     */
+
     private String generateCardKeyString(String prefix) {
         StringBuilder sb = new StringBuilder();
-        
+
         if (prefix != null && !prefix.trim().isEmpty()) {
             sb.append(prefix);
         }
-        
-        // 生成随机字符（数字+大写字母，共16位）
+
         String chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         int length = 16 - sb.length();
-        
+
         for (int i = 0; i < length; i++) {
             int index = (int) (Math.random() * chars.length());
             sb.append(chars.charAt(index));
         }
-        
+
         return sb.toString();
     }
-    
+
     @Override
     public boolean batchDeleteUsedCardKeys() {
         try {
             QueryWrapper<CardKey> queryWrapper = new QueryWrapper<>();
             queryWrapper.eq("status", "已使用");
-            
-            // 查询所有已使用的卡密
+
             List<CardKey> usedCardKeys = baseMapper.selectList(queryWrapper);
-            
+
             if (usedCardKeys.isEmpty()) {
-                // 没有已使用的卡密，返回成功
                 return true;
             }
-            
-            // 批量删除已使用的卡密
+
             boolean deleted = baseMapper.delete(queryWrapper) > 0;
-            
+
             return deleted;
         } catch (Exception e) {
             e.printStackTrace();

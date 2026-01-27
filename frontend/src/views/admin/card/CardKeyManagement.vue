@@ -262,7 +262,6 @@ const handleExport = async () => {
         const specName = specifications.value.find(spec => spec.id === specificationFilter.value)?.name || '全部'
         const fileName = `卡密导出_${specName}_${timestamp}.txt`
 
-        // 创建Blob并下载
         const blob = new Blob([cardKeyContent], { type: 'text/plain;charset=utf-8' })
         const url = URL.createObjectURL(blob)
         const link = document.createElement('a')
@@ -401,7 +400,6 @@ const loadSpecifications = async () => {
       }))
     }
   } catch (error) {
-    // 规格数据加载失败，静默处理
   }
 }
 

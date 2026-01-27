@@ -3,28 +3,24 @@ package com.leafboss.entity;
 import com.baomidou.mybatisplus.annotation.*;
 import java.time.LocalDateTime;
 
-/**
- * 操作日志实体类
- */
 @TableName("operation_logs")
 public class OperationLog {
-    
+
     @TableId(type = IdType.AUTO)
     private Integer id;
-    
+
     @TableField("operation_type")
     private String operationType;
-    
+
     @TableField("description")
     private String description;
-    
+
     @TableField("ip_address")
     private String ipAddress;
-    
+
     @TableField("created_at")
     private LocalDateTime createdAt;
 
-    // Getter and Setter methods
     public Integer getId() {
         return id;
     }
