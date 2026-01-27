@@ -400,6 +400,7 @@ const loadSpecifications = async () => {
       }))
     }
   } catch (error) {
+    // eslint-disable-next-line no-empty
   }
 }
 

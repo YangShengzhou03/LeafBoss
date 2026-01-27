@@ -1,5 +1,7 @@
 const { defineConfig } = require('@vue/cli-service')
 const path = require('path')
+const CompressionWebpackPlugin = require('compression-webpack-plugin')
+const isProduction = process.env.NODE_ENV === 'production'
 
 module.exports = defineConfig({
   transpileDependencies: true,
@@ -14,18 +16,53 @@ module.exports = defineConfig({
       splitChunks: {
         chunks: 'all',
         cacheGroups: {
-          vendor: {
+          libs: {
+            name: 'chunk-libs',
             test: /[\\/]node_modules[\\/]/,
-            name: 'vendors',
             priority: 10,
-            chunks: 'all'
+            chunks: 'initial'
+          },
+          elementPlus: {
+            name: 'chunk-elementPlus',
+            priority: 20,
+            test: /[\\/]node_modules[\\/]_?element-plus(.*)/
+          },
+          commons: {
+            name: 'chunk-commons',
+            test: /[\\/]src[\\/]/,
+            minChunks: 3,
+            priority: 5,
+            reuseExistingChunk: true
           }
         }
-      }
+      },
+      runtimeChunk: 'single'
+    },
+    plugins: isProduction ? [
+      new CompressionWebpackPlugin({
+        algorithm: 'gzip',
+        test: /\.(js|css|html|svg)$/,
+        threshold: 10240,
+        minRatio: 0.8
+      })
+    ] : []
+  },
+  chainWebpack: config => {
+    config.plugin('html').tap(args => {
+      args[0].title = 'LEAF-BOSS 业务运营支撑系统'
+      return args
+    })
+    
+    if (isProduction) {
+      config.optimization.minimize(true)
+      config.optimization.minimizer('terser').tap(args => {
+        args[0].terserOptions.compress.drop_console = true
+        args[0].terserOptions.compress.drop_debugger = true
+        return args
+      })
     }
   },
   devServer: {
-    // 这里实际上没被使用，先留着吧。因为用了环境变量 VUE_APP_API_BASE_URL
     port: 8080,
     host: 'localhost',
     open: true,
@@ -42,26 +79,22 @@ module.exports = defineConfig({
         logLevel: 'debug'
       }
     },
-    // 添加静态资源服务配置
     static: {
       directory: path.join(__dirname, 'public'),
       publicPath: '/'
     }
   },
-  // 启用ESLint检查，保存时检查
   lintOnSave: process.env.NODE_ENV !== 'production',
-  // 生产环境配置
   productionSourceMap: false,
-  // 配置CSS
   css: {
     sourceMap: process.env.NODE_ENV !== 'production',
     loaderOptions: {
       sass: {
         additionalData: '@import "@/assets/styles/variables.scss";'
       }
-    }
+    },
+    extract: isProduction
   },
-  // 配置PWA（可选）
   pwa: {
     name: 'LEAF-BOSS 业务运营支撑系统',
     themeColor: '#409EFF',

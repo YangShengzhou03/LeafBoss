@@ -25,6 +25,11 @@
 - **响应式设计** - 支持PC、平板、手机等多端访问
 - **高性能** - 基于Spring Boot 3和Vue 3的高性能架构
 
+### 系统界面预览
+
+![LEAF-BOSS 业务运营支撑系统](https://gitee.com/Yangshengzhou/leaf-boss/raw/master/assets/LEAF-BOSS-Overview.png)
+
+
 ## 快速开始
 
 ## 环境要求
@@ -122,6 +127,8 @@ npm run build
 ### 2. 默认账号
 - **管理员**: admin@qq.com / 123456
 
+![LEAF-BOSS 管理员登录](https://gitee.com/Yangshengzhou/leaf-boss/raw/master/assets/LEAF-BOSS-Login.png)
+
 ### 3. 核心功能
 
 #### 卡密管理
@@ -134,6 +141,8 @@ npm run build
 - 产品信息维护
 - 产品规格配置
 - 产品状态管理
+
+![LEAF-BOSS 商品管理](https://gitee.com/Yangshengzhou/leaf-boss/raw/master/assets/LEAF-BOSS-Product-Management.png)
 
 #### 规格管理
 - 规格定义和配置
@@ -170,7 +179,14 @@ npm run build
 - 产品和规格统计
 - 操作日志分析
 
-## 技术架构
+![LEAF-BOSS 管理员仪表盘](https://gitee.com/Yangshengzhou/leaf-boss/raw/master/assets/LEAF-BOSS-Dashboard.png)
+
+#### 管理员管理
+- 管理员账户管理
+- 管理员信息维护
+- 权限控制
+
+![LEAF-BOSS 管理人员](https://gitee.com/Yangshengzhou/leaf-boss/raw/master/assets/LEAF-BOSS-Admin-Management.png)
 
 ### 系统架构图
 ```

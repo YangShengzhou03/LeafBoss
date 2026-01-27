@@ -196,52 +196,6 @@ curl -X GET "http://localhost:8081/api/public/boss-reviews?company_name=杨圣�
 
 ---
 
-## 管理后台 API（需要认证）
-
-### 认证说明
-
-所有管理后台 API 都需要在请求头中携带 JWT Token：
-
-```
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-```
-
-### 获取访问令牌
-
-**接口地址**: `POST /api/auth/login`
-
-**请求示例**:
-```bash
-curl -X POST "http://localhost:8081/api/auth/login" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email": "admin@qq.com",
-    "password": "123456"
-  }'
-```
-
-**响应示例**:
-```json
-{
-    "code": 200,
-    "message": "登录成功",
-    "data": {
-        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-        "user": {
-            "id": "550e8400-e29b-41d4-a716-446655440000",
-            "username": "admin",
-            "email": "admin@qq.com",
-            "status": "active",
-            "lastLoginTime": "2024-01-15T14:30:00",
-            "createdAt": "2024-01-01T00:00:00",
-            "updatedAt": "2024-01-15T14:30:00"
-        }
-    }
-}
-```
-
----
-
 ## 认证管理 API
 
 ### 用户登录
@@ -379,6 +333,38 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
 ## 管理员管理 API
 
+### 管理员登录
+
+**接口地址**: `POST /api/admins/login`
+
+**请求参数**:
+```json
+{
+    "email": "admin@qq.com",
+    "password": "123456"
+}
+```
+
+**响应示例**:
+```json
+{
+    "code": 200,
+    "message": "登录成功",
+    "data": {
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+        "user": {
+            "id": "550e8400-e29b-41d4-a716-446655440000",
+            "username": "admin",
+            "email": "admin@qq.com",
+            "status": "active",
+            "lastLoginTime": "2024-01-15T14:30:00",
+            "createdAt": "2024-01-01T00:00:00",
+            "updatedAt": "2024-01-15T14:30:00"
+        }
+    }
+}
+```
+
 ### 获取管理员列表
 
 **接口地址**: `GET /api/admins`
@@ -413,6 +399,27 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 }
 ```
 
+### 获取管理员详情
+
+**接口地址**: `GET /api/admins/{id}`
+
+**响应示例**:
+```json
+{
+    "code": 200,
+    "message": "success",
+    "data": {
+        "id": "550e8400-e29b-41d4-a716-446655440000",
+        "username": "admin",
+        "email": "admin@qq.com",
+        "status": "active",
+        "lastLoginTime": "2024-01-15T14:30:00",
+        "createdAt": "2024-01-01T00:00:00",
+        "updatedAt": "2024-01-15T14:30:00"
+    }
+}
+```
+
 ### 创建管理员
 
 **接口地址**: `POST /api/admins`
@@ -443,14 +450,10 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 **请求参数**:
 ```json
 {
-    "id": "1",
     "email": "updated_admin@qq.com",
     "username": "updated_admin",
     "passwordHash": "new_password",
-    "status": "active",
-    "lastLoginTime": "2024-01-15T14:30:00",
-    "createdAt": "2024-01-01T00:00:00",
-    "updatedAt": "2024-01-15T14:30:00"
+    "status": "active"
 }
 ```
 
@@ -473,6 +476,27 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
     "code": 200,
     "message": "管理员删除成功",
     "data": true
+}
+```
+
+### 根据用户名获取管理员
+
+**接口地址**: `GET /api/admins/username/{username}`
+
+**响应示例**:
+```json
+{
+    "code": 200,
+    "message": "success",
+    "data": {
+        "id": "550e8400-e29b-41d4-a716-446655440000",
+        "username": "admin",
+        "email": "admin@qq.com",
+        "status": "active",
+        "lastLoginTime": "2024-01-15T14:30:00",
+        "createdAt": "2024-01-01T00:00:00",
+        "updatedAt": "2024-01-15T14:30:00"
+    }
 }
 ```
 
@@ -639,18 +663,153 @@ Content-Type: application/json
 
 ---
 
-## 操作日志管理 API
+## 用户管理 API
 
-### 获取操作日志列表
+### 获取用户列表
 
-**接口地址**: `GET /api/operation-logs`
+**接口地址**: `GET /api/users`
 
 **查询参数**:
 - `page` (可选): 页码，默认1
 - `size` (可选): 页大小，默认10
-- `startDate` (可选): 开始日期 (yyyy-MM-dd)
-- `endDate` (可选): 结束日期 (yyyy-MM-dd)
-- `operationType` (可选): 操作类型
+- `keyword` (可选): 关键词
+- `status` (可选): 状态
+
+**响应示例**:
+```json
+{
+    "code": 200,
+    "message": "用户列表查询成功",
+    "data": {
+        "page": 1,
+        "size": 10,
+        "total": 1,
+        "records": [
+            {
+                "id": "1",
+                "username": "user1",
+                "email": "user1@qq.com",
+                "status": "active",
+                "createdAt": "2024-01-01T00:00:00",
+                "updatedAt": "2024-01-01T00:00:00"
+            }
+        ]
+    }
+}
+```
+
+### 获取用户详情
+
+**接口地址**: `GET /api/users/{id}`
+
+**响应示例**:
+```json
+{
+    "code": 200,
+    "message": "success",
+    "data": {
+        "id": "1",
+        "username": "user1",
+        "email": "user1@qq.com",
+        "status": "active",
+        "createdAt": "2024-01-01T00:00:00",
+        "updatedAt": "2024-01-01T00:00:00"
+    }
+}
+```
+
+### 创建用户
+
+**接口地址**: `POST /api/users`
+
+**请求参数**:
+```json
+{
+    "username": "newuser",
+    "email": "newuser@qq.com",
+    "passwordHash": "123456",
+    "status": "active"
+}
+```
+
+**响应示例**:
+```json
+{
+    "code": 200,
+    "message": "用户创建成功",
+    "data": true
+}
+```
+
+### 更新用户
+
+**接口地址**: `PUT /api/users/{id}`
+
+**请求参数**:
+```json
+{
+    "username": "updateduser",
+    "email": "updateduser@qq.com",
+    "passwordHash": "newpassword",
+    "status": "active"
+}
+```
+
+**响应示例**:
+```json
+{
+    "code": 200,
+    "message": "用户更新成功",
+    "data": true
+}
+```
+
+### 删除用户
+
+**接口地址**: `DELETE /api/users/{id}`
+
+**响应示例**:
+```json
+{
+    "code": 200,
+    "message": "用户删除成功",
+    "data": true
+}
+```
+
+### 重置用户密码
+
+**接口地址**: `POST /api/users/reset-password`
+
+**请求参数**:
+```json
+{
+    "email": "user@qq.com",
+    "newPassword": "newpassword123"
+}
+```
+
+**响应示例**:
+```json
+{
+    "code": 200,
+    "message": "密码重置成功",
+    "data": true
+}
+```
+
+---
+
+## 卡密管理 API
+
+### 获取卡密列表
+
+**接口地址**: `GET /api/card-keys`
+
+**查询参数**:
+- `page` (可选): 页码，默认1
+- `size` (可选): 页大小，默认10
+- `status` (可选): 状态
 
 **响应示例**:
 ```json
@@ -661,9 +820,296 @@ Content-Type: application/json
         "records": [
             {
                 "id": 1,
-                "operationType": "LOGIN",
-                "description": "管理员登录成功",
-                "ipAddress": "192.168.1.100",
+                "cardKey": "vD2Sbh1OXLLKPFBfB49JnCaV0atSlyQh",
+                "specificationId": 1,
+                "status": "未使用",
+                "userEmail": null,
+                "userId": null,
+                "activateTime": null,
+                "expireTime": null,
+                "createdAt": "2024-01-01T00:00:00",
+                "updatedAt": "2024-01-01T00:00:00"
+            }
+        ],
+        "total": 100,
+        "size": 10,
+        "current": 1,
+        "pages": 10
+    }
+}
+```
+
+### 获取卡密列表（带详情）
+
+**接口地址**: `GET /api/card-keys/with-details`
+
+**查询参数**:
+- `page` (可选): 页码，默认1
+- `size` (可选): 页大小，默认10
+- `keyword` (可选): 关键词
+- `specificationId` (可选): 规格ID
+- `status` (可选): 状态
+
+**响应示例**:
+```json
+{
+    "code": 200,
+    "message": "success",
+    "data": {
+        "records": [
+            {
+                "id": 1,
+                "cardKey": "vD2Sbh1OXLLKPFBfB49JnCaV0atSlyQh",
+                "specificationId": 1,
+                "specificationName": "月卡",
+                "productId": 1,
+                "productName": "VIP会员",
+                "status": "未使用",
+                "price": 29.9,
+                "durationDays": 30,
+                "createdAt": "2024-01-01T00:00:00"
+            }
+        ],
+        "total": 100,
+        "size": 10,
+        "current": 1,
+        "pages": 10
+    }
+}
+```
+
+### 搜索卡密
+
+**接口地址**: `GET /api/card-keys/search`
+
+**查询参数**:
+- `cardKey` (必填): 卡密
+
+**响应示例**:
+```json
+{
+    "code": 200,
+    "message": "success",
+    "data": {
+        "id": 1,
+        "cardKey": "vD2Sbh1OXLLKPFBfB49JnCaV0atSlyQh",
+        "specificationId": 1,
+        "status": "未使用",
+        "createdAt": "2024-01-01T00:00:00"
+    }
+}
+```
+
+### 验证卡密
+
+**接口地址**: `GET /api/card-keys/verify/{cardKey}`
+
+**响应示例**:
+```json
+{
+    "code": 200,
+    "message": "success",
+    "data": {
+        "id": 1,
+        "cardKey": "vD2Sbh1OXLLKPFBfB49JnCaV0atSlyQh",
+        "specificationId": 1,
+        "status": "未使用",
+        "specificationName": "月卡",
+        "productName": "VIP会员",
+        "productSpec": "VIP会员-月卡",
+        "price": 29.9,
+        "durationDays": 30
+    }
+}
+```
+
+### 激活卡密
+
+**接口地址**: `POST /api/card-keys/activate`
+
+**请求参数**:
+```json
+{
+    "cardKey": "vD2Sbh1OXLLKPFBfB49JnCaV0atSlyQh"
+}
+```
+
+**响应示例**:
+```json
+{
+    "code": 200,
+    "message": "卡密激活成功",
+    "data": true
+}
+```
+
+### 禁用卡密
+
+**接口地址**: `POST /api/card-keys/disable`
+
+**请求参数**:
+```json
+{
+    "cardKey": "vD2Sbh1OXLLKPFBfB49JnCaV0atSlyQh"
+}
+```
+
+**响应示例**:
+```json
+{
+    "code": 200,
+    "message": "卡密禁用成功",
+    "data": true
+}
+```
+
+### 删除卡密（通过ID）
+
+**接口地址**: `DELETE /api/card-keys/{id}`
+
+**响应示例**:
+```json
+{
+    "code": 200,
+    "message": "卡密删除成功",
+    "data": true
+}
+```
+
+### 删除卡密（通过卡密）
+
+**接口地址**: `DELETE /api/card-keys/by-card-key/{cardKey}`
+
+**响应示例**:
+```json
+{
+    "code": 200,
+    "message": "卡密删除成功",
+    "data": true
+}
+```
+
+### 批量生成卡密
+
+**接口地址**: `POST /api/card-keys/batch-generate`
+
+**请求参数**:
+```json
+{
+    "productId": "1",
+    "quantity": 100,
+    "prefix": "VIP"
+}
+```
+
+**响应示例**:
+```json
+{
+    "code": 200,
+    "message": "批量生成卡密成功",
+    "data": true
+}
+```
+
+### 创建卡密
+
+**接口地址**: `POST /api/card-keys`
+
+**请求参数**:
+```json
+{
+    "cardKey": "vD2Sbh1OXLLKPFBfB49JnCaV0atSlyQh",
+    "specificationId": 1,
+    "status": "未使用"
+}
+```
+
+**响应示例**:
+```json
+{
+    "code": 200,
+    "message": "卡密创建成功",
+    "data": true
+}
+```
+
+### 切换卡密状态
+
+**接口地址**: `POST /api/card-keys/{cardKey}/status`
+
+**请求参数**:
+```json
+{
+    "status": "已使用"
+}
+```
+
+**响应示例**:
+```json
+{
+    "code": 200,
+    "message": "卡密状态更新成功",
+    "data": true
+}
+```
+
+### 批量删除已使用卡密
+
+**接口地址**: `DELETE /api/card-keys/batch-delete-used`
+
+**响应示例**:
+```json
+{
+    "code": 200,
+    "message": "已使用卡密批量删除成功",
+    "data": true
+}
+```
+
+### 获取卡密统计信息
+
+**接口地址**: `GET /api/card-keys/statistics`
+
+**响应示例**:
+```json
+{
+    "code": 200,
+    "message": "success",
+    "data": {
+        "totalCardKeys": 1000,
+        "unusedCardKeys": 500,
+        "usedCardKeys": 400,
+        "disabledCardKeys": 100
+    }
+}
+```
+
+---
+
+## 评论管理 API
+
+### 获取评论列表
+
+**接口地址**: `GET /api/boss-reviews`
+
+**查询参数**:
+- `page` (可选): 页码，默认1
+- `size` (可选): 页大小，默认10
+- `companyId` (可选): 公司ID
+- `cardKey` (可选): 卡密
+
+**响应示例**:
+```json
+{
+    "code": 200,
+    "message": "success",
+    "data": {
+        "records": [
+            {
+                "id": 1,
+                "cardKey": "vD2Sbh1OXLLKPFBfB49JnCaV0atSlyQh",
+                "companyId": 1,
+                "content": "服务非常好，推荐！",
                 "createdAt": "2024-01-15T14:30:00"
             }
         ],
@@ -675,13 +1121,9 @@ Content-Type: application/json
 }
 ```
 
-### 获取日志统计信息
+### 获取评论详情
 
-**接口地址**: `GET /api/operation-logs/stats`
-
-**查询参数**:
-- `startDate` (可选): 开始日期 (yyyy-MM-dd)
-- `endDate` (可选): 结束日期 (yyyy-MM-dd)
+**接口地址**: `GET /api/boss-reviews/{id}`
 
 **响应示例**:
 ```json
@@ -689,73 +1131,114 @@ Content-Type: application/json
     "code": 200,
     "message": "success",
     "data": {
-        "totalCount": 150,
-        "typeStats": {
-            "LOGIN": 45,
-            "CARD_KEY": 60,
-            "PRODUCT": 20,
-            "SPECIFICATION": 15,
-            "USER": 8,
-            "SYSTEM": 2
-        }
+        "id": 1,
+        "cardKey": "vD2Sbh1OXLLKPFBfB49JnCaV0atSlyQh",
+        "companyId": 1,
+        "content": "服务非常好，推荐！",
+        "createdAt": "2024-01-15T14:30:00"
     }
 }
 ```
 
-### 根据操作类型查询操作日志
+### 创建评论
 
-**接口地址**: `GET /api/operation-logs/type/{operationType}`
+**接口地址**: `POST /api/boss-reviews`
+
+**请求参数**:
+```json
+{
+    "cardKey": "vD2Sbh1OXLLKPFBfB49JnCaV0atSlyQh",
+    "companyId": 1,
+    "content": "服务非常好，推荐！"
+}
+```
+
+**响应示例**:
+```json
+{
+    "code": 200,
+    "message": "评论发布成功",
+    "data": true
+}
+```
+
+### 删除评论
+
+**接口地址**: `DELETE /api/boss-reviews/{id}`
+
+**响应示例**:
+```json
+{
+    "code": 200,
+    "message": "评论删除成功",
+    "data": true
+}
+```
+
+---
+
+## 公司管理 API
+
+### 获取公司列表
+
+**接口地址**: `GET /api/companies`
+
+**查询参数**:
+- `page` (可选): 页码，默认1
+- `size` (可选): 页大小，默认10
+- `name` (可选): 公司名称
 
 **响应示例**:
 ```json
 {
     "code": 200,
     "message": "success",
-    "data": [
-        {
-            "id": 1,
-            "operationType": "LOGIN",
-            "description": "管理员登录成功",
-            "ipAddress": "192.168.1.100",
-            "createdAt": "2024-01-15T14:30:00"
-        }
-    ]
+    "data": {
+        "records": [
+            {
+                "id": 1,
+                "name": "测试公司",
+                "commentCount": 10,
+                "createdAt": "2024-01-01T00:00:00",
+                "updatedAt": "2024-01-01T00:00:00"
+            }
+        ],
+        "total": 100,
+        "size": 10,
+        "current": 1,
+        "pages": 10
+    }
 }
 ```
 
-### 导出操作日志
+### 获取公司详情
 
-**接口地址**: `GET /api/operation-logs/export`
-
-**查询参数**:
-- `startDate` (可选): 开始日期 (yyyy-MM-dd)
-- `endDate` (可选): 结束日期 (yyyy-MM-dd)
-
-**响应**: 返回Excel文件下载
-
-### 清空操作日志
-
-**接口地址**: `DELETE /api/operation-logs`
+**接口地址**: `GET /api/companies/{id}`
 
 **响应示例**:
 ```json
 {
     "code": 200,
-    "message": "日志清空成功",
-    "data": true
+    "message": "success",
+    "data": {
+        "id": 1,
+        "name": "测试公司",
+        "commentCount": 10,
+        "createdAt": "2024-01-01T00:00:00",
+        "updatedAt": "2024-01-01T00:00:00"
+    }
 }
 ```
 
-### 记录操作日志
+### 创建公司
 
-**接口地址**: `POST /api/operation-logs`
+**接口地址**: `POST /api/companies`
 
 **请求参数**:
 ```json
 {
-    "operationType": "操作类型",
-    "description": "操作描述",
-    "ipAddress": "IP地址"
+    "name": "新公司",
+    "commentCount": 0
 }
 ```
 
@@ -763,7 +1246,41 @@ Content-Type: application/json
 ```json
 {
     "code": 200,
-    "message": "操作日志记录成功",
+    "message": "公司创建成功",
+    "data": true
+}
+```
+
+### 更新公司
+
+**接口地址**: `PUT /api/companies/{id}`
+
+**请求参数**:
+```json
+{
+    "name": "更新后的公司名",
+    "commentCount": 10
+}
+```
+
+**响应示例**:
+```json
+{
+    "code": 200,
+    "message": "公司更新成功",
+    "data": true
+}
+```
+
+### 删除公司
+
+**接口地址**: `DELETE /api/companies/{id}`
+
+**响应示例**:
+```json
+{
+    "code": 200,
+    "message": "公司删除成功",
     "data": true
 }
 ```
@@ -1126,13 +1643,12 @@ Content-Type: application/json
     "data": {
         "totalSpecifications": 15,
         "activeSpecifications": 12,
-        "inactiveSpecifications": 3,
-        "totalStock": 15000
+        "inactiveSpecifications": 3
     }
 }
 ```
 
-### 获取规格DTO列表（包含卡密统计信息）
+### 获取规格DTO列表
 
 **接口地址**: `GET /api/specifications/dto`
 
@@ -1145,23 +1661,19 @@ Content-Type: application/json
         {
             "id": 1,
             "productId": 1,
+            "productName": "VIP会员",
             "name": "月卡",
-            "description": "VIP会员专属月卡，享受专属权益",
+            "description": "VIP会员专属月卡",
             "durationDays": 30,
             "price": 29.9,
             "stockQuantity": 1000,
-            "status": "active",
-            "createdAt": "2024-01-01T00:00:00",
-            "updatedAt": "2024-01-01T00:00:00",
-            "totalKeys": 500,
-            "usedKeys": 200,
-            "unusedKeys": 300
+            "status": "active"
         }
     ]
 }
 ```
 
-### 分页获取规格DTO列表（包含卡密统计信息）
+### 分页获取规格DTO列表
 
 **接口地址**: `GET /api/specifications/dto/pagination`
 
@@ -1181,39 +1693,37 @@ Content-Type: application/json
             {
                 "id": 1,
                 "productId": 1,
+                "productName": "VIP会员",
                 "name": "月卡",
-                "description": "VIP会员专属月卡，享受专属权益",
+                "description": "VIP会员专属月卡",
                 "durationDays": 30,
                 "price": 29.9,
                 "stockQuantity": 1000,
-                "status": "active",
-                "createdAt": "2024-01-01T00:00:00",
-                "updatedAt": "2024-01-01T00:00:00",
-                "totalKeys": 500,
-                "usedKeys": 200,
-                "unusedKeys": 300
+                "status": "active"
             }
         ],
-        "total": 8,
+        "total": 15,
         "size": 10,
         "current": 1,
-        "pages": 1
+        "pages": 2
     }
 }
 ```
 
 ---
 
-## 卡密管理 API
+## 操作日志管理 API
 
-### 分页查询卡密列表
+### 获取操作日志列表
 
-**接口地址**: `GET /api/card-keys`
+**接口地址**: `GET /api/operation-logs`
 
 **查询参数**:
 - `page` (可选): 页码，默认1
 - `size` (可选): 页大小，默认10
-- `status` (可选): 卡密状态
+- `startDate` (可选): 开始日期 (yyyy-MM-dd)
+- `endDate` (可选): 结束日期 (yyyy-MM-dd)
+- `operationType` (可选): 操作类型
 
 **响应示例**:
 ```json
@@ -1224,15 +1734,10 @@ Content-Type: application/json
         "records": [
             {
                 "id": 1,
-                "cardKey": "LEAF-2024-001-ABCD-EFGH",
-                "specificationId": 1,
-                "status": "未使用",
-                "userId": null,
-                "userEmail": null,
-                "activateTime": null,
-                "expireTime": null,
-                "createdAt": "2024-01-01T00:00:00",
-                "updatedAt": "2024-01-01T00:00:00"
+                "operationType": "LOGIN",
+                "description": "管理员登录成功",
+                "ipAddress": "192.168.1.100",
+                "createdAt": "2024-01-15T14:30:00"
             }
         ],
         "total": 100,
@@ -1243,53 +1748,13 @@ Content-Type: application/json
 }
 ```
 
-### 获取包含商品和规格名称的卡密列表
+### 获取日志统计信息
 
-**接口地址**: `GET /api/card-keys/with-details`
-
-**查询参数**:
-- `page` (可选): 页码，默认1
-- `size` (可选): 页大小，默认10
-- `keyword` (可选): 关键词
-- `specificationId` (可选): 规格ID
-- `status` (可选): 卡密状态
-
-**响应示例**:
-```json
-{
-    "code": 200,
-    "message": "success",
-    "data": {
-        "records": [
-            {
-                "id": 1,
-                "cardKey": "LEAF-2024-001-ABCD-EFGH",
-                "specificationId": 1,
-                "specificationName": "月卡",
-                "productName": "VIP会员",
-                "status": "未使用",
-                "userId": null,
-                "userEmail": null,
-                "activateTime": null,
-                "expireTime": null,
-                "createdAt": "2024-01-01T00:00:00",
-                "updatedAt": "2024-01-01T00:00:00"
-            }
-        ],
-        "total": 10,
-        "size": 10,
-        "current": 1,
-        "pages": 1
-    }
-}
-```
-
-### 搜索卡密
-
-**接口地址**: `GET /api/card-keys/search`
+**接口地址**: `GET /api/operation-logs/stats`
 
 **查询参数**:
-- `cardKey` (必填): 卡密关键字
+- `startDate` (可选): 开始日期 (yyyy-MM-dd)
+- `endDate` (可选): 结束日期 (yyyy-MM-dd)
 
 **响应示例**:
 ```json
@@ -1297,57 +1762,73 @@ Content-Type: application/json
     "code": 200,
     "message": "success",
     "data": {
-        "id": 1,
-        "cardKey": "LEAF-2024-001-ABCD-EFGH",
-        "specificationId": 1,
-        "status": "未使用",
-        "userId": null,
-        "userEmail": null,
-        "activateTime": null,
-        "expireTime": null,
-        "createdAt": "2024-01-01T00:00:00",
-        "updatedAt": "2024-01-01T00:00:00"
+        "totalCount": 150,
+        "typeStats": {
+            "LOGIN": 45,
+            "CARD_KEY": 60,
+            "PRODUCT": 20,
+            "SPECIFICATION": 15,
+            "USER": 8,
+            "SYSTEM": 2
+        }
     }
 }
 ```
 
-### 验证卡密
+### 根据操作类型查询操作日志
 
-**接口地址**: `GET /api/card-keys/verify/{cardKey}`
+**接口地址**: `GET /api/operation-logs/type/{operationType}`
 
 **响应示例**:
 ```json
 {
     "code": 200,
     "message": "success",
-    "data": {
-        "id": 1,
-        "cardKey": "LEAF-2024-001-ABCD-EFGH",
-        "specificationId": 1,
-        "status": "未使用",
-        "userEmail": null,
-        "userId": null,
-        "activateTime": null,
-        "expireTime": null,
-        "createdAt": "2024-01-01T00:00:00",
-        "updatedAt": "2024-01-01T00:00:00",
-        "specificationName": "月卡",
-        "price": 29.9,
-        "durationDays": 30,
-        "productName": "VIP会员",
-        "productSpec": "VIP会员-月卡"
-    }
+    "data": [
+        {
+            "id": 1,
+            "operationType": "LOGIN",
+            "description": "管理员登录成功",
+            "ipAddress": "192.168.1.100",
+            "createdAt": "2024-01-15T14:30:00"
+        }
+    ]
 }
 ```
 
-### 激活卡密
+### 导出操作日志
 
-**接口地址**: `POST /api/card-keys/activate`
+**接口地址**: `GET /api/operation-logs/export`
+
+**查询参数**:
+- `startDate` (可选): 开始日期 (yyyy-MM-dd)
+- `endDate` (可选): 结束日期 (yyyy-MM-dd)
+
+**响应**: 返回Excel文件下载
+
+### 清空操作日志
+
+**接口地址**: `DELETE /api/operation-logs`
+
+**响应示例**:
+```json
+{
+    "code": 200,
+    "message": "日志清空成功",
+    "data": true
+}
+```
+
+### 记录操作日志
+
+**接口地址**: `POST /api/operation-logs`
 
 **请求参数**:
 ```json
 {
-    "cardKey": "LEAF-2024-001-ABCD-EFGH"
+    "operationType": "操作类型",
+    "description": "操作描述",
+    "ipAddress": "IP地址"
 }
 ```
 
@@ -1355,500 +1836,16 @@ Content-Type: application/json
 ```json
 {
     "code": 200,
-    "message": "卡密激活成功",
-    "data": true
-}
-```
-
-### 禁用卡密
-
-**接口地址**: `POST /api/card-keys/disable`
-
-**请求参数**:
-```json
-{
-    "cardKey": "LEAF-2024-001-ABCD-EFGH"
-}
-```
-
-**响应示例**:
-```json
-{
-    "code": 200,
-    "message": "卡密禁用成功",
-    "data": true
-}
-```
-
-### 获取卡密统计信息
-
-**接口地址**: `GET /api/card-keys/statistics`
-
-**响应示例**:
-```json
-{
-    "code": 200,
-    "message": "success",
-    "data": {
-        "totalCards": 10,
-        "unusedCards": 6,
-        "usedCards": 3,
-        "disabledCards": 1
-    }
-}
-```
-
-### 创建卡密
-
-**接口地址**: `POST /api/card-keys`
-
-**请求参数**:
-```json
-{
-    "cardKey": "LEAF-2024-002-ABCD-EFGH",
-    "specificationId": 1,
-    "status": "未使用"
-}
-```
-
-**响应示例**:
-```json
-{
-    "code": 200,
-    "message": "卡密创建成功",
-    "data": true
-}
-```
-
-### 删除卡密（通过ID）
-
-**接口地址**: `DELETE /api/card-keys/{id}`
-
-**响应示例**:
-```json
-{
-    "code": 200,
-    "message": "卡密删除成功",
-    "data": true
-}
-```
-
-### 删除卡密（通过卡密字符串）
-
-**接口地址**: `DELETE /api/card-keys/by-card-key/{cardKey}`
-
-**响应示例**:
-```json
-{
-    "code": 200,
-    "message": "卡密删除成功",
-    "data": true
-}
-```
-
-### 批量生成卡密
-
-**接口地址**: `POST /api/card-keys/batch-generate`
-
-**请求参数**:
-```json
-{
-    "productId": "1",
-    "quantity": 100,
-    "prefix": "VIP"
-}
-```
-
-**响应示例**:
-```json
-{
-    "code": 200,
-    "message": "批量生成卡密成功",
-    "data": true
-}
-```
-
-### 切换卡密状态
-
-**接口地址**: `POST /api/card-keys/{cardKey}/status`
-
-**请求参数**:
-```json
-{
-    "status": "已使用"
-}
-```
-
-**响应示例**:
-```json
-{
-    "code": 200,
-    "message": "卡密状态更新成功",
-    "data": true
-}
-```
-
-### 批量删除已使用卡密
-
-**接口地址**: `DELETE /api/card-keys/batch-delete-used`
-
-**响应示例**:
-```json
-{
-    "code": 200,
-    "message": "已使用卡密批量删除成功",
+    "message": "操作日志记录成功",
     "data": true
 }
 ```
 
 ---
 
-## 公司管理 API
+## 仪表盘 API
 
-### 分页查询公司列表
-
-**接口地址**: `GET /api/companies`
-
-**查询参数**:
-- `page` (可选): 页码，默认1
-- `size` (可选): 页大小，默认10
-- `name` (可选): 公司名称（模糊查询）
-
-**响应示例**:
-```json
-{
-    "code": 200,
-    "message": "success",
-    "data": {
-        "records": [
-            {
-                "id": 1,
-                "name": "测试公司",
-                "description": "这是一家测试公司",
-                "commentCount": 5,
-                "createdAt": "2024-01-01T00:00:00",
-                "updatedAt": "2024-01-15T14:30:00"
-            }
-        ],
-        "total": 10,
-        "size": 10,
-        "current": 1,
-        "pages": 1
-    }
-}
-```
-
-### 根据ID查询公司
-
-**接口地址**: `GET /api/companies/{id}`
-
-**响应示例**:
-```json
-{
-    "code": 200,
-    "message": "success",
-    "data": {
-        "id": 1,
-        "name": "测试公司",
-        "description": "这是一家测试公司",
-        "commentCount": 5,
-        "createdAt": "2024-01-01T00:00:00",
-        "updatedAt": "2024-01-15T14:30:00"
-    }
-}
-```
-
-### 创建公司
-
-**接口地址**: `POST /api/companies`
-
-**请求参数**:
-```json
-{
-    "name": "新公司",
-    "description": "公司描述",
-    "commentCount": 0
-}
-```
-
-**响应示例**:
-```json
-{
-    "code": 200,
-    "message": "公司创建成功",
-    "data": true
-}
-```
-
-### 更新公司
-
-**接口地址**: `PUT /api/companies/{id}`
-
-**请求参数**:
-```json
-{
-    "name": "更新后的公司名",
-    "description": "更新后的描述",
-    "commentCount": 5
-}
-```
-
-**响应示例**:
-```json
-{
-    "code": 200,
-    "message": "公司更新成功",
-    "data": true
-}
-```
-
-### 删除公司
-
-**接口地址**: `DELETE /api/companies/{id}`
-
-**响应示例**:
-```json
-{
-    "code": 200,
-    "message": "公司删除成功",
-    "data": true
-}
-```
-
----
-
-## 评论管理 API
-
-### 分页查询评论列表
-
-**接口地址**: `GET /api/boss-reviews`
-
-**查询参数**:
-- `page` (可选): 页码，默认1
-- `size` (可选): 页大小，默认10
-- `companyId` (可选): 公司ID
-- `cardKey` (可选): 卡密
-
-**响应示例**:
-```json
-{
-    "code": 200,
-    "message": "success",
-    "data": {
-        "records": [
-            {
-                "id": 1,
-                "cardKey": "vD2Sbh1OXLLKPFBfB49JnCaV0atSlyQh",
-                "companyId": 1,
-                "companyName": "测试公司",
-                "content": "非常好的服务",
-                "createdAt": "2024-01-15T14:30:00"
-            }
-        ],
-        "total": 10,
-        "size": 10,
-        "current": 1,
-        "pages": 1
-    }
-}
-```
-
-### 根据ID查询评论
-
-**接口地址**: `GET /api/boss-reviews/{id}`
-
-**响应示例**:
-```json
-{
-    "code": 200,
-    "message": "success",
-    "data": {
-        "id": 1,
-        "cardKey": "vD2Sbh1OXLLKPFBfB49JnCaV0atSlyQh",
-        "companyId": 1,
-        "companyName": "测试公司",
-        "content": "非常好的服务",
-        "createdAt": "2024-01-15T14:30:00"
-    }
-}
-```
-
-### 创建评论
-
-**接口地址**: `POST /api/boss-reviews`
-
-**请求参数**:
-```json
-{
-    "cardKey": "vD2Sbh1OXLLKPFBfB49JnCaV0atSlyQh",
-    "companyId": 1,
-    "content": "非常好的服务"
-}
-```
-
-**响应示例**:
-```json
-{
-    "code": 200,
-    "message": "评论发布成功",
-    "data": true
-}
-```
-
-### 删除评论
-
-**接口地址**: `DELETE /api/boss-reviews/{id}`
-
-**响应示例**:
-```json
-{
-    "code": 200,
-    "message": "评论删除成功",
-    "data": true
-}
-```
-
----
-
-## 客户用户管理 API
-
-### 分页查询用户列表
-
-**接口地址**: `GET /api/users`
-
-**查询参数**:
-- `page` (可选): 页码，默认1
-- `size` (可选): 页大小，默认10
-- `keyword` (可选): 关键词（用户名或邮箱）
-- `status` (可选): 用户状态
-
-**响应示例**:
-```json
-{
-    "code": 200,
-    "message": "用户列表查询成功",
-    "data": {
-        "page": 1,
-        "size": 10,
-        "total": 10,
-        "records": [
-            {
-                "id": "1",
-                "username": "testuser",
-                "email": "test@example.com",
-                "status": "active",
-                "createdAt": "2024-01-01T00:00:00",
-                "updatedAt": "2024-01-15T14:30:00"
-            }
-        ]
-    }
-}
-```
-
-### 根据ID查询用户
-
-**接口地址**: `GET /api/users/{id}`
-
-**响应示例**:
-```json
-{
-    "code": 200,
-    "message": "success",
-    "data": {
-        "id": "1",
-        "username": "testuser",
-        "email": "test@example.com",
-        "status": "active",
-        "createdAt": "2024-01-01T00:00:00",
-        "updatedAt": "2024-01-15T14:30:00"
-    }
-}
-```
-
-### 创建用户
-
-**接口地址**: `POST /api/users`
-
-**请求参数**:
-```json
-{
-    "username": "newuser",
-    "email": "newuser@example.com",
-    "passwordHash": "123456",
-    "status": "active"
-}
-```
-
-**响应示例**:
-```json
-{
-    "code": 200,
-    "message": "用户创建成功",
-    "data": true
-}
-```
-
-### 更新用户
-
-**接口地址**: `PUT /api/users/{id}`
-
-**请求参数**:
-```json
-{
-    "username": "updateduser",
-    "email": "updated@example.com",
-    "status": "active"
-}
-```
-
-**响应示例**:
-```json
-{
-    "code": 200,
-    "message": "用户更新成功",
-    "data": true
-}
-```
-
-### 删除用户
-
-**接口地址**: `DELETE /api/users/{id}`
-
-**响应示例**:
-```json
-{
-    "code": 200,
-    "message": "用户删除成功",
-    "data": true
-}
-```
-
-### 重置用户密码
-
-**接口地址**: `POST /api/users/reset-password`
-
-**请求参数**:
-```json
-{
-    "email": "test@example.com",
-    "newPassword": "123456"
-}
-```
-
-**响应示例**:
-```json
-{
-    "code": 200,
-    "message": "密码重置成功",
-    "data": true
-}
-```
-
----
-
-## 仪表盘管理 API
-
-### 获取仪表盘统计数据
+### 获取仪表盘统计信息
 
 **接口地址**: `GET /api/admin/stats`
 
@@ -1862,10 +1859,10 @@ Content-Type: application/json
         "dailyRevenue": 299.0,
         "yesterdaySales": 8,
         "yesterdayRevenue": 239.2,
-        "totalOrders": 500,
-        "totalRevenue": 14950.0,
-        "monthlyRevenue": 8970.0,
-        "lastMonthRevenue": 5980.0,
+        "totalOrders": 1000,
+        "totalRevenue": 29900.0,
+        "monthlyRevenue": 5000.0,
+        "lastMonthRevenue": 4500.0,
         "conversionRate": 0.0
     }
 }
@@ -1873,21 +1870,81 @@ Content-Type: application/json
 
 ---
 
-## 错误码说明
+## 用户个人中心 API
 
-### HTTP 状态码
+### 获取存储信息
 
-| 错误码 | 说明 | 描述 | 常见场景 |
-|--------|------|------|----------|
-| 200 | 成功 | 请求成功 | 所有正常操作 |
-| 400 | 请求错误 | 请求参数错误或格式不正确 | 卡密已使用、卡密已禁用、参数格式错误 |
-| 401 | 未授权访问 | 用户未登录或token过期 | 未携带token或token过期 |
-| 403 | 权限不足 | 用户权限不足 | 普通用户访问管理员接口 |
-| 404 | 资源不存在 | 请求的资源不存在 | 产品、规格、卡密不存在 |
-| 405 | 方法不允许 | 请求方法不被支持 | 使用GET访问POST接口 |
-| 500 | 服务器内部错误 | 服务器内部处理错误 | 数据库连接失败、系统异常 |
+**接口地址**: `GET /api/user/storage`
 
----
+**请求头**:
+```
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
 
-*最后更新: 2026-01-18*  
-*文档版本: v3.0.0*
+**响应示例**:
+```json
+{
+    "code": 200,
+    "message": "success",
+    "data": {
+        "storageQuota": 1073741824,
+        "usedStorage": 104857600,
+        "availableStorage": 968884224,
+        "usagePercentage": 10
+    }
+}
+```
+
+### 更新个人资料
+
+**接口地址**: `PUT /api/user/profile`
+
+**请求头**:
+```
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+Content-Type: application/json
+```
+
+**请求参数**:
+```json
+{
+    "username": "admin",
+    "email": "admin@qq.com"
+}
+```
+
+**响应示例**:
+```json
+{
+    "code": 200,
+    "message": "用户信息更新成功",
+    "data": true
+}
+```
+
+### 更新密码
+
+**接口地址**: `PUT /api/user/password`
+
+**请求头**:
+```
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+Content-Type: application/json
+```
+
+**请求参数**:
+```json
+{
+    "oldPassword": "123456",
+    "newPassword": "newpassword"
+}
+```
+
+**响应示例**:
+```json
+{
+    "code": 200,
+    "message": "密码更新成功",
+    "data": true
+}
+```

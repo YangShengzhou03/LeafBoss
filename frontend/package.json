@@ -5,13 +5,18 @@
   "description": "LEAF-BOSS 业务运营支撑系统前端",
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build"
+    "build": "vue-cli-service build",
+    "build:prod": "vue-cli-service build --mode production",
+    "lint": "vue-cli-service lint",
+    "lint:fix": "vue-cli-service lint --fix"
   },
   "dependencies": {
     "@element-plus/icons-vue": "2.3.0",
     "axios": "1.6.0",
+    "echarts": "^6.0.0",
     "element-plus": "2.4.0",
     "vue": "3.4.0",
+    "vue-echarts": "^8.0.1",
     "vue-router": "4.2.0"
   },
   "devDependencies": {
@@ -20,6 +25,7 @@
     "@vue/cli-plugin-babel": "^5.0.8",
     "@vue/cli-plugin-eslint": "^5.0.8",
     "@vue/cli-service": "^5.0.8",
+    "compression-webpack-plugin": "^11.1.0",
     "eslint": "8.52.0",
     "eslint-plugin-vue": "9.18.0",
     "sass": "1.69.0",
