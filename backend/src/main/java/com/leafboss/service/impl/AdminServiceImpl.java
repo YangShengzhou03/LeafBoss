@@ -12,9 +12,6 @@ import org.springframework.util.DigestUtils;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 
-/**
- * 管理员服务实现类
- */
 @Service
 public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements AdminService {
 
@@ -36,7 +33,6 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
     public Page<Admin> page(Page<Admin> pageInfo, String keyword, String status) {
         QueryWrapper<Admin> queryWrapper = new QueryWrapper<>();
         
-        // 添加搜索条件
         if (keyword != null && !keyword.trim().isEmpty()) {
             queryWrapper.and(wrapper -> wrapper
                 .like("username", keyword)
@@ -45,16 +41,13 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
             );
         }
         
-        // 添加状态筛选条件
         if (status != null && !status.trim().isEmpty()) {
             queryWrapper.eq("status", status);
         }
         
-        // 按创建时间倒序排列
         queryWrapper.orderByDesc("created_at");
         
         return this.page(pageInfo, queryWrapper);
     }
 
-    // 登录逻辑已移到Controller中，使用邮箱登录
 }

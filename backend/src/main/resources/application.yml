@@ -1,22 +1,35 @@
 spring:
   application:
     name: leaf-boss-backend
-  datasource:
-    url: jdbc:mysql://localhost:3306/leaf_boss?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
-    username: root
-    password: 123456
-    driver-class-name: com.mysql.cj.jdbc.Driver
-
+  profiles:
+    active: dev
   jackson:
     default-property-inclusion: non_null
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: Asia/Shanghai
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+  cache:
+    type: none
 
 server:
   port: 8081
+  servlet:
+    session:
+      timeout: 1800
 
 app:
   jwt:
     secret: leaf-boss-secret-key-for-jwt-token-generation
     expiration: 86400000
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when_authorized

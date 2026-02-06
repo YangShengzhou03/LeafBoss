@@ -1198,7 +1198,7 @@ Content-Type: application/json
             {
                 "id": 1,
                 "name": "测试公司",
-                "commentCount": 10,
+                "commentCount": 5,
                 "createdAt": "2024-01-01T00:00:00",
                 "updatedAt": "2024-01-01T00:00:00"
             }
@@ -1223,7 +1223,7 @@ Content-Type: application/json
     "data": {
         "id": 1,
         "name": "测试公司",
-        "commentCount": 10,
+        "commentCount": 5,
         "createdAt": "2024-01-01T00:00:00",
         "updatedAt": "2024-01-01T00:00:00"
     }
@@ -1258,7 +1258,7 @@ Content-Type: application/json
 **请求参数**:
 ```json
 {
-    "name": "更新后的公司名",
+    "name": "更新后的公司名称",
     "commentCount": 10
 }
 ```
@@ -1289,15 +1289,15 @@ Content-Type: application/json
 
 ## 产品管理 API
 
-### 分页查询产品列表
+### 获取产品列表
 
 **接口地址**: `GET /api/products`
 
 **查询参数**:
 - `page` (可选): 页码，默认1
 - `size` (可选): 页大小，默认10
-- `category` (可选): 产品分类
-- `status` (可选): 产品状态
+- `category` (可选): 分类
+- `status` (可选): 状态
 
 **响应示例**:
 ```json
@@ -1309,22 +1309,21 @@ Content-Type: application/json
             {
                 "id": 1,
                 "name": "VIP会员",
-                "description": "VIP会员专属权益，享受高级服务",
-                "category": "virtual",
+                "category": "会员",
                 "status": "active",
                 "createdAt": "2024-01-01T00:00:00",
                 "updatedAt": "2024-01-01T00:00:00"
             }
         ],
-        "total": 5,
+        "total": 100,
         "size": 10,
         "current": 1,
-        "pages": 1
+        "pages": 10
     }
 }
 ```
 
-### 根据ID查询产品
+### 获取产品详情
 
 **接口地址**: `GET /api/products/{id}`
 
@@ -1336,8 +1335,7 @@ Content-Type: application/json
     "data": {
         "id": 1,
         "name": "VIP会员",
-        "description": "VIP会员专属权益，享受高级服务",
-        "category": "virtual",
+        "category": "会员",
         "status": "active",
         "createdAt": "2024-01-01T00:00:00",
         "updatedAt": "2024-01-01T00:00:00"
@@ -1353,8 +1351,7 @@ Content-Type: application/json
 ```json
 {
     "name": "新产品",
-    "description": "新产品描述",
-    "category": "virtual",
+    "category": "会员",
     "status": "active"
 }
 ```
@@ -1375,10 +1372,8 @@ Content-Type: application/json
 **请求参数**:
 ```json
 {
-    "id": "1",
-    "name": "更新后的产品名",
-    "description": "更新后的描述",
-    "category": "virtual",
+    "name": "更新后的产品名称",
+    "category": "会员",
     "status": "active"
 }
 ```
@@ -1415,11 +1410,9 @@ Content-Type: application/json
     "code": 200,
     "message": "success",
     "data": {
-        "totalProducts": 10,
-        "activeProducts": 8,
-        "inactiveProducts": 2,
-        "virtualProducts": 6,
-        "physicalProducts": 4
+        "totalProducts": 50,
+        "activeProducts": 40,
+        "totalRevenue": 10000
     }
 }
 ```
@@ -1437,8 +1430,7 @@ Content-Type: application/json
         {
             "id": 1,
             "name": "VIP会员",
-            "description": "VIP会员专属权益，享受高级服务",
-            "category": "virtual",
+            "category": "会员",
             "status": "active",
             "createdAt": "2024-01-01T00:00:00",
             "updatedAt": "2024-01-01T00:00:00"
@@ -1451,7 +1443,7 @@ Content-Type: application/json
 
 ## 规格管理 API
 
-### 分页查询规格列表
+### 获取规格列表
 
 **接口地址**: `GET /api/specifications`
 
@@ -1470,26 +1462,24 @@ Content-Type: application/json
         "records": [
             {
                 "id": 1,
-                "productId": 1,
                 "name": "月卡",
-                "description": "VIP会员专属月卡，享受专属权益",
-                "durationDays": 30,
+                "productId": 1,
                 "price": 29.9,
-                "stockQuantity": 1000,
+                "durationDays": 30,
                 "status": "active",
                 "createdAt": "2024-01-01T00:00:00",
                 "updatedAt": "2024-01-01T00:00:00"
             }
         ],
-        "total": 8,
+        "total": 100,
         "size": 10,
         "current": 1,
-        "pages": 1
+        "pages": 10
     }
 }
 ```
 
-### 根据ID查询规格
+### 获取规格详情
 
 **接口地址**: `GET /api/specifications/{id}`
 
@@ -1500,12 +1490,10 @@ Content-Type: application/json
     "message": "success",
     "data": {
         "id": 1,
-        "productId": 1,
         "name": "月卡",
-        "description": "VIP会员专属月卡，享受专属权益",
-        "durationDays": 30,
+        "productId": 1,
         "price": 29.9,
-        "stockQuantity": 1000,
+        "durationDays": 30,
         "status": "active",
         "createdAt": "2024-01-01T00:00:00",
         "updatedAt": "2024-01-01T00:00:00"
@@ -1513,7 +1501,7 @@ Content-Type: application/json
 }
 ```
 
-### 根据产品ID查询规格列表
+### 根据产品获取规格
 
 **接口地址**: `GET /api/specifications/product/{productId}`
 
@@ -1525,12 +1513,10 @@ Content-Type: application/json
     "data": [
         {
             "id": 1,
-            "productId": 1,
             "name": "月卡",
-            "description": "VIP会员专属月卡，享受专属权益",
-            "durationDays": 30,
+            "productId": 1,
             "price": 29.9,
-            "stockQuantity": 1000,
+            "durationDays": 30,
             "status": "active",
             "createdAt": "2024-01-01T00:00:00",
             "updatedAt": "2024-01-01T00:00:00"
@@ -1539,7 +1525,7 @@ Content-Type: application/json
 }
 ```
 
-### 根据状态查询规格列表
+### 根据状态获取规格
 
 **接口地址**: `GET /api/specifications/status/{status}`
 
@@ -1551,12 +1537,10 @@ Content-Type: application/json
     "data": [
         {
             "id": 1,
-            "productId": 1,
             "name": "月卡",
-            "description": "VIP会员专属月卡，享受专属权益",
-            "durationDays": 30,
+            "productId": 1,
             "price": 29.9,
-            "stockQuantity": 1000,
+            "durationDays": 30,
             "status": "active",
             "createdAt": "2024-01-01T00:00:00",
             "updatedAt": "2024-01-01T00:00:00"
@@ -1572,12 +1556,10 @@ Content-Type: application/json
 **请求参数**:
 ```json
 {
+    "name": "新规格",
     "productId": 1,
-    "name": "季卡",
-    "description": "VIP会员专属季卡，享受专属权益",
-    "durationDays": 90,
-    "price": 79.9,
-    "stockQuantity": 500,
+    "price": 29.9,
+    "durationDays": 30,
     "status": "active"
 }
 ```
@@ -1598,13 +1580,10 @@ Content-Type: application/json
 **请求参数**:
 ```json
 {
-    "id": "1",
+    "name": "更新后的规格名称",
     "productId": 1,
-    "name": "更新后的规格名",
-    "description": "更新后的描述",
-    "durationDays": 60,
-    "price": 49.9,
-    "stockQuantity": 800,
+    "price": 39.9,
+    "durationDays": 30,
     "status": "active"
 }
 ```
@@ -1641,9 +1620,8 @@ Content-Type: application/json
     "code": 200,
     "message": "success",
     "data": {
-        "totalSpecifications": 15,
-        "activeSpecifications": 12,
-        "inactiveSpecifications": 3
+        "totalSpecifications": 20,
+        "activeSpecifications": 15
     }
 }
 ```
@@ -1660,20 +1638,17 @@ Content-Type: application/json
     "data": [
         {
             "id": 1,
+            "name": "月卡",
             "productId": 1,
             "productName": "VIP会员",
-            "name": "月卡",
-            "description": "VIP会员专属月卡",
-            "durationDays": 30,
             "price": 29.9,
-            "stockQuantity": 1000,
-            "status": "active"
+            "durationDays": 30
         }
     ]
 }
 ```
 
-### 分页获取规格DTO列表
+### 获取规格DTO列表（分页）
 
 **接口地址**: `GET /api/specifications/dto/pagination`
 
@@ -1692,27 +1667,51 @@ Content-Type: application/json
         "records": [
             {
                 "id": 1,
+                "name": "月卡",
                 "productId": 1,
                 "productName": "VIP会员",
-                "name": "月卡",
-                "description": "VIP会员专属月卡",
-                "durationDays": 30,
                 "price": 29.9,
-                "stockQuantity": 1000,
-                "status": "active"
+                "durationDays": 30
             }
         ],
-        "total": 15,
+        "total": 100,
         "size": 10,
         "current": 1,
-        "pages": 2
+        "pages": 10
     }
 }
 ```
 
 ---
 
-## 操作日志管理 API
+## 仪表盘 API
+
+### 获取仪表盘统计信息
+
+**接口地址**: `GET /api/admin/stats`
+
+**响应示例**:
+```json
+{
+    "code": 200,
+    "message": "success",
+    "data": {
+        "dailySales": 10,
+        "dailyRevenue": 299,
+        "yesterdaySales": 8,
+        "yesterdayRevenue": 239.2,
+        "totalOrders": 1000,
+        "totalRevenue": 29900,
+        "monthlyRevenue": 8970,
+        "lastMonthRevenue": 7970,
+        "conversionRate": 0.0
+    }
+}
+```
+
+---
+
+## 操作日志 API
 
 ### 获取操作日志列表
 
@@ -1721,8 +1720,8 @@ Content-Type: application/json
 **查询参数**:
 - `page` (可选): 页码，默认1
 - `size` (可选): 页大小，默认10
-- `startDate` (可选): 开始日期 (yyyy-MM-dd)
-- `endDate` (可选): 结束日期 (yyyy-MM-dd)
+- `startDate` (可选): 开始日期
+- `endDate` (可选): 结束日期
 - `operationType` (可选): 操作类型
 
 **响应示例**:
@@ -1735,9 +1734,9 @@ Content-Type: application/json
             {
                 "id": 1,
                 "operationType": "LOGIN",
-                "description": "管理员登录成功",
-                "ipAddress": "192.168.1.100",
-                "createdAt": "2024-01-15T14:30:00"
+                "description": "用户登录",
+                "ipAddress": "127.0.0.1",
+                "createdAt": "2024-01-01T00:00:00"
             }
         ],
         "total": 100,
@@ -1748,13 +1747,13 @@ Content-Type: application/json
 }
 ```
 
-### 获取日志统计信息
+### 获取操作日志统计信息
 
 **接口地址**: `GET /api/operation-logs/stats`
 
 **查询参数**:
-- `startDate` (可选): 开始日期 (yyyy-MM-dd)
-- `endDate` (可选): 结束日期 (yyyy-MM-dd)
+- `startDate` (可选): 开始日期
+- `endDate` (可选): 结束日期
 
 **响应示例**:
 ```json
@@ -1762,20 +1761,14 @@ Content-Type: application/json
     "code": 200,
     "message": "success",
     "data": {
-        "totalCount": 150,
-        "typeStats": {
-            "LOGIN": 45,
-            "CARD_KEY": 60,
-            "PRODUCT": 20,
-            "SPECIFICATION": 15,
-            "USER": 8,
-            "SYSTEM": 2
-        }
+        "totalLogs": 1000,
+        "loginLogs": 500,
+        "operationLogs": 500
     }
 }
 ```
 
-### 根据操作类型查询操作日志
+### 根据操作类型获取操作日志
 
 **接口地址**: `GET /api/operation-logs/type/{operationType}`
 
@@ -1788,9 +1781,9 @@ Content-Type: application/json
         {
             "id": 1,
             "operationType": "LOGIN",
-            "description": "管理员登录成功",
-            "ipAddress": "192.168.1.100",
-            "createdAt": "2024-01-15T14:30:00"
+            "description": "用户登录",
+            "ipAddress": "127.0.0.1",
+            "createdAt": "2024-01-01T00:00:00"
         }
     ]
 }
@@ -1801,10 +1794,15 @@ Content-Type: application/json
 **接口地址**: `GET /api/operation-logs/export`
 
 **查询参数**:
-- `startDate` (可选): 开始日期 (yyyy-MM-dd)
-- `endDate` (可选): 结束日期 (yyyy-MM-dd)
+- `startDate` (可选): 开始日期
+- `endDate` (可选): 结束日期
 
-**响应**: 返回Excel文件下载
+**响应示例**:
+```
+# 导出的CSV文件内容
+id,operationType,description,ipAddress,createdAt
+1,LOGIN,用户登录,127.0.0.1,2024-01-01T00:00:00
+```
 
 ### 清空操作日志
 
@@ -1824,13 +1822,9 @@ Content-Type: application/json
 **接口地址**: `POST /api/operation-logs`
 
 **请求参数**:
-```json
-{
-    "operationType": "操作类型",
-    "description": "操作描述",
-    "ipAddress": "IP地址"
-}
-```
+- `operationType` (必填): 操作类型
+- `description` (必填): 描述
+- `ipAddress` (必填): IP地址
 
 **响应示例**:
 ```json
@@ -1843,34 +1837,7 @@ Content-Type: application/json
 
 ---
 
-## 仪表盘 API
-
-### 获取仪表盘统计信息
-
-**接口地址**: `GET /api/admin/stats`
-
-**响应示例**:
-```json
-{
-    "code": 200,
-    "message": "success",
-    "data": {
-        "dailySales": 10,
-        "dailyRevenue": 299.0,
-        "yesterdaySales": 8,
-        "yesterdayRevenue": 239.2,
-        "totalOrders": 1000,
-        "totalRevenue": 29900.0,
-        "monthlyRevenue": 5000.0,
-        "lastMonthRevenue": 4500.0,
-        "conversionRate": 0.0
-    }
-}
-```
-
----
-
-## 用户个人中心 API
+## 用户 API
 
 ### 获取存储信息
 
@@ -1895,7 +1862,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 }
 ```
 
-### 更新个人资料
+### 更新用户资料
 
 **接口地址**: `PUT /api/user/profile`
 
@@ -1908,8 +1875,8 @@ Content-Type: application/json
 **请求参数**:
 ```json
 {
-    "username": "admin",
-    "email": "admin@qq.com"
+    "username": "updateduser",
+    "email": "updateduser@qq.com"
 }
 ```
 
@@ -1922,7 +1889,7 @@ Content-Type: application/json
 }
 ```
 
-### 更新密码
+### 更新用户密码
 
 **接口地址**: `PUT /api/user/password`
 

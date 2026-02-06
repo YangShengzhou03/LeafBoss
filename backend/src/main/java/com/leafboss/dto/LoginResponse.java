@@ -2,9 +2,6 @@ package com.leafboss.dto;
 
 import com.leafboss.entity.Admin;
 
-/**
- * 登录响应DTO
- */
 public class LoginResponse {
     
     private String token;
@@ -18,7 +15,6 @@ public class LoginResponse {
         this.user = user;
     }
     
-    // Getter and Setter methods
     public String getToken() {
         return token;
     }

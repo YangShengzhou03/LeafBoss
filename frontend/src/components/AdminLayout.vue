@@ -325,7 +325,7 @@ onMounted(async () => {
   background-color: #f0f2f5;
 }
 
-/* 路由过渡动画 */
+
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.3s ease;
@@ -336,7 +336,7 @@ onMounted(async () => {
   opacity: 0;
 }
 
-/* 卡片容器统一样式 */
+
 .admin-main :deep(.el-card) {
   border-radius: 6px;
   border: 1px solid #e6e8eb;
@@ -354,7 +354,7 @@ onMounted(async () => {
   padding: 20px;
 }
 
-/* 表单间距优化 */
+
 .admin-main :deep(.el-form) {
   margin-bottom: 16px;
 }
@@ -380,7 +380,7 @@ onMounted(async () => {
   color: #303133;
 }
 
-/* 响应式设计 */
+
 @media (max-width: 1024px) {
   .admin-sidebar {
     width: 200px;

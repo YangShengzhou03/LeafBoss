@@ -2,9 +2,6 @@ package com.leafboss.dto;
 
 import java.time.LocalDateTime;
 
-/**
- * 规格数据传输对象（包含卡密统计信息）
- */
 public class SpecificationDTO {
     
     private Integer id;
@@ -19,17 +16,14 @@ public class SpecificationDTO {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     
-    // 卡密统计信息
-    private Integer totalKeys;     // 卡密总数
-    private Integer usedKeys;      // 已使用卡密数
-    private Integer unusedKeys;    // 未使用卡密数
-    private Integer disabledKeys;  // 已禁用卡密数
+    private Integer totalKeys;     
+    private Integer usedKeys;      
+    private Integer unusedKeys;    
+    private Integer disabledKeys;  
 
-    // 无参构造函数
     public SpecificationDTO() {
     }
 
-    // Getter and Setter methods
     public Integer getId() {
         return id;
     }

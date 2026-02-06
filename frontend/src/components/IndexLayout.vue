@@ -289,7 +289,7 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-/* 简约精致的整体布局 */
+
 .index-layout {
   font-family: 'Inter', 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', Arial, sans-serif;
   color: #1f2937;
@@ -310,7 +310,7 @@ onUnmounted(() => {
   box-sizing: border-box;
 }
 
-/* 简约精致的顶部导航 */
+
 .header {
   background-color: #ffffff;
   border-bottom: 1px solid #f3f4f6;
@@ -384,12 +384,12 @@ onUnmounted(() => {
   font-size: 14px;
 }
 
-/* 简约美观的主内容区域 */
+
 .main-content {
   flex: 1;
 }
 
-/* 英雄区域 */
+
 .hero-section {
   background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
   padding: 120px 0 80px;
@@ -444,7 +444,7 @@ onUnmounted(() => {
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
 }
 
-/* 功能特色区域 */
+
 .features-section {
   padding: 80px 0;
   background-color: #ffffff;
@@ -497,7 +497,7 @@ onUnmounted(() => {
   font-size: 15px;
 }
 
-/* 简约的页脚 */
+
 .footer {
   background-color: #111827;
   color: #d1d5db;
@@ -569,7 +569,7 @@ onUnmounted(() => {
   color: #3b82f6;
 }
 
-/* 响应式设计 */
+
 @media (max-width: 768px) {
   .container {
     padding: 0 16px;

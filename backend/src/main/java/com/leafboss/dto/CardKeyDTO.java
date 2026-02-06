@@ -2,9 +2,6 @@ package com.leafboss.dto;
 
 import java.time.LocalDateTime;
 
-/**
- * 卡密数据传输对象
- */
 public class CardKeyDTO {
     
     private Integer id;
@@ -21,11 +18,9 @@ public class CardKeyDTO {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    // 无参构造函数
     public CardKeyDTO() {
     }
 
-    // 全参构造函数
     public CardKeyDTO(Integer id, String cardKey, Integer specificationId, String specificationName, 
                      Integer productId, String productName, String status, String userEmail, 
                      String userId, LocalDateTime activateTime, LocalDateTime expireTime, 
@@ -45,7 +40,6 @@ public class CardKeyDTO {
         this.updatedAt = updatedAt;
     }
 
-    // Getter and Setter methods
     public Integer getId() {
         return id;
     }

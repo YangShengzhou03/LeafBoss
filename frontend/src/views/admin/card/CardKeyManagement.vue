@@ -533,7 +533,7 @@ onMounted(() => {
   min-width: 60px;
 }
 
-/* 表格样式优化 */
+
 .cardkey-card :deep(.el-table__header) {
   background-color: #f5f7fa;
 }
@@ -548,7 +548,7 @@ onMounted(() => {
   background-color: #fafafa;
 }
 
-/* 按钮样式优化 - 移除可能影响原生悬浮效果的样式 */
+
 .cardkey-card :deep(.el-button) {
   border-radius: 4px;
 }

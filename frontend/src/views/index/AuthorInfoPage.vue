@@ -56,36 +56,36 @@
                 <div class="timeline-item">
                     <div class="timeline-marker"></div>
                     <div class="timeline-content">
-                      <h3>项目构思 · 2024年1月</h3>
+                      <h3>项目构思 · 2025年6月</h3>
                       <p>深入分析现有业务运营支撑系统痛点，构思打造轻量级、高可用的业务运营支撑系统</p>
                     </div>
                   </div>
                 <div class="timeline-item">
                     <div class="timeline-marker"></div>
                     <div class="timeline-content">
-                      <h3>技术选型 · 2024年2月</h3>
+                      <h3>技术选型 · 2025年8月</h3>
                       <p>确定采用 Vue 3 + Spring Boot 3 现代化技术栈，完成系统架构设计与技术方案论证</p>
                     </div>
                   </div>
                 <div class="timeline-item">
                     <div class="timeline-marker"></div>
                     <div class="timeline-content">
-                      <h3>核心开发 · 2024年3月-7月</h3>
+                      <h3>核心开发 · 2025年9月-2025年12月</h3>
                       <p>完成前后端核心功能开发，实现卡管理、用户管理、权限控制等关键模块</p>
                     </div>
                   </div>
                 <div class="timeline-item">
                     <div class="timeline-marker"></div>
                     <div class="timeline-content">
-                    <h3>正式发布 · 2024年10月27日</h3>
+                    <h3>正式发布 · 2026年1月27日</h3>
                     <p>LEAF-BOSS 业务运营支撑系统正式上线，开始为用户提供稳定服务</p>
                     </div>
                   </div>
                 <div class="timeline-item">
                   <div class="timeline-marker"></div>
                   <div class="timeline-content">
-                    <h3>全面重构 · 2026年1月18日</h3>
-                    <p>系统全面架构升级，正式更名为 LeafBoss，大幅提升性能与用户体验</p>
+                    <h3>全面重构 · 2026年2月6日</h3>
+                    <p>系统全面架构升级，正式更名为 LEAF-BOSS，大幅提升性能与用户体验</p>
                   </div>
                 </div>
               </div>

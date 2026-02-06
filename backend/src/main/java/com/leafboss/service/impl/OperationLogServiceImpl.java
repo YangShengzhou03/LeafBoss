@@ -17,9 +17,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * 操作日志服务实现类
- */
 @Service
 public class OperationLogServiceImpl extends ServiceImpl<OperationLogMapper, OperationLog> implements OperationLogService {
 
@@ -35,7 +32,6 @@ public class OperationLogServiceImpl extends ServiceImpl<OperationLogMapper, Ope
     public Map<String, Object> getLogStats(String startDate, String endDate) {
         QueryWrapper<OperationLog> queryWrapper = new QueryWrapper<>();
         
-        // 时间范围筛选
         if (startDate != null && !startDate.isEmpty()) {
             queryWrapper.ge("created_at", startDate + " 00:00:00");
         }
@@ -48,7 +44,6 @@ public class OperationLogServiceImpl extends ServiceImpl<OperationLogMapper, Ope
         Map<String, Object> stats = new HashMap<>();
         stats.put("totalCount", logs.size());
         
-        // 按操作类型统计
         Map<String, Integer> typeStats = new HashMap<>();
         for (OperationLog log : logs) {
             typeStats.put(log.getOperationType(), typeStats.getOrDefault(log.getOperationType(), 0) + 1);
@@ -62,7 +57,6 @@ public class OperationLogServiceImpl extends ServiceImpl<OperationLogMapper, Ope
     public void exportLogs(String startDate, String endDate, HttpServletResponse response) throws IOException {
         QueryWrapper<OperationLog> queryWrapper = new QueryWrapper<>();
         
-        // 时间范围筛选
         if (startDate != null && !startDate.isEmpty()) {
             queryWrapper.ge("created_at", startDate + " 00:00:00");
         }
@@ -73,12 +67,10 @@ public class OperationLogServiceImpl extends ServiceImpl<OperationLogMapper, Ope
         queryWrapper.orderByDesc("created_at");
         List<OperationLog> logs = this.list(queryWrapper);
         
-        // 设置响应头
         response.setContentType("text/csv;charset=UTF-8");
         response.setHeader("Content-Disposition", 
             "attachment; filename=\"operation_logs_" + LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")) + ".csv\"");
         
-        // 写入CSV数据
         PrintWriter writer = response.getWriter();
         writer.write("ID,操作类型,描述,IP地址,创建时间\n");
         
@@ -117,9 +109,6 @@ public class OperationLogServiceImpl extends ServiceImpl<OperationLogMapper, Ope
         this.save(operationLog);
     }
     
-    /**
-     * 转义CSV字段中的特殊字符
-     */
     private String escapeCsv(String field) {
         if (field == null) {
             return "";
