@@ -9,7 +9,7 @@
 
       <div class="search-bar">
         <el-row :gutter="16">
-          <el-col :span="6">
+          <el-col :xs="24" :sm="8" :md="6" class="mb-10">
             <el-input v-model="searchQuery" placeholder="搜索卡密或邮箱" clearable @keyup.enter="handleSearch">
               <template #append>
                 <el-button @click="handleSearch">
@@ -20,24 +20,25 @@
               </template>
             </el-input>
           </el-col>
-          <el-col :span="3">
-            <el-select v-model="specificationFilter" placeholder="商品规格" clearable @change="handleSearch">
+          <el-col :xs="24" :sm="6" :md="3" class="mb-10">
+            <el-select v-model="specificationFilter" placeholder="商品规格" clearable @change="handleSearch"
+              style="width: 100%">
               <el-option label="全部" value="" />
               <el-option v-for="spec in specifications" :key="spec.id" :label="spec.name" :value="spec.id" />
             </el-select>
           </el-col>
-          <el-col :span="3">
-            <el-select v-model="statusFilter" placeholder="卡密状态" clearable @change="handleSearch">
+          <el-col :xs="24" :sm="6" :md="3" class="mb-10">
+            <el-select v-model="statusFilter" placeholder="卡密状态" clearable @change="handleSearch" style="width: 100%">
               <el-option label="全部" value="" />
               <el-option label="未使用" value="未使用" />
               <el-option label="已使用" value="已使用" />
               <el-option label="已禁用" value="已禁用" />
             </el-select>
           </el-col>
-          <el-col :span="12" class="button-group">
+          <el-col :xs="24" :sm="24" :md="12" class="button-group">
             <el-button type="primary" @click="handleSearch">查询</el-button>
             <el-button @click="resetFilter">重置</el-button>
-            <div style="flex: 1;"></div>
+            <div class="flex-grow" v-if="!isMobile"></div>
             <el-button type="success" @click="handleExport">导出卡密</el-button>
             <el-button type="danger" @click="handleClearUsed">清空已使用</el-button>
           </el-col>
@@ -45,13 +46,12 @@
       </div>
 
       <div class="table-container">
-        <el-table :data="pagedCardKeys" style="width: 100%" v-loading="loading" :scroll="{ x: 1200 }">
-          <template #empty>
-            <div style="padding: 40px 0;">
-              <el-empty description="暂无卡密数据" />
-            </div>
-          </template>
-          <el-table-column prop="id" label="ID" width="80" align="center" />
+        <el-table :data="pagedCardKeys" style="width: 100%" v-loading="loading">
+          <el-table-column prop="id" label="ID" width="100" align="center">
+            <template #default="scope">
+              <span class="id-display">{{ formatId(scope.row.id) }}</span>
+            </template>
+          </el-table-column>
           <el-table-column prop="cardKey" label="卡密代码" min-width="200" align="left" :show-overflow-tooltip="true">
             <template #default="scope">
               <span class="cardkey-code" @click="copyCardKey(scope.row.cardKey)" style="cursor: pointer;">{{
@@ -91,12 +91,18 @@
               </el-button>
             </template>
           </el-table-column>
+
+          <template #empty>
+            <div class="empty-container" style="padding: 40px 0;">
+              <el-empty description="暂无卡密数据" :image-size="120" />
+            </div>
+          </template>
         </el-table>
       </div>
 
       <div class="pagination-container">
         <el-pagination v-model:current-page="currentPage" v-model:page-size="pageSize" :page-sizes="[10, 20, 50, 100]"
-          :total="total" layout="total, sizes, prev, pager, next, jumper" @size-change="handleSizeChange"
+          layout="total, sizes, prev, pager, next, jumper" :total="total" @size-change="handleSizeChange"
           @current-change="handleCurrentChange" />
       </div>
     </el-card>
@@ -104,12 +110,29 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Search } from '@element-plus/icons-vue'
 import api from '@/services/api.js'
 
 const loading = ref(false)
+const isMobile = ref(false)
+
+const checkIfMobile = () => {
+  isMobile.value = window.innerWidth <= 768
+}
+
+onMounted(() => {
+  checkIfMobile()
+  window.addEventListener('resize', checkIfMobile)
+  loadCardKeys()
+  loadSpecifications()
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', checkIfMobile)
+})
+
 const cardKeys = ref([])
 const specifications = ref([])
 const searchQuery = ref('')
@@ -122,6 +145,15 @@ const total = ref(0)
 const pagedCardKeys = computed(() => {
   return cardKeys.value
 })
+
+const formatId = (id) => {
+  if (!id) return ''
+  const idStr = id.toString()
+  if (idStr.length > 8) {
+    return `${idStr.substring(0, 8)}...`
+  }
+  return idStr
+}
 
 const getStatusTagType = (status) => {
   const typeMap = {
@@ -412,96 +444,44 @@ onMounted(() => {
 
 <style scoped>
 .admin-cardkey-management {
-  padding: 16px;
-  background-color: #f0f2f5;
-  min-height: calc(100vh - 32px);
-}
-
-.cardkey-card {
-  margin-bottom: 0;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  border: none;
-}
-
-.cardkey-card :deep(.el-card__body) {
-  padding: 20px;
-}
-
-.cardkey-card :deep(.el-card__header) {
-  padding: 16px 20px;
-  border-bottom: 1px solid #e6e8eb;
-  background-color: #fafafa;
-}
-
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-weight: 600;
-  font-size: 16px;
-  color: #303133;
+  padding: 0;
 }
 
 .search-bar {
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   padding: 20px;
-  background-color: #f8f9fa;
-  border-radius: 6px;
-  border: 1px solid #e6e8eb;
-}
-
-.search-bar :deep(.el-col) {
-  display: flex;
-  align-items: center;
-}
-
-.search-bar :deep(.el-input) {
-  flex: 1;
 }
 
 .search-bar :deep(.button-group) {
+  display: flex;
   justify-content: flex-end;
-  gap: 12px;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
-.table-container {
-  width: 100%;
-  border-radius: 6px;
-  overflow: hidden;
-  border: 1px solid #e6e8eb;
+.mb-10 {
+  margin-bottom: 10px;
 }
 
-.table-container :deep(.el-table) {
-  border-radius: 6px;
+.mt-10 {
+  margin-top: 10px;
 }
 
-.table-container :deep(.el-table__header-wrapper) {
-  background-color: #f5f7fa;
+.flex-grow {
+  flex-grow: 1;
 }
 
-.table-container :deep(.el-table th) {
-  background-color: #f5f7fa !important;
-  color: #606266;
-  font-weight: 600;
-  padding: 12px 0;
-}
-
-.table-container :deep(.el-table td) {
-  padding: 12px 0;
-}
-
-.table-container :deep(.el-table .cell) {
-  padding: 0 12px;
-  word-break: break-word;
+.id-display {
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  color: #666;
 }
 
 .pagination-container {
   display: flex;
   justify-content: flex-end;
-  margin-top: 20px;
-  padding: 16px 0 0;
-  border-top: 1px solid #e6e8eb;
+  margin-top: 12px;
+  padding: 16px;
 }
 
 .cardkey-code {
@@ -520,153 +500,5 @@ onMounted(() => {
 .time-text {
   font-size: 13px;
   color: #909399;
-}
-
-.action-buttons {
-  display: flex;
-  gap: 8px;
-  justify-content: center;
-  align-items: center;
-}
-
-.action-btn {
-  min-width: 60px;
-}
-
-
-.cardkey-card :deep(.el-table__header) {
-  background-color: #f5f7fa;
-}
-
-.cardkey-card :deep(.el-table th) {
-  background-color: #f5f7fa;
-  color: #606266;
-  font-weight: 600;
-}
-
-.cardkey-card :deep(.el-table--striped .el-table__body tr.el-table__row--striped td) {
-  background-color: #fafafa;
-}
-
-
-.cardkey-card :deep(.el-button) {
-  border-radius: 4px;
-}
-
-.cardkey-card :deep(.el-button--primary) {
-  background-color: #409eff;
-  border-color: #409eff;
-}
-
-.cardkey-card :deep(.el-button--danger) {
-  background-color: #f56c6c;
-  border-color: #f56c6c;
-}
-
-@media (max-width: 768px) {
-  .admin-cardkey-management {
-    padding: 10px;
-  }
-
-  .cardkey-card :deep(.el-card__body) {
-    padding: 16px;
-  }
-
-  .search-bar {
-    padding: 16px;
-    margin-bottom: 16px;
-  }
-
-  .search-bar :deep(.el-col) {
-    margin-bottom: 12px;
-  }
-
-  .search-bar :deep(.el-col:last-child) {
-    margin-bottom: 0;
-  }
-
-  .search-bar :deep(.button-group) {
-    flex-direction: column;
-    gap: 8px;
-    align-items: stretch;
-  }
-
-  .search-bar :deep(.button-group .el-button) {
-    width: 100%;
-  }
-
-  .table-container {
-    overflow-x: auto;
-  }
-
-  .table-container :deep(.el-table) {
-    font-size: 12px;
-  }
-
-  .table-container :deep(.el-table th),
-  .table-container :deep(.el-table td) {
-    padding: 8px 4px;
-  }
-
-  .table-container :deep(.el-button) {
-    padding: 4px 8px;
-    font-size: 12px;
-  }
-
-  .pagination-container {
-    justify-content: center;
-    padding: 12px 0;
-  }
-
-  .pagination-container :deep(.el-pagination) {
-    font-size: 12px;
-  }
-
-  .pagination-container :deep(.el-pagination__sizes),
-  .pagination-container :deep(.el-pagination__jump) {
-    display: none;
-  }
-
-  .cardkey-code,
-  .product-spec,
-  .time-text {
-    font-size: 11px;
-  }
-}
-
-@media (max-width: 480px) {
-  .card-header {
-    font-size: 14px;
-  }
-
-  .search-bar :deep(.el-input__inner),
-  .search-bar :deep(.el-select) {
-    font-size: 14px;
-  }
-
-  .table-container :deep(.el-table) {
-    font-size: 11px;
-  }
-
-  :deep(.el-dialog) {
-    width: 95% !important;
-    margin: 0 auto;
-  }
-
-  :deep(.el-dialog__header) {
-    padding: 16px;
-  }
-
-  :deep(.el-dialog__body) {
-    padding: 16px;
-  }
-
-  :deep(.el-dialog__footer) {
-    padding: 12px 16px;
-  }
-
-  :deep(.el-form-item__label) {
-    font-size: 14px;
-  }
 }
 </style>

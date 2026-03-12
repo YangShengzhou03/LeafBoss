@@ -8,21 +8,21 @@
       </template>
 
       <div class="config-section">
-        <el-form :model="generateForm" label-width="100px">
-          <el-row :gutter="8">
-            <el-col :span="4">
+        <el-form :model="generateForm" :label-width="isMobile ? '80px' : '100px'" :label-position="isMobile ? 'top' : 'left'">
+          <el-row :gutter="16">
+            <el-col :xs="24" :sm="12" :md="4">
               <el-form-item label="生成数量">
                 <el-input-number v-model="generateForm.count" :min="1" :max="10000" controls-position="right"
                   placeholder="请输入数量" class="form-input" />
               </el-form-item>
             </el-col>
-            <el-col :span="4">
+            <el-col :xs="24" :sm="12" :md="4">
               <el-form-item label="卡密长度">
                 <el-input-number v-model="generateForm.length" :min="8" :max="32" controls-position="right"
                   placeholder="请输入长度" class="form-input" />
               </el-form-item>
             </el-col>
-            <el-col :span="5">
+            <el-col :xs="24" :sm="12" :md="5">
               <el-form-item label="商品">
                 <el-select v-model="generateForm.productId" placeholder="请选择商品" clearable class="form-input"
                   @change="handleProductChange">
@@ -31,21 +31,18 @@
                 </el-select>
               </el-form-item>
             </el-col>
-            <el-col :span="5">
+            <el-col :xs="24" :sm="12" :md="5">
               <el-form-item label="规格">
                 <el-select v-model="generateForm.specId" placeholder="请选择规格" clearable class="form-input">
                   <el-option v-for="spec in specList" :key="spec.id" :label="spec.name" :value="spec.id" />
                 </el-select>
               </el-form-item>
             </el-col>
-            <el-col :span="6">
+            <el-col :xs="24" :md="6">
               <el-form-item label="操作">
                 <div class="action-buttons">
-                  <el-button type="primary" @click="generateCardKeys" :loading="generating" class="generate-btn">
+                  <el-button type="primary" @click="generateCardKeys" :loading="generating" class="generate-btn" style="width: 100%">
                     生成卡密
-                  </el-button>
-                  <el-button @click="resetForm" class="reset-btn">
-                    重置
                   </el-button>
                 </div>
               </el-form-item>
@@ -68,7 +65,7 @@
 
       <div v-if="generatedKeys.length > 0" class="result-section">
         <div class="result-header">
-          <div class="result-header-content">
+          <div class="result-header-content" :class="{ 'is-mobile': isMobile }">
             <span class="result-title">生成结果 ({{ generatedKeys.length }} 条)</span>
 
             <div v-if="generateForm.productId && generateForm.specId" class="product-spec-info">
@@ -78,25 +75,25 @@
               <span class="info-value">{{ getSpecName(generateForm.specId) }}</span>
             </div>
 
-            <div class="action-buttons">
+            <div class="action-buttons" :class="{ 'is-mobile': isMobile }">
               <el-button type="success" @click="addToStock" :loading="addingToStock"
                 :disabled="!generateForm.productId || !generateForm.specId" class="action-btn">
                 <el-icon>
                   <Upload />
                 </el-icon>
-                导入系统
+                导入
               </el-button>
               <el-button type="primary" @click="copyCardKeys">
                 <el-icon>
                   <CopyDocument />
                 </el-icon>
-                一键复制
+                复制
               </el-button>
               <el-button type="primary" @click="exportCardKeys" class="export-btn">
                 <el-icon>
                   <Download />
                 </el-icon>
-                导出卡密
+                导出
               </el-button>
             </div>
           </div>
@@ -126,7 +123,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, computed } from 'vue'
+import { ref, reactive, onMounted, onUnmounted, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Download, Upload, CopyDocument } from '@element-plus/icons-vue'
 import Server from '@/utils/Server.js'
@@ -134,9 +131,25 @@ import api from '@/services/api.js'
 
 const generating = ref(false)
 const addingToStock = ref(false)
+const isMobile = ref(false)
+
+const checkIfMobile = () => {
+  isMobile.value = window.innerWidth <= 768
+}
+
+onMounted(() => {
+  checkIfMobile()
+  window.addEventListener('resize', checkIfMobile)
+  loadProducts()
+  loadAllSpecs()
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', checkIfMobile)
+})
 
 const generateForm = reactive({
-  count: 50,
+  count: 100,
   length: 32,
   productId: '',
   specId: '',
@@ -437,19 +450,8 @@ const copyCardKeys = async () => {
     textArea.select()
     document.execCommand('copy')
     document.body.removeChild(textArea)
-    ElMessage.success(`已复制 ${generatedKeys.value.length} 个卡密到剪贴板`)
   }
-}
-
-const resetForm = () => {
-  Object.assign(generateForm, {
-    count: 50,
-    length: 32,
-    productId: '',
-    specId: '',
-    charset: ['numbers', 'uppercase', 'lowercase']
-  })
-  generatedKeys.value = []
+  ElMessage.success(`已复制 ${generatedKeys.value.length} 个卡密到剪贴板`)
 }
 </script>
 
@@ -506,11 +508,6 @@ const resetForm = () => {
   padding: 8px 12px;
 }
 
-.reset-btn {
-  min-width: 60px;
-  padding: 8px 12px;
-}
-
 .result-section {
   border-top: 1px solid #e6e8eb;
   padding-top: 16px;
@@ -521,7 +518,12 @@ const resetForm = () => {
   justify-content: space-between;
   align-items: center;
   gap: 16px;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
+}
+
+.result-header-content.is-mobile {
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 .result-title {
@@ -535,7 +537,7 @@ const resetForm = () => {
   display: flex;
   align-items: center;
   gap: 16px;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
 }
 
 .product-spec-info {
@@ -547,6 +549,8 @@ const resetForm = () => {
   border-radius: 6px;
   border: 1px solid #e6e8eb;
   white-space: nowrap;
+  max-width: 100%;
+  overflow-x: auto;
 }
 
 .info-label {
@@ -571,6 +575,7 @@ const resetForm = () => {
   display: flex;
   gap: 16px;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .charset-checkbox {
@@ -580,6 +585,18 @@ const resetForm = () => {
 .action-buttons {
   display: flex;
   gap: 8px;
+  flex-wrap: wrap;
+}
+
+.action-buttons.is-mobile {
+  width: 100%;
+  justify-content: space-between;
+}
+
+.action-buttons.is-mobile .el-button {
+  flex: 1;
+  padding: 8px 4px;
+  font-size: 12px;
 }
 
 .keys-container {

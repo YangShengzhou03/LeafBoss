@@ -9,8 +9,6 @@ public interface ProductService extends IService<Product> {
 
     Product findByName(String name);
 
-    List<Product> findByCategory(String category);
-
     List<Product> findByStatus(String status);
 
     Object getProductStatistics();

@@ -23,7 +23,7 @@ public interface CardKeyService extends IService<CardKey> {
 
     Object getCardStatistics();
 
-    boolean batchGenerateCardKeys(String productId, Integer quantity, String prefix);
+    boolean batchGenerateCardKeys(String productId, Integer specificationId, Integer quantity, String prefix);
 
     boolean batchDeleteUsedCardKeys();
 }

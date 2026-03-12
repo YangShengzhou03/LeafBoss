@@ -5,7 +5,6 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @TableName("users")
@@ -23,20 +22,8 @@ public class User {
     @Email(message = "邮箱格式不正确")
     private String email;
     
-    @TableField("password_hash")
-    private String passwordHash;
-    
-    @TableField("phone")
-    private String phone;
-    
-    @TableField("birthday")
-    private LocalDate birthday;
-    
-    @TableField("education")
-    private String education;
-    
-    @TableField("gender")
-    private String gender;
+    @TableField("password")
+    private String password;
     
     @TableField("status")
     private String status;
@@ -46,9 +33,6 @@ public class User {
     
     @TableField("last_login_time")
     private LocalDateTime lastLoginTime;
-    
-    @TableField("last_login_ip")
-    private String lastLoginIp;
 
     public String getId() {
         return id;
@@ -74,44 +58,12 @@ public class User {
         this.email = email;
     }
 
-    public String getPasswordHash() {
-        return passwordHash;
+    public String getPassword() {
+        return password;
     }
 
-    public void setPasswordHash(String passwordHash) {
-        this.passwordHash = passwordHash;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public LocalDate getBirthday() {
-        return birthday;
-    }
-
-    public void setBirthday(LocalDate birthday) {
-        this.birthday = birthday;
-    }
-
-    public String getEducation() {
-        return education;
-    }
-
-    public void setEducation(String education) {
-        this.education = education;
-    }
-
-    public String getGender() {
-        return gender;
-    }
-
-    public void setGender(String gender) {
-        this.gender = gender;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public String getStatus() {
@@ -136,13 +88,5 @@ public class User {
 
     public void setLastLoginTime(LocalDateTime lastLoginTime) {
         this.lastLoginTime = lastLoginTime;
-    }
-
-    public String getLastLoginIp() {
-        return lastLoginIp;
-    }
-
-    public void setLastLoginIp(String lastLoginIp) {
-        this.lastLoginIp = lastLoginIp;
     }
 }

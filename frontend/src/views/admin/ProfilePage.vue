@@ -17,7 +17,7 @@
         <!-- 用户信息展示 -->
         <div class="user-info-display">
           <div class="avatar-section">
-            <el-avatar :size="100" :src="userInfo.avatar" class="user-avatar">
+            <el-avatar :size="100" class="user-avatar">
               {{ userInfo.nickname ? userInfo.nickname.charAt(0) : 'U' }}
             </el-avatar>
           </div>
@@ -32,7 +32,7 @@
               </div>
               <div class="info-item">
                 <span class="info-label">账户状态：</span>
-                <el-tag type="success">正常</el-tag>
+                <el-tag type="success">启用</el-tag>
               </div>
             </div>
           </div>
@@ -43,21 +43,6 @@
     <!-- 修改资料对话框 -->
     <el-dialog v-model="profileDialogVisible" title="修改资料" width="500px">
       <el-form :model="profileForm" :rules="profileRules" ref="profileFormRef" label-width="80px">
-        <el-form-item label="头像" prop="avatar">
-          <div class="avatar-upload">
-            <el-avatar :size="80" :src="profileForm.avatar" class="preview-avatar">
-              {{ profileForm.nickname ? profileForm.nickname.charAt(0) : 'U' }}
-            </el-avatar>
-            <el-button type="primary" @click="changeAvatar" style="margin-left: 16px;">
-              <el-icon>
-                <Camera />
-              </el-icon>
-              更换头像
-            </el-button>
-            <input ref="avatarInput" type="file" accept="image/*" style="display: none" @change="handleAvatarChange" />
-          </div>
-        </el-form-item>
-
         <el-form-item label="昵称" prop="nickname">
           <el-input v-model="profileForm.nickname" placeholder="请输入昵称" maxlength="20" show-word-limit />
         </el-form-item>
@@ -86,11 +71,10 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
-import { Camera, Edit } from '@element-plus/icons-vue'
+import { Edit } from '@element-plus/icons-vue'
 import api from '../../services/api'
 
 const profileFormRef = ref()
-const avatarInput = ref()
 
 const profileDialogVisible = ref(false)
 const saving = ref(false)
@@ -99,12 +83,10 @@ const userInfo = ref({
   id: '',
   nickname: '',
   email: '',
-  avatar: '',
   createTime: ''
 })
 
 const profileForm = reactive({
-  avatar: '',
   nickname: '',
   email: '',
   password: ''
@@ -137,7 +119,6 @@ const loadUserInfo = async () => {
         id: userData.id || userData.userId || '',
         nickname: userData.nickname || userData.username || userData.name || '',
         email: userData.email || '',
-        avatar: userData.avatar || userData.profilePicture || '',
         createTime: userData.createTime || userData.createdAt || userData.registrationTime || ''
       }
 
@@ -193,40 +174,6 @@ const saveProfile = async () => {
   } finally {
     saving.value = false
   }
-}
-
-// 更换头像
-const changeAvatar = () => {
-  avatarInput.value?.click()
-}
-
-// 处理头像更改
-const handleAvatarChange = (event) => {
-  const file = event.target.files[0]
-  if (!file) return
-
-  // 检查文件类型
-  if (!file.type.startsWith('image/')) {
-    ElMessage.warning('请选择图片文件')
-    return
-  }
-
-  // 检查文件大小（限制为2MB）
-  if (file.size > 2 * 1024 * 1024) {
-    ElMessage.warning('图片大小不能超过2MB')
-    return
-  }
-
-  // 创建预览URL
-  const reader = new FileReader()
-  reader.onload = (e) => {
-    profileForm.avatar = e.target.result
-    ElMessage.success('头像更换成功')
-  }
-  reader.readAsDataURL(file)
-
-  // 重置文件输入
-  event.target.value = ''
 }
 
 onMounted(() => {
@@ -355,31 +302,6 @@ onMounted(() => {
   font-size: 14px;
 }
 
-.avatar-upload {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.preview-avatar {
-  border: 2px solid #e5e7eb;
-  background-color: #3b82f6;
-  color: white;
-  font-weight: 600;
-}
-
-.avatar-upload .el-button {
-  background-color: #3b82f6;
-  border-color: #3b82f6;
-  color: white;
-  font-weight: 500;
-}
-
-.avatar-upload .el-button:hover {
-  background-color: #2563eb;
-  border-color: #2563eb;
-}
-
 .el-dialog {
   border-radius: 8px;
 }
@@ -440,11 +362,6 @@ onMounted(() => {
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
-  }
-
-  .avatar-upload {
-    flex-direction: column;
-    gap: 12px;
   }
 }
 

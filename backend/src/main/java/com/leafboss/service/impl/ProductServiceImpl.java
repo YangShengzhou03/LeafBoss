@@ -40,34 +40,42 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
     }
 
     @Override
-    public List<Product> findByCategory(String category) {
-        QueryWrapper<Product> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("category", category);
-        return baseMapper.selectList(queryWrapper);
-    }
-
-    @Override
     public List<Product> findByStatus(String status) {
         QueryWrapper<Product> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("status", status);
-        return baseMapper.selectList(queryWrapper);
+        return this.list(queryWrapper);
     }
 
     @Override
     public Object getProductStatistics() {
-        List<Product> allProducts = baseMapper.selectList(null);
-        List<Specification> allSpecifications = specificationMapper.selectList(null);
-
         Map<String, Object> statistics = new HashMap<>();
-        statistics.put("totalProducts", allProducts.size());
-        statistics.put("activeProducts", (int) allProducts.stream().filter(product -> "active".equals(product.getStatus())).count());
-        statistics.put("inactiveProducts", (int) allProducts.stream().filter(product -> "inactive".equals(product.getStatus())).count());
-        statistics.put("activeSpecifications", (int) allSpecifications.stream().filter(spec -> "active".equals(spec.getStatus())).count());
+        
+        long totalProducts = this.count();
+        statistics.put("totalProducts", (int)totalProducts);
 
-        int totalStock = allSpecifications.stream()
-                .filter(spec -> "active".equals(spec.getStatus()))
-                .mapToInt(Specification::getStockQuantity)
-                .sum();
+        QueryWrapper<Product> activeProductQuery = new QueryWrapper<>();
+        activeProductQuery.eq("status", "active");
+        statistics.put("activeProducts", (int)this.count(activeProductQuery));
+
+        QueryWrapper<Product> inactiveProductQuery = new QueryWrapper<>();
+        inactiveProductQuery.eq("status", "inactive");
+        statistics.put("inactiveProducts", (int)this.count(inactiveProductQuery));
+
+        QueryWrapper<Specification> activeSpecQuery = new QueryWrapper<>();
+        activeSpecQuery.eq("status", "active");
+        statistics.put("activeSpecifications", (int)specificationService.count(activeSpecQuery));
+
+        // 计算总库存 - 这里使用 listMaps 聚合或者简单的 sum
+        QueryWrapper<Specification> stockQuery = new QueryWrapper<>();
+        stockQuery.eq("status", "active");
+        stockQuery.select("SUM(stock_quantity) as totalStock");
+        Map<String, Object> stockMap = specificationService.getMap(stockQuery);
+        
+        Object totalStockObj = stockMap != null ? stockMap.get("totalStock") : 0;
+        int totalStock = 0;
+        if (totalStockObj instanceof Number) {
+            totalStock = ((Number) totalStockObj).intValue();
+        }
         statistics.put("totalStock", totalStock);
 
         return statistics;

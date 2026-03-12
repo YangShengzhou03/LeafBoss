@@ -9,7 +9,7 @@
 
       <div class="search-bar">
         <el-row :gutter="20">
-          <el-col :span="6">
+          <el-col :xs="24" :sm="8" :md="6" class="mb-10">
             <el-input v-model="searchQuery" placeholder="卡密" clearable @clear="handleSearch()"
               @keyup.enter="handleSearch()">
               <template #append>
@@ -21,25 +21,29 @@
               </template>
             </el-input>
           </el-col>
-          <el-col :span="4">
-            <el-select v-model="companyFilter" placeholder="选择公司" clearable @change="handleSearch()">
+          <el-col :xs="24" :sm="6" :md="4" class="mb-10">
+            <el-select v-model="companyFilter" placeholder="选择公司" clearable @change="handleSearch()" style="width: 100%">
               <el-option label="全部" value="" />
               <el-option v-for="company in companies" :key="company.id" :label="company.name" :value="company.id" />
             </el-select>
           </el-col>
-          <el-col :span="14" class="button-group">
+          <el-col :xs="24" :sm="10" :md="14" class="button-group">
             <el-button type="primary" @click="handleSearch()">查询</el-button>
             <el-button @click="resetFilters()">重置</el-button>
-            <div style="flex: 1;"></div>
+            <div class="flex-grow" v-if="!isMobile"></div>
             <el-button type="primary" @click="handleAddReview">新增评论</el-button>
           </el-col>
         </el-row>
       </div>
 
       <div class="table-container">
-        <el-table :data="filteredReviews" v-loading="loading" stripe style="width: 100%" :key="tableKey"
+        <el-table :data="filteredReviews" v-loading="loading" style="width: 100%" :key="tableKey"
           :reserve-selection="false" :row-key="row => row.id || Math.random()">
-          <el-table-column prop="id" label="ID" width="80" align="center" show-overflow-tooltip />
+          <el-table-column prop="id" label="ID" width="100" align="center">
+            <template #default="scope">
+              <span class="id-display">{{ formatId(scope.row.id) }}</span>
+            </template>
+          </el-table-column>
           <el-table-column prop="cardKey" label="卡密" width="200" align="center" :show-overflow-tooltip="true" />
           <el-table-column prop="companyName" label="公司" min-width="150" align="left" :show-overflow-tooltip="true" />
           <el-table-column prop="content" label="评论内容" min-width="250" align="left" :show-overflow-tooltip="true" />
@@ -69,8 +73,8 @@
       </div>
     </el-card>
 
-    <el-dialog v-model="showAddDialog" title="新增评论" width="500px">
-      <el-form :model="reviewForm" :rules="reviewRules" ref="reviewFormRef" label-width="80px">
+    <el-dialog v-model="showAddDialog" title="新增评论" :width="isMobile ? '90%' : '500px'">
+      <el-form :model="reviewForm" :rules="reviewRules" ref="reviewFormRef" :label-width="isMobile ? '60px' : '80px'">
         <el-form-item label="卡密" prop="cardKey">
           <el-input v-model="reviewForm.cardKey" placeholder="请输入卡密" />
         </el-form-item>
@@ -94,12 +98,28 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, reactive } from 'vue'
+import { ref, onMounted, onUnmounted, computed, reactive } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Search } from '@element-plus/icons-vue'
 import api from '../../../services/api'
 
 const loading = ref(false)
+const isMobile = ref(false)
+
+const checkIfMobile = () => {
+  isMobile.value = window.innerWidth <= 768
+}
+
+onMounted(() => {
+  checkIfMobile()
+  window.addEventListener('resize', checkIfMobile)
+  loadReviews()
+  loadCompanies()
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', checkIfMobile)
+})
 
 const reviews = ref([])
 const companies = ref([])
@@ -120,6 +140,15 @@ const reviewForm = reactive({
   companyId: null,
   content: ''
 })
+
+const formatId = (id) => {
+  if (!id) return ''
+  const idStr = id.toString()
+  if (idStr.length > 8) {
+    return `${idStr.substring(0, 8)}...`
+  }
+  return idStr
+}
 
 const reviewRules = {
   cardKey: [{ required: true, message: '请输入卡密', trigger: 'blur' }],
@@ -273,39 +302,34 @@ onMounted(() => {
   padding: 0;
 }
 
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-weight: 600;
-  font-size: 16px;
-  color: #303133;
-}
-
 .search-bar {
   margin-bottom: 16px;
   padding: 20px;
 }
 
-.search-bar :deep(.el-col) {
-  display: flex;
-  align-items: center;
-}
-
-.search-bar :deep(.el-input) {
-  flex: 1;
-}
-
 .search-bar :deep(.button-group) {
+  display: flex;
   justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
-.search-bar :deep(.button-group .el-button) {
-  margin-left: 8px;
+.mb-10 {
+  margin-bottom: 10px;
 }
 
-.table-container {
-  width: 100%;
+.mt-10 {
+  margin-top: 10px;
+}
+
+.flex-grow {
+  flex-grow: 1;
+}
+
+.id-display {
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  color: #666;
 }
 
 .pagination-container {
@@ -313,9 +337,5 @@ onMounted(() => {
   justify-content: flex-end;
   margin-top: 12px;
   padding: 16px;
-}
-
-.empty-container {
-  padding: 40px 0;
 }
 </style>

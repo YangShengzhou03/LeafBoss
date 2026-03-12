@@ -10,7 +10,7 @@
       <div class="users-content">
         <div class="search-bar">
           <el-row :gutter="16">
-            <el-col :span="6">
+            <el-col :xs="24" :sm="8" :md="6" class="mb-10">
               <el-input v-model="searchQuery" placeholder="搜索邮箱" clearable @clear="handleSearch"
                 @keyup.enter="handleSearch">
                 <template #append>
@@ -22,53 +22,43 @@
                 </template>
               </el-input>
             </el-col>
-            <el-col :span="4">
-              <el-select v-model="statusFilter" placeholder="管理人员状态" clearable @change="handleSearch">
+            <el-col :xs="24" :sm="6" :md="4" class="mb-10">
+              <el-select v-model="statusFilter" placeholder="管理员状态" clearable @change="handleSearch" style="width: 100%">
                 <el-option label="全部" value="" />
-                <el-option label="正常" value="active" />
+                <el-option label="启用" value="active" />
                 <el-option label="禁用" value="inactive" />
               </el-select>
             </el-col>
-            <el-col :span="14" class="button-group">
+            <el-col :xs="24" :sm="10" :md="14" class="button-group">
               <el-button type="primary" @click="handleSearch">查询</el-button>
               <el-button @click="resetFilters">重置</el-button>
-              <div style="flex: 1;"></div>
+              <div class="flex-grow" v-if="!isMobile"></div>
               <el-button type="primary" @click="addUser">
-                添加管理人员
+                添加
               </el-button>
             </el-col>
           </el-row>
         </div>
 
         <div class="table-container">
-          <el-table :data="filteredUsers" style="width: 100%" v-loading="loading" stripe>
-            <el-table-column prop="id" label="ID" min-width="80" align="center">
-              <template #default="scope">
-                <span class="truncate-id">{{ scope.row.id ? scope.row.id.toString().substring(0, 3) + '...' : ''
-                  }}</span>
-              </template>
-            </el-table-column>
+          <el-table :data="filteredUsers" style="width: 100%" v-loading="loading">
             <el-table-column prop="username" label="管理员名" min-width="120" align="center" :show-overflow-tooltip="true" />
             <el-table-column prop="email" label="邮箱" min-width="200" align="center" :show-overflow-tooltip="true" />
 
-            <el-table-column prop="status" label="状态" min-width="100" align="center">
+            <el-table-column prop="status" label="状态" width="100" align="center">
               <template #default="scope">
                 <el-tag :type="scope.row.status === 'active' ? 'success' : 'danger'">
-                  {{ scope.row.status === 'active' ? '正常' : '禁用' }}
+                  {{ scope.row.status === 'active' ? '启用' : '禁用' }}
                 </el-tag>
               </template>
             </el-table-column>
-            <el-table-column prop="createdAt" label="注册时间" min-width="160" align="center"
+            <el-table-column prop="createdAt" label="注册时间" width="180" align="center"
               :show-overflow-tooltip="true" />
-            <el-table-column prop="lastLoginTime" label="最后上线时间" min-width="160" align="center"
+            <el-table-column prop="lastLoginTime" label="最后上线时间" width="180" align="center"
               :show-overflow-tooltip="true" />
-            <el-table-column label="操作" min-width="280" fixed="right" align="center">
+            <el-table-column label="操作" width="220" fixed="right" align="center">
               <template #default="scope">
                 <el-button size="small" @click="editUser(scope.row)">编辑</el-button>
-                <el-button size="small" :type="scope.row.status === 'active' ? 'warning' : 'primary'"
-                  @click="toggleUserStatus(scope.row)">
-                  {{ scope.row.status === 'active' ? '停用' : '启用' }}
-                </el-button>
                 <el-button size="small" type="info" @click="resetPassword(scope.row)">重置密码</el-button>
                 <el-button size="small" type="danger" @click="deleteUser(scope.row)">删除</el-button>
               </template>
@@ -90,8 +80,8 @@
       </div>
     </el-card>
 
-    <el-dialog v-model="showAddUserDialog" :title="editingUser ? '编辑管理人员' : '添加管理人员'" width="500px">
-      <el-form :model="userForm" :rules="userRules" ref="userFormRef" label-width="80px">
+    <el-dialog v-model="showAddUserDialog" :title="editingUser ? '编辑管理人员' : '添加管理人员'" :width="isMobile ? '90%' : '500px'">
+      <el-form :model="userForm" :rules="userRules" ref="userFormRef" :label-width="isMobile ? '60px' : '80px'">
         <el-form-item label="邮箱" prop="email">
           <el-input v-model="userForm.email" />
         </el-form-item>
@@ -100,7 +90,7 @@
         </el-form-item>
         <el-form-item label="状态" prop="status">
           <el-radio-group v-model="userForm.status">
-            <el-radio label="active">正常</el-radio>
+            <el-radio label="active">启用</el-radio>
             <el-radio label="inactive">禁用</el-radio>
           </el-radio-group>
         </el-form-item>
@@ -117,12 +107,28 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, computed } from 'vue'
+import { ref, reactive, onMounted, onUnmounted, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Search } from '@element-plus/icons-vue'
 import api from '../../services/api'
 
 const loading = ref(false)
+const isMobile = ref(false)
+
+const checkIfMobile = () => {
+  isMobile.value = window.innerWidth <= 768
+}
+
+onMounted(() => {
+  checkIfMobile()
+  window.addEventListener('resize', checkIfMobile)
+  loadUsers()
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', checkIfMobile)
+})
+
 const users = ref([])
 const searchQuery = ref('')
 const statusFilter = ref('')
@@ -149,7 +155,7 @@ const userRules = {
     { min: 6, max: 20, message: '长度在 6 到 20 个字符', trigger: 'blur' }
   ],
   status: [
-    { required: true, message: '请选择管理人员状态', trigger: 'change' }
+    { required: true, message: '请选择管理员状态', trigger: 'change' }
   ]
 }
 
@@ -251,7 +257,7 @@ const saveUser = async () => {
 
     const userData = {
       email: userForm.email,
-      status: userForm.status === 'active' ? 1 : 0
+      status: userForm.status
     }
 
     if (!editingUser.value && userForm.password) {
@@ -280,22 +286,6 @@ const addUser = () => {
   editingUser.value = null
   resetUserForm()
   showAddUserDialog.value = true
-}
-
-const toggleUserStatus = async (user) => {
-  try {
-    const newStatus = user.status === 'active' ? 'inactive' : 'active'
-    const enabled = newStatus === 'active'
-
-    await api.user.updateUser(user.id, {
-      status: enabled ? 1 : 0
-    })
-
-    ElMessage.success(`管理人员已${newStatus === 'active' ? '启用' : '禁用'}`)
-    loadUsers()
-  } catch (error) {
-    ElMessage.error('切换管理人员状态失败: ' + (error.response?.data?.message || error.message))
-  }
 }
 
 const deleteUser = async (user) => {
@@ -337,317 +327,42 @@ onMounted(() => {
 <style scoped>
 .admin-users {
   padding: 0;
-  background-color: #f0f2f5;
-  width: 100%;
-  max-height: 100vh;
-}
-
-.users-card {
-  margin: 0;
-  border: none;
-  border-radius: 0;
-  box-shadow: none;
-  width: 100%;
-  max-height: 100vh;
-}
-
-.users-card :deep(.el-card__body) {
-  padding: 0;
-  width: 100%;
-}
-
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-weight: 600;
-  font-size: 16px;
-  color: #303133;
 }
 
 .search-bar {
-  margin-bottom: 0;
+  margin-bottom: 16px;
   padding: 20px;
-  background-color: #ffffff;
-  border-radius: 0;
-  box-shadow: none;
-  border-bottom: 1px solid #e6e8eb;
-}
-
-.search-bar :deep(.el-col) {
-  display: flex;
-  align-items: center;
-}
-
-.search-bar :deep(.el-input) {
-  flex: 1;
 }
 
 .search-bar :deep(.button-group) {
+  display: flex;
   justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
-.search-bar :deep(.button-group .el-button) {
-  margin-left: 8px;
-  transition: all 0.2s ease;
+.mb-10 {
+  margin-bottom: 10px;
 }
 
-.search-bar :deep(.button-group .el-button:hover) {
-  transform: translateY(-1px);
+.mt-10 {
+  margin-top: 10px;
 }
 
-.table-container {
-  width: 100%;
-  border-radius: 0;
-  overflow: hidden;
-  box-shadow: none;
-  margin: 0;
-  padding: 0;
+.flex-grow {
+  flex-grow: 1;
 }
 
-.table-container :deep(.el-table) {
-  border-radius: 8px;
-  border: 1px solid #ebeef5;
-}
-
-.table-container :deep(.el-table__header-wrapper) {
-  background-color: #f5f7fa;
-}
-
-.table-container :deep(.el-table th) {
-  background-color: #f5f7fa !important;
-  color: #606266;
-  font-weight: 600;
-  padding: 12px 0;
-}
-
-.table-container :deep(.el-table td) {
-  padding: 12px 0;
-  transition: background-color 0.2s ease;
-}
-
-.table-container :deep(.el-table tr:hover td) {
-  background-color: #f8f9fa;
-}
-
-.table-container :deep(.el-table .cell) {
-  padding: 0 12px;
-  word-break: break-word;
-}
-
-.table-container :deep(.el-button) {
-  transition: all 0.2s ease;
-}
-
-.table-container :deep(.el-button:hover) {
-  transform: translateY(-1px);
-}
-
-.truncate-id {
-  display: inline-block;
-  max-width: 160px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+.id-display {
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  color: #666;
 }
 
 .pagination-container {
   display: flex;
   justify-content: flex-end;
-  margin-top: 0;
+  margin-top: 12px;
   padding: 16px;
-  background-color: #fafafa;
-  border-top: 1px solid #e6e8eb;
-  width: 100%;
-}
-
-.empty-container {
-  padding: 40px 0;
-  transition: all 0.3s ease;
-}
-
-:deep(.el-table) {
-  min-width: 100%;
-  font-size: 14px;
-  table-layout: auto !important;
-}
-
-:deep(.el-table__header) {
-  background-color: #f8f9fa;
-}
-
-:deep(.el-table th) {
-  background-color: #f8f9fa;
-  color: #495057;
-  font-weight: 600;
-  border-bottom: 2px solid #dee2e6;
-  text-align: center !important;
-  white-space: nowrap;
-}
-
-:deep(.el-table td) {
-  border-bottom: 1px solid #e9ecef;
-  padding: 12px 8px;
-  text-align: center !important;
-}
-
-:deep(.el-table__body-wrapper) {
-  overflow-x: auto;
-}
-
-:deep(.el-table .cell) {
-  white-space: nowrap;
-  line-height: 1.4;
-  text-align: center !important;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 32px;
-}
-
-:deep(.el-table .el-table__row:hover) {
-  background-color: #f8f9fa;
-}
-
-:deep(.el-table .el-button) {
-  margin: 2px;
-  min-width: 60px;
-}
-
-:deep(.el-table .el-table__cell:last-child .cell) {
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  flex-wrap: nowrap;
-  gap: 4px;
-}
-
-:deep(.el-table .el-table__cell) {
-  min-width: 80px;
-}
-
-:deep(.el-table .el-table__cell:nth-child(2)) {
-  min-width: 120px;
-  max-width: 150px;
-}
-
-:deep(.el-table .el-table__cell:nth-child(3)) {
-  min-width: 200px;
-  max-width: 280px;
-}
-
-:deep(.el-table .el-table__cell:nth-child(4)) {
-  min-width: 100px;
-  max-width: 120px;
-}
-
-:deep(.el-table .el-table__cell:nth-child(5)) {
-  min-width: 160px;
-  max-width: 200px;
-}
-
-:deep(.el-table .el-table__cell:nth-child(6)) {
-  min-width: 160px;
-  max-width: 200px;
-}
-
-:deep(.el-table .el-table__cell:nth-child(7)) {
-  min-width: 280px;
-  max-width: 320px;
-}
-
-:deep(.el-dialog__body) {
-  padding-top: 20px;
-}
-
-@media screen and (max-width: 768px) {
-  .search-bar {
-    padding: 16px;
-  }
-
-  .search-bar :deep(.el-col) {
-    margin-bottom: 12px;
-  }
-
-  .search-bar :deep(.el-col:last-child) {
-    margin-bottom: 0;
-  }
-
-  .search-bar :deep(.button-group) {
-    flex-direction: column;
-    gap: 8px;
-    align-items: stretch;
-  }
-
-  .search-bar :deep(.button-group .el-button) {
-    width: 100%;
-  }
-
-  .table-container {
-    overflow-x: auto;
-  }
-
-  .table-container :deep(.el-table) {
-    font-size: 12px;
-  }
-
-  .table-container :deep(.el-table th),
-  .table-container :deep(.el-table td) {
-    padding: 8px 4px;
-  }
-
-  .table-container :deep(.el-button) {
-    padding: 4px 8px;
-    font-size: 12px;
-  }
-
-  .pagination-container {
-    justify-content: center;
-    padding: 12px;
-  }
-
-  .pagination-container :deep(.el-pagination) {
-    font-size: 12px;
-  }
-
-  .pagination-container :deep(.el-pagination__sizes),
-  .pagination-container :deep(.el-pagination__jump) {
-    display: none;
-  }
-}
-
-@media screen and (max-width: 480px) {
-  .card-header {
-    font-size: 14px;
-  }
-
-  .search-bar :deep(.el-input__inner) {
-    font-size: 14px;
-  }
-
-  .table-container :deep(.el-table) {
-    font-size: 11px;
-  }
-
-  :deep(.el-dialog) {
-    width: 95% !important;
-    margin: 0 auto;
-  }
-
-  :deep(.el-dialog__header) {
-    padding: 16px;
-  }
-
-  :deep(.el-dialog__body) {
-    padding: 16px;
-  }
-
-  :deep(.el-dialog__footer) {
-    padding: 12px 16px;
-  }
-
-  :deep(.el-form-item__label) {
-    font-size: 14px;
-  }
 }
 </style>

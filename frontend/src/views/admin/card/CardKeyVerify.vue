@@ -8,10 +8,10 @@
       </template>
 
       <div class="verify-content">
-        <div class="input-section">
-          <el-input v-model="cardKeyInput" placeholder="请输入卡密代码" clearable size="large" @keyup.enter="handleVerify"
+        <div class="input-section" :class="{ 'is-mobile': isMobile }">
+          <el-input v-model="cardKeyInput" placeholder="请输入卡密代码" clearable :size="isMobile ? 'default' : 'large'" @keyup.enter="handleVerify"
             @clear="clearResult" class="cardkey-input" />
-          <el-button type="primary" @click="handleVerify" :loading="verifying" class="verify-btn">
+          <el-button type="primary" @click="handleVerify" :loading="verifying" class="verify-btn" :size="isMobile ? 'default' : 'large'">
             验证
           </el-button>
         </div>
@@ -28,7 +28,7 @@
             </div>
 
             <div class="result-content">
-              <el-descriptions :column="2" border>
+              <el-descriptions :column="isMobile ? 1 : 2" border>
                 <el-descriptions-item label="卡密代码">{{ cardKeyInfo.cardKey }}</el-descriptions-item>
                 <el-descriptions-item label="状态">
                   <el-tag :type="getStatusTagType(cardKeyInfo.status)">
@@ -50,7 +50,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { CircleCheck, CircleClose, Warning } from '@element-plus/icons-vue'
 import Server from '@/utils/Server.js'
@@ -58,6 +58,20 @@ import Server from '@/utils/Server.js'
 const cardKeyInput = ref('')
 
 const verifying = ref(false)
+const isMobile = ref(false)
+
+const checkIfMobile = () => {
+  isMobile.value = window.innerWidth <= 768
+}
+
+onMounted(() => {
+  checkIfMobile()
+  window.addEventListener('resize', checkIfMobile)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', checkIfMobile)
+})
 
 const showResult = ref(false)
 const cardKeyInfo = ref({})
@@ -236,8 +250,17 @@ const clearResult = () => {
   gap: 16px;
 }
 
+.input-section.is-mobile {
+  flex-direction: column;
+  width: 100%;
+}
+
 .cardkey-input {
   width: 400px;
+}
+
+.input-section.is-mobile .cardkey-input {
+  width: 100%;
 }
 
 .cardkey-input :deep(.el-input__wrapper) {
@@ -247,6 +270,10 @@ const clearResult = () => {
 .verify-btn {
   height: 40px;
   padding: 0 20px;
+}
+
+.input-section.is-mobile .verify-btn {
+  width: 100%;
 }
 
 .result-section {

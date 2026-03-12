@@ -9,11 +9,6 @@ import com.leafboss.service.OperationLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -62,14 +57,6 @@ public class OperationLogController {
     public Result<List<OperationLog>> getOperationLogsByType(@PathVariable String operationType) {
         List<OperationLog> logs = operationLogService.findByOperationType(operationType);
         return Result.success(logs);
-    }
-
-    @GetMapping("/export")
-    public void exportLogs(
-            @RequestParam(required = false) String startDate,
-            @RequestParam(required = false) String endDate,
-            HttpServletResponse response) throws IOException {
-        operationLogService.exportLogs(startDate, endDate, response);
     }
 
     @DeleteMapping

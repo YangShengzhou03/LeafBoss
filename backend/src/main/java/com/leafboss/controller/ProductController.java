@@ -27,14 +27,14 @@ public class ProductController {
     public Result<IPage<Product>> getProducts(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String name,
             @RequestParam(required = false) String status) {
 
         Page<Product> pageParam = new Page<>(page, size);
         QueryWrapper<Product> queryWrapper = new QueryWrapper<>();
 
-        if (category != null && !category.isEmpty()) {
-            queryWrapper.eq("category", category);
+        if (name != null && !name.isEmpty()) {
+            queryWrapper.like("name", name);
         }
 
         if (status != null && !status.isEmpty()) {
@@ -123,11 +123,5 @@ public class ProductController {
     public Result<Object> getStatistics() {
         Object statistics = productService.getProductStatistics();
         return Result.success(statistics);
-    }
-
-    @GetMapping("/category/{category}")
-    public Result<List<Product>> getProductsByCategory(@PathVariable String category) {
-        List<Product> products = productService.findByCategory(category);
-        return Result.success(products);
     }
 }

@@ -349,7 +349,7 @@ const handleRegister = async () => {
   try {
     const registerData = {
       email: registerForm.email,
-      passwordHash: registerForm.password
+      password: registerForm.password
     };
 
     const response = await store.register(registerData);
@@ -656,7 +656,6 @@ onMounted(() => {
 .submit-btn:hover {
   background: linear-gradient(135deg, #1e4a8c 0%, #153a75 100%);
   box-shadow: 0 4px 16px rgba(44, 90, 160, 0.4);
-  transform: translateY(-1px);
 }
 
 .submit-btn:hover::before {
@@ -666,7 +665,6 @@ onMounted(() => {
 .submit-btn:active {
   background: linear-gradient(135deg, #153a75 0%, #0f2a5a 100%);
   box-shadow: 0 1px 4px rgba(44, 90, 160, 0.25);
-  transform: translateY(0);
 }
 
 .form-footer {
@@ -882,7 +880,7 @@ onMounted(() => {
 }
 
 :deep(.el-link:hover) {
-  transform: translateY(-1px);
+  opacity: 0.8;
 }
 
 /* 响应式设计 */

@@ -270,11 +270,16 @@ public class CardKeyController {
     @PostMapping("/batch-generate")
     public Result<Boolean> batchGenerateCardKeys(@RequestBody Map<String, Object> requestBody, HttpServletRequest request) {
         String productId = (String) requestBody.get("productId");
+        Integer specificationId = (Integer) requestBody.get("specificationId");
         Integer quantity = (Integer) requestBody.get("quantity");
         String prefix = (String) requestBody.get("prefix");
 
         if (productId == null || productId.trim().isEmpty()) {
             return Result.error("产品ID不能为空");
+        }
+
+        if (specificationId == null) {
+            return Result.error("规格ID不能为空");
         }
 
         if (quantity == null || quantity <= 0) {
@@ -285,7 +290,7 @@ public class CardKeyController {
             return Result.error("单次生成数量不能超过1000");
         }
 
-        boolean success = cardKeyService.batchGenerateCardKeys(productId, quantity, prefix);
+        boolean success = cardKeyService.batchGenerateCardKeys(productId, specificationId, quantity, prefix);
 
         if (success) {
             String productName = "未知商品";

@@ -21,13 +21,12 @@
               <el-collapse v-model="activeNames" accordion>
                 <el-collapse-item name="register" title="注册账号">
                   <div class="collapse-content">
-                    <p>注册LeafBoss 业务运营支撑系统账号需要满足以下要求：</p>
+                    <p>注册 LEAF-BOSS 业务运营支撑系统账号的要求如下：</p>
                     <ul>
                       <li>用户名：3-20个字符，支持中文、英文、数字和下划线</li>
-                      <li>密码：8-20个字符，必须包含字母和数字</li>
-                      <li>邮箱：用于验证和找回密码</li>
+                      <li>密码：6-100个字符，支持明文存储（按业务需求）</li>
+                      <li>邮箱：用于登录和系统通知</li>
                     </ul>
-                    <p>注册成功后，系统会自动发送验证邮件到您的邮箱，请及时验证。</p>
                   </div>
                 </el-collapse-item>
                 
@@ -37,24 +36,68 @@
                   </div>
                 </el-collapse-item>
                 
-                <el-collapse-item name="card" title="授权管理">
+                <el-collapse-item name="card" title="卡密与授权管理">
                   <div class="collapse-content">
-                    <p>LeafBoss 业务运营支撑系统支持多种授权管理操作：</p>
+                    <p>LEAF-BOSS 业务运营支撑系统支持完整的卡密生命周期管理：</p>
                     <ul>
-                      <li>添加授权：点击"添加授权"按钮填写授权信息</li>
-                      <li>编辑授权：点击授权列表中的编辑按钮修改信息</li>
-                      <li>删除授权：选择需要删除的授权进行移除</li>
+                      <li>生成卡密：在管理后台根据产品规格批量生成授权密钥</li>
+                      <li>验证激活：用户通过验证页面激活卡密并绑定邮箱/用户ID</li>
+                      <li>状态监控：实时监控卡密的有效状态、激活时间及过期时间</li>
                     </ul>
-                    <p>支持功能：授权密钥验证、用户信息管理、有效期跟踪、批量导入导出等。</p>
+                    <p>支持功能：卡密批量导入导出、状态一键切换、过期自动清理等。</p>
                   </div>
                 </el-collapse-item>
                 
-                <el-collapse-item name="manage" title="管理文件">
+                <el-collapse-item name="product" title="产品规格配置">
                   <div class="collapse-content">
-                    <p>在文件列表中可以创建文件夹、移动文件、重命名、删除等操作。支持多选、拖拽移动，搜索功能可以按文件名和内容搜索，删除文件会在回收站保留30天。</p>
+                    <p>系统支持灵活的产品与规格定义，方便业务快速上线：</p>
+                    <ul>
+                      <li>产品管理：创建不同的业务产品线，设置产品状态与描述</li>
+                      <li>规格定义：为每个产品配置不同的规格（如：月卡、年卡、永久版）</li>
+                      <li>价格库存：精细化控制每个规格的价格、有效期及库存数量</li>
+                    </ul>
+                  </div>
+                </el-collapse-item>
+
+                <el-collapse-item name="review" title="业务评论管理">
+                  <div class="collapse-content">
+                    <p>LEAF-BOSS 集成了 Boss 评论管理模块，支持用户对公司/业务进行评价：</p>
+                    <ul>
+                      <li>评论提交：用户持有效卡密可对特定公司发表业务评论</li>
+                      <li>评论审核：管理员在后台对用户提交的评论进行审核与管理</li>
+                      <li>公司关联：评论与特定公司主体关联，支持评论总数自动统计</li>
+                    </ul>
                   </div>
                 </el-collapse-item>
               </el-collapse>
+            </div>
+          </section>
+          <section class="guide-section">
+            <div class="section-header">
+              <h2>发展历程</h2>
+              <p>LEAF-BOSS 业务运营支撑系统的成长历程</p>
+            </div>
+            <div class="guide-content">
+              <div class="timeline">
+                <div class="timeline-item">
+                  <div class="timeline-content">
+                    <h3>项目启动 · 2025年6月</h3>
+                    <p>深入分析业务运营支撑系统痛点，确立系统架构与技术选型，采用 Vue 3 + Spring Boot 3 现代化技术栈。</p>
+                  </div>
+                </div>
+                <div class="timeline-item">
+                  <div class="timeline-content">
+                    <h3>核心开发 · 2025年9月</h3>
+                    <p>完成前后端核心功能开发，实现授权密钥管理、用户权限控制、产品规格配置等关键核心业务模块。</p>
+                  </div>
+                </div>
+                <div class="timeline-item">
+                  <div class="timeline-content">
+                    <h3>正式发布 · 2026年1月</h3>
+                    <p>LEAF-BOSS 业务运营支撑系统正式上线并持续迭代优化，为用户提供稳定可靠的业务运营支持服务。</p>
+                  </div>
+                </div>
+              </div>
             </div>
           </section>
         </div>
@@ -133,6 +176,41 @@ export default {
 
 .guide-content {
   padding: 24px;
+}
+
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.timeline-item {
+  border-left: 2px solid #2d3748;
+  padding-left: 20px;
+  position: relative;
+}
+
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -7px;
+  top: 0;
+  width: 12px;
+  height: 12px;
+  background: #2d3748;
+  border-radius: 50%;
+}
+
+.timeline-content h3 {
+  font-size: 16px;
+  margin-bottom: 8px;
+  color: #2d3748;
+}
+
+.timeline-content p {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.6;
 }
 
 .collapse-content {

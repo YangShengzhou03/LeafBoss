@@ -2,15 +2,15 @@ import Server from '../utils/Server'
 
 const AdminService = {
   login(data) {
-    return Server.post('/api/admins/login', data)
-  },
-
-  register(data) {
-    return Server.post('/api/admins', data)
+    return Server.post('/api/auth/login', data)
   },
 
   getDashboardStats() {
     return Server.get('/api/admin/stats')
+  },
+
+  getTodaySalesDistribution() {
+    return Server.get('/api/admin/today-sales-distribution')
   },
 
   getUserList(params) {
@@ -31,13 +31,6 @@ const AdminService = {
       operationType: params.operationType,
       adminId: params.adminId
     })
-  },
-
-  exportLogs(params) {
-    return Server.get('/api/operation-logs/export', {
-      startDate: params.startDate,
-      endDate: params.endDate
-    }, { responseType: 'blob' })
   },
 
   clearLogs() {
@@ -78,7 +71,6 @@ const AdminService = {
     return Server.get('/api/products', {
       page: params.page || 1,
       size: params.size || 10,
-      category: params.category,
       status: params.status
     })
   },
@@ -228,8 +220,12 @@ const UserService = {
     return Server.post('/api/admins/send-reset-code', data)
   },
 
+  resetPassword(data) {
+    return Server.post('/api/admins/reset-password', data)
+  },
+
   getUserInfo() {
-    return Server.get('/api/admins/info')
+    return Server.get('/api/auth/me')
   },
 
   getCurrentUser() {
@@ -237,15 +233,15 @@ const UserService = {
   },
 
   updateUserInfo(data) {
-    return Server.put('/api/admins/info', data)
+    return Server.put('/api/auth/me', data)
   },
 
   changePassword(data) {
-    return Server.put('/api/admins/password', data)
+    return Server.put('/api/auth/password', data)
   },
 
   getStorageInfo() {
-    return Server.get('/api/user/storage')
+    return Server.get('/api/auth/storage')
   }
 }
 

@@ -65,8 +65,44 @@ public class CardKeyServiceImpl extends ServiceImpl<CardKeyMapper, CardKey> impl
         }
 
         Page<CardKey> cardKeyPage = baseMapper.selectPage(pageParam, queryWrapper);
+        List<CardKey> records = cardKeyPage.getRecords();
 
-        List<CardKeyDTO> dtoList = cardKeyPage.getRecords().stream().map(cardKey -> {
+        if (records.isEmpty()) {
+            Page<CardKeyDTO> resultPage = new Page<>(cardKeyPage.getCurrent(), cardKeyPage.getSize(), cardKeyPage.getTotal());
+            resultPage.setRecords(new java.util.ArrayList<>());
+            return resultPage;
+        }
+
+        // 批量获取规格信息，避免 N+1
+        List<Integer> specIds = records.stream()
+                .map(CardKey::getSpecificationId)
+                .filter(java.util.Objects::nonNull)
+                .distinct()
+                .collect(Collectors.toList());
+
+        Map<Integer, Specification> specMap = new HashMap<>();
+        Map<Integer, Product> productMap = new HashMap<>();
+
+        if (!specIds.isEmpty()) {
+            List<Specification> specs = specificationService.listByIds(specIds);
+            specMap = specs.stream().collect(Collectors.toMap(Specification::getId, s -> s));
+
+            List<Integer> productIds = specs.stream()
+                    .map(Specification::getProductId)
+                    .filter(java.util.Objects::nonNull)
+                    .distinct()
+                    .collect(Collectors.toList());
+
+            if (!productIds.isEmpty()) {
+                List<Product> products = productService.listByIds(productIds);
+                productMap = products.stream().collect(Collectors.toMap(Product::getId, p -> p));
+            }
+        }
+
+        Map<Integer, Specification> finalSpecMap = specMap;
+        Map<Integer, Product> finalProductMap = productMap;
+
+        List<CardKeyDTO> dtoList = records.stream().map(cardKey -> {
             CardKeyDTO dto = new CardKeyDTO();
             dto.setId(cardKey.getId());
             dto.setCardKey(cardKey.getCardKey());
@@ -80,13 +116,13 @@ public class CardKeyServiceImpl extends ServiceImpl<CardKeyMapper, CardKey> impl
             dto.setUpdatedAt(cardKey.getUpdatedAt());
 
             if (cardKey.getSpecificationId() != null) {
-                Specification spec = specificationService.getById(cardKey.getSpecificationId());
+                Specification spec = finalSpecMap.get(cardKey.getSpecificationId());
                 if (spec != null) {
                     dto.setSpecificationName(spec.getName());
                     dto.setProductId(spec.getProductId());
 
                     if (spec.getProductId() != null) {
-                        Product product = productService.getById(spec.getProductId());
+                        Product product = finalProductMap.get(spec.getProductId());
                         if (product != null) {
                             dto.setProductName(product.getName());
                         }
@@ -133,43 +169,53 @@ public class CardKeyServiceImpl extends ServiceImpl<CardKeyMapper, CardKey> impl
 
     @Override
     public Object getCardStatistics() {
-        List<CardKey> allCards = baseMapper.selectList(null);
-
-        Map<String, Integer> statistics = new HashMap<>();
-        statistics.put("total", allCards.size());
-        statistics.put("unused", (int) allCards.stream().filter(card -> "未使用".equals(card.getStatus())).count());
-        statistics.put("used", (int) allCards.stream().filter(card -> "已使用".equals(card.getStatus())).count());
-        statistics.put("disabled", (int) allCards.stream().filter(card -> "已禁用".equals(card.getStatus())).count());
+        Map<String, Long> statistics = new HashMap<>();
+        
+        statistics.put("total", this.count());
+        
+        QueryWrapper<CardKey> unusedQuery = new QueryWrapper<>();
+        unusedQuery.eq("status", "未使用");
+        statistics.put("unused", this.count(unusedQuery));
+        
+        QueryWrapper<CardKey> usedQuery = new QueryWrapper<>();
+        usedQuery.eq("status", "已使用");
+        statistics.put("used", this.count(usedQuery));
+        
+        QueryWrapper<CardKey> disabledQuery = new QueryWrapper<>();
+        disabledQuery.eq("status", "已禁用");
+        statistics.put("disabled", this.count(disabledQuery));
 
         return statistics;
     }
 
     @Override
-    public boolean batchGenerateCardKeys(String productId, Integer quantity, String prefix) {
+    public boolean batchGenerateCardKeys(String productId, Integer specificationId, Integer quantity, String prefix) {
         if (quantity == null || quantity <= 0 || quantity > 1000) {
             return false;
         }
 
         try {
+            java.util.List<CardKey> cardKeys = new java.util.ArrayList<>();
+            LocalDateTime now = LocalDateTime.now();
+            
             for (int i = 0; i < quantity; i++) {
                 CardKey cardKey = new CardKey();
-
                 String cardKeyStr = generateCardKeyString(prefix);
 
                 cardKey.setCardKey(cardKeyStr);
-                cardKey.setSpecificationId(null);
+                cardKey.setSpecificationId(specificationId);
                 cardKey.setStatus("未使用");
                 cardKey.setUserId(null);
                 cardKey.setUserEmail(null);
                 cardKey.setActivateTime(null);
                 cardKey.setExpireTime(null);
-                cardKey.setCreatedAt(LocalDateTime.now());
-                cardKey.setUpdatedAt(LocalDateTime.now());
+                cardKey.setCreatedAt(now);
+                cardKey.setUpdatedAt(now);
 
-                baseMapper.insert(cardKey);
+                cardKeys.add(cardKey);
             }
 
-            return true;
+            return this.saveBatch(cardKeys);
         } catch (Exception e) {
             e.printStackTrace();
             return false;

@@ -7,12 +7,7 @@ import com.leafboss.mapper.OperationLogMapper;
 import com.leafboss.service.OperationLogService;
 import org.springframework.stereotype.Service;
 
-import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,41 +49,6 @@ public class OperationLogServiceImpl extends ServiceImpl<OperationLogMapper, Ope
     }
 
     @Override
-    public void exportLogs(String startDate, String endDate, HttpServletResponse response) throws IOException {
-        QueryWrapper<OperationLog> queryWrapper = new QueryWrapper<>();
-        
-        if (startDate != null && !startDate.isEmpty()) {
-            queryWrapper.ge("created_at", startDate + " 00:00:00");
-        }
-        if (endDate != null && !endDate.isEmpty()) {
-            queryWrapper.le("created_at", endDate + " 23:59:59");
-        }
-        
-        queryWrapper.orderByDesc("created_at");
-        List<OperationLog> logs = this.list(queryWrapper);
-        
-        response.setContentType("text/csv;charset=UTF-8");
-        response.setHeader("Content-Disposition", 
-            "attachment; filename=\"operation_logs_" + LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")) + ".csv\"");
-        
-        PrintWriter writer = response.getWriter();
-        writer.write("ID,操作类型,描述,IP地址,创建时间\n");
-        
-        for (OperationLog log : logs) {
-            writer.write(String.format("%d,%s,%s,%s,%s\n",
-                log.getId(),
-                log.getOperationType(),
-                escapeCsv(log.getDescription()),
-                log.getIpAddress(),
-                log.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
-            ));
-        }
-        
-        writer.flush();
-        writer.close();
-    }
-
-    @Override
     public boolean clearLogs() {
         try {
             QueryWrapper<OperationLog> queryWrapper = new QueryWrapper<>();
@@ -107,15 +67,5 @@ public class OperationLogServiceImpl extends ServiceImpl<OperationLogMapper, Ope
         operationLog.setCreatedAt(LocalDateTime.now());
         
         this.save(operationLog);
-    }
-    
-    private String escapeCsv(String field) {
-        if (field == null) {
-            return "";
-        }
-        if (field.contains(",") || field.contains("\"") || field.contains("\n")) {
-            return "\"" + field.replace("\"", "\"\"") + "\"";
-        }
-        return field;
     }
 }

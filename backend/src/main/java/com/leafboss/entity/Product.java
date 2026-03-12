@@ -16,9 +16,6 @@ public class Product {
     @TableField("description")
     private String description;
 
-    @TableField("category")
-    private String category;
-
     @TableField("status")
     private String status;
 
@@ -50,14 +47,6 @@ public class Product {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public String getCategory() {
-        return category;
-    }
-
-    public void setCategory(String category) {
-        this.category = category;
     }
 
     public String getStatus() {

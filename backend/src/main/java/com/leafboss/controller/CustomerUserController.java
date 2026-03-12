@@ -128,7 +128,7 @@ public class CustomerUserController {
             return Result.error("该邮箱对应的用户不存在");
         }
         
-        user.setPasswordHash(newPassword);
+        user.setPassword(newPassword);
         boolean updated = userService.updateById(user);
         
         if (updated) {

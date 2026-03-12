@@ -4,7 +4,10 @@
     <div class="admin-layout">
       <header class="admin-header">
         <div class="header-left">
-          <h1 class="logo">LEAFBOSS - 业务运营支撑系统</h1>
+          <el-button class="mobile-toggle" @click="showDrawer = true" v-if="isMobile">
+            <el-icon><Menu /></el-icon>
+          </el-button>
+          <h1 class="logo">LEAFBOSS <span class="logo-sub">- 业务运营支撑系统</span></h1>
         </div>
         <div class="header-right">
           <el-dropdown @command="handleCommand" trigger="click">
@@ -28,7 +31,8 @@
       </header>
 
       <div class="admin-container">
-        <aside class="admin-sidebar">
+        <!-- Desktop Sidebar -->
+        <aside class="admin-sidebar" v-if="!isMobile">
           <el-menu :default-active="activeMenu" class="admin-menu" router unique-opened>
             <el-menu-item index="/admin">
               <el-icon>
@@ -136,6 +140,119 @@
           </el-menu>
         </aside>
 
+        <!-- Mobile Drawer Sidebar -->
+        <el-drawer v-model="showDrawer" direction="ltr" size="240px" :with-header="false" class="mobile-drawer"
+          :body-style="{ padding: '0', backgroundColor: '#2c3e50' }" v-if="isMobile">
+          <div class="drawer-header">
+            <h2 class="drawer-logo">LEAFBOSS</h2>
+          </div>
+          <el-menu :default-active="activeMenu" class="admin-menu" router unique-opened @select="showDrawer = false">
+            <el-menu-item index="/admin">
+              <el-icon>
+                <Monitor />
+              </el-icon>
+              <template #title>管理员仪表盘</template>
+            </el-menu-item>
+
+            <el-sub-menu index="personnel-management">
+              <template #title>
+                <el-icon>
+                  <User />
+                </el-icon>
+                <span>人员管理</span>
+              </template>
+              <el-menu-item index="/admin/admins">
+                <el-icon>
+                  <UserFilled />
+                </el-icon>
+                <template #title>管理人员</template>
+              </el-menu-item>
+              <el-menu-item index="/admin/users">
+                <el-icon>
+                  <User />
+                </el-icon>
+                <template #title>用户管理</template>
+              </el-menu-item>
+            </el-sub-menu>
+
+            <el-sub-menu index="product-management">
+              <template #title>
+                <el-icon>
+                  <Goods />
+                </el-icon>
+                <span>商品管理</span>
+              </template>
+              <el-menu-item index="/admin/products">
+                <el-icon>
+                  <List />
+                </el-icon>
+                <template #title>商品列表</template>
+              </el-menu-item>
+              <el-menu-item index="/admin/product-specs">
+                <el-icon>
+                  <Operation />
+                </el-icon>
+                <template #title>规格管理</template>
+              </el-menu-item>
+            </el-sub-menu>
+
+            <el-sub-menu index="card-management">
+              <template #title>
+                <el-icon>
+                  <Key />
+                </el-icon>
+                <span>卡密管理</span>
+              </template>
+              <el-menu-item index="/admin/card-keys">
+                <el-icon>
+                  <List />
+                </el-icon>
+                <template #title>卡密列表</template>
+              </el-menu-item>
+              <el-menu-item index="/admin/card-verify">
+                <el-icon>
+                  <Check />
+                </el-icon>
+                <template #title>卡密验证</template>
+              </el-menu-item>
+              <el-menu-item index="/admin/card-generate">
+                <el-icon>
+                  <Plus />
+                </el-icon>
+                <template #title>卡密生成</template>
+              </el-menu-item>
+            </el-sub-menu>
+
+            <el-sub-menu index="jobs-management">
+              <template #title>
+                <el-icon>
+                  <Briefcase />
+                </el-icon>
+                <span>海投助手</span>
+              </template>
+              <el-menu-item index="/admin/jobs/companies">
+                <el-icon>
+                  <OfficeBuilding />
+                </el-icon>
+                <template #title>公司管理</template>
+              </el-menu-item>
+              <el-menu-item index="/admin/jobs/boss-reviews">
+                <el-icon>
+                  <ChatDotRound />
+                </el-icon>
+                <template #title>评论管理</template>
+              </el-menu-item>
+            </el-sub-menu>
+
+            <el-menu-item index="/admin/logs">
+              <el-icon>
+                <Document />
+              </el-icon>
+              <template #title>操作日志</template>
+            </el-menu-item>
+          </el-menu>
+        </el-drawer>
+
         <main class="admin-main">
           <router-view v-slot="{ Component }">
             <transition name="fade" mode="out-in">
@@ -149,14 +266,24 @@
 </template>
 
 <script setup>
-import { computed, onMounted, nextTick } from 'vue'
+import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { User, UserFilled, ArrowDown, Monitor, Document, Key, Goods, List, Operation, Check, Plus, Briefcase, OfficeBuilding, ChatDotRound } from '@element-plus/icons-vue'
+import { User, UserFilled, ArrowDown, Monitor, Document, Key, Goods, List, Operation, Check, Plus, Briefcase, OfficeBuilding, ChatDotRound, Menu } from '@element-plus/icons-vue'
 import store from '@/utils/store.js'
 
 const router = useRouter()
 const route = useRoute()
+
+const isMobile = ref(false)
+const showDrawer = ref(false)
+
+const checkIfMobile = () => {
+  isMobile.value = window.innerWidth <= 768
+  if (!isMobile.value) {
+    showDrawer.value = false
+  }
+}
 
 const activeMenu = computed(() => route.path)
 
@@ -199,6 +326,8 @@ const handleCommand = async (command) => {
 }
 
 onMounted(async () => {
+  checkIfMobile()
+  window.addEventListener('resize', checkIfMobile)
   try {
     if (!store.state.user) {
       await store.fetchCurrentUser()
@@ -208,6 +337,10 @@ onMounted(async () => {
   } catch (error) {
     ElMessage.error('初始化失败，请刷新页面重试')
   }
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', checkIfMobile)
 })
 </script>
 
@@ -229,7 +362,29 @@ onMounted(async () => {
   padding: 0 24px;
   border-bottom: 1px solid #ddd;
   position: relative;
-  z-index: 10;
+  z-index: 1001; /* Higher than el-drawer overlay if needed */
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.mobile-toggle {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 24px;
+  padding: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobile-toggle:hover {
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .header-left .logo {
@@ -238,6 +393,12 @@ onMounted(async () => {
   font-weight: 600;
   color: #fff;
   letter-spacing: 0.5px;
+}
+
+.logo-sub {
+  font-size: 14px;
+  font-weight: 400;
+  opacity: 0.8;
 }
 
 .header-right .user-info {
@@ -263,18 +424,51 @@ onMounted(async () => {
   flex: 1;
   display: flex;
   overflow: hidden;
+  position: relative;
 }
 
 .admin-sidebar {
   width: 240px;
   background-color: #2c3e50;
   border-right: 1px solid #34495e;
+  transition: width 0.3s;
+  flex-shrink: 0;
 }
 
 .admin-menu {
   height: 100%;
   border-right: none;
-  background-color: transparent;
+  background-color: #304156;
+}
+
+/* Mobile Drawer Styles */
+.mobile-drawer {
+  --el-drawer-padding-primary: 0 !important;
+}
+
+.mobile-drawer :deep(.el-drawer) {
+  background-color: #2c3e50;
+}
+
+.drawer-header {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  background-color: #304156;
+  border-bottom: 1px solid #34495e;
+}
+
+.drawer-logo {
+  margin: 0;
+  font-size: 18px;
+  color: #fff;
+  font-weight: 600;
+}
+
+.admin-menu :deep(.el-menu) {
+  background-color: #2c3e50;
+  border-right: none;
 }
 
 .admin-menu :deep(.el-menu-item),
@@ -320,9 +514,10 @@ onMounted(async () => {
 
 .admin-main {
   flex: 1;
-  padding: 12px;
+  padding: 20px;
   overflow-y: auto;
   background-color: #f0f2f5;
+  width: 100%;
 }
 
 
@@ -338,10 +533,11 @@ onMounted(async () => {
 
 
 .admin-main :deep(.el-card) {
-  border-radius: 6px;
+  border-radius: 8px;
   border: 1px solid #e6e8eb;
   overflow: hidden;
   margin-bottom: 0px;
+  box-shadow: 0 2px 12px 0 rgba(0,0,0,0.05);
 }
 
 .admin-main :deep(.el-card__header) {
@@ -385,10 +581,6 @@ onMounted(async () => {
   .admin-sidebar {
     width: 200px;
   }
-
-  .admin-menu :deep(.el-menu-item) {
-    margin: 0;
-  }
 }
 
 @media (max-width: 768px) {
@@ -401,46 +593,20 @@ onMounted(async () => {
     font-size: 18px;
   }
 
+  .logo-sub {
+    display: none;
+  }
+
   .username {
     display: none;
   }
 
-  .admin-sidebar {
-    width: 240px;
-  }
-
-  .admin-menu :deep(.el-menu-item) {
-    margin: 0;
-    padding: 0 20px !important;
-  }
-
-  .admin-menu :deep(.el-menu-item span) {
-    display: inline;
-  }
-
-  .admin-menu :deep(.el-menu-item .el-icon) {
-    margin-right: 12px;
-    font-size: 18px;
-  }
-
   .admin-main {
-    padding: 16px;
-  }
-
-  .admin-main :deep(.el-card) {
-    margin-bottom: 12px;
-  }
-
-  .admin-main :deep(.el-card__header) {
-    padding: 14px 16px;
+    padding: 12px;
   }
 
   .admin-main :deep(.el-card__body) {
-    padding: 16px;
-  }
-
-  .admin-main :deep(.el-form-item) {
-    margin-bottom: 12px;
+    padding: 12px;
   }
 }
 
@@ -454,23 +620,15 @@ onMounted(async () => {
   }
 
   .admin-main {
-    padding: 12px;
+    padding: 10px;
   }
+}
+</style>
 
-  .admin-main :deep(.el-card) {
-    margin-bottom: 8px;
-  }
-
-  .admin-main :deep(.el-card__header) {
-    padding: 12px;
-  }
-
-  .admin-main :deep(.el-card__body) {
-    padding: 12px;
-  }
-
-  .admin-main :deep(.el-form-item) {
-    margin-bottom: 8px;
-  }
+<style>
+/* Global styles to override teleported Element Plus components */
+.mobile-drawer .el-drawer__body {
+  padding: 0 !important;
+  background-color: #2c3e50 !important;
 }
 </style>

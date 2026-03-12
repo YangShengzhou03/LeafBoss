@@ -15,7 +15,7 @@
 
       <div class="dashboard-content">
         <el-row :gutter="20" class="stats-row">
-          <el-col :span="6">
+          <el-col :xs="24" :sm="12" :lg="6" class="mb-20">
             <div class="stat-card primary">
               <div class="stat-item">
                 <div class="stat-icon">
@@ -31,7 +31,7 @@
             </div>
           </el-col>
 
-          <el-col :span="6">
+          <el-col :xs="24" :sm="12" :lg="6" class="mb-20">
             <div class="stat-card success">
               <div class="stat-item">
                 <div class="stat-icon">
@@ -51,7 +51,7 @@
             </div>
           </el-col>
 
-          <el-col :span="6">
+          <el-col :xs="24" :sm="12" :lg="6" class="mb-20">
             <div class="stat-card warning">
               <div class="stat-item">
                 <div class="stat-icon">
@@ -71,7 +71,7 @@
             </div>
           </el-col>
 
-          <el-col :span="6">
+          <el-col :xs="24" :sm="12" :lg="6" class="mb-20">
             <div class="stat-card info">
               <div class="stat-item">
                 <div class="stat-icon">
@@ -93,16 +93,16 @@
         </el-row>
 
         <el-row :gutter="20" class="charts-row">
-          <el-col :span="12">
+          <el-col :xs="24" :lg="12" class="mb-20">
             <el-card class="chart-card">
               <template #header>
                 <div class="chart-header">
-                  <span>未使用卡密占比</span>
+                  <span>库存卡密</span>
                 </div>
               </template>
               <div class="chart-container">
                 <div v-if="specDistribution.length === 0" class="no-data">
-                  <el-empty description="暂无数据" :image-size="80" />
+                  <el-empty description="暂无库存数据" :image-size="80" />
                 </div>
                 <div v-else class="chart-content">
                   <v-chart :option="pieChartOption" style="height: 300px;" />
@@ -111,19 +111,19 @@
             </el-card>
           </el-col>
 
-          <el-col :span="12">
+          <el-col :xs="24" :lg="12" class="mb-20">
             <el-card class="chart-card">
               <template #header>
                 <div class="chart-header">
-                  <span>已使用卡密占比</span>
+                  <span>当日售出</span>
                 </div>
               </template>
               <div class="chart-container">
-                <div v-if="specDistribution.length === 0" class="no-data">
-                  <el-empty description="暂无数据" :image-size="80" />
+                <div v-if="todaySalesDistribution.length === 0" class="no-data">
+                  <el-empty description="暂无售出数据" :image-size="80" />
                 </div>
                 <div v-else class="chart-content">
-                  <v-chart :option="pieChartOption" style="height: 300px;" />
+                  <v-chart :option="salesPieChartOption" style="height: 300px;" />
                 </div>
               </div>
             </el-card>
@@ -172,6 +172,7 @@ const stats = ref({
 const loading = ref(false)
 
 const specDistribution = ref([])
+const todaySalesDistribution = ref([])
 
 const pieChartOption = computed(() => {
   return {
@@ -184,7 +185,7 @@ const pieChartOption = computed(() => {
     },
     series: [
       {
-        name: '商品',
+        name: '规格',
         type: 'pie',
         radius: ['50%', '80%'],
         avoidLabelOverlap: false,
@@ -216,6 +217,56 @@ const pieChartOption = computed(() => {
           name: item.name,
           itemStyle: {
             color: getSpecColor(index)
+          }
+        }))
+      }
+    ]
+  }
+})
+
+const salesPieChartOption = computed(() => {
+  return {
+    tooltip: {
+      trigger: 'item',
+      formatter: '{a} <br/>{b}: {c}张 ({d}%)'
+    },
+    legend: {
+      show: false
+    },
+    series: [
+      {
+        name: '售出规格',
+        type: 'pie',
+        radius: ['50%', '80%'],
+        avoidLabelOverlap: false,
+        itemStyle: {
+          borderRadius: 10,
+          borderColor: '#fff',
+          borderWidth: 2
+        },
+        label: {
+          show: true,
+          formatter: '{b}\n{c}张 ({d}%)',
+          fontSize: 10,
+          fontWeight: 'bold'
+        },
+        emphasis: {
+          label: {
+            show: true,
+            fontSize: 12,
+            fontWeight: 'bold'
+          }
+        },
+        labelLine: {
+          show: true,
+          length: 10,
+          length2: 5
+        },
+        data: todaySalesDistribution.value.map((item, index) => ({
+          value: item.count,
+          name: item.name,
+          itemStyle: {
+            color: getSpecColor(index + 3) // 不同颜色起始偏移
           }
         }))
       }
@@ -257,6 +308,7 @@ const loadDashboardData = async () => {
       }
 
       await loadSpecDistribution()
+      await loadTodaySalesDistribution()
 
     } else {
       stats.value = {
@@ -270,6 +322,7 @@ const loadDashboardData = async () => {
       }
 
       specDistribution.value = []
+      todaySalesDistribution.value = []
 
       ElMessage.warning('仪表盘数据为空，请检查数据配置')
     }
@@ -296,8 +349,23 @@ const loadDashboardData = async () => {
     }
 
     specDistribution.value = []
+    todaySalesDistribution.value = []
   } finally {
     loading.value = false
+  }
+}
+
+const loadTodaySalesDistribution = async () => {
+  try {
+    const response = await api.admin.getTodaySalesDistribution()
+    if (response && response.code === 200 && response.data) {
+      todaySalesDistribution.value = response.data
+    } else {
+      todaySalesDistribution.value = []
+    }
+  } catch (error) {
+    todaySalesDistribution.value = []
+    console.error('加载当日售出分布失败', error)
   }
 }
 
@@ -395,6 +463,10 @@ onMounted(() => {
 
 .stat-card.info {
   border-left: 4px solid #909399;
+}
+
+.mb-20 {
+  margin-bottom: 20px;
 }
 
 .stat-item {

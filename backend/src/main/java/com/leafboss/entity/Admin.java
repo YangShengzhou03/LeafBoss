@@ -23,10 +23,10 @@ public class Admin {
     @Email(message = "邮箱格式不正确")
     private String email;
 
-    @TableField("password_hash")
+    @TableField("password")
     @NotBlank(message = "密码不能为空")
     @Size(min = 6, max = 100, message = "密码长度必须在6-100个字符之间")
-    private String passwordHash;
+    private String password;
 
     @TableField("status")
     private String status;
@@ -64,12 +64,12 @@ public class Admin {
         this.email = email;
     }
 
-    public String getPasswordHash() {
-        return passwordHash;
+    public String getPassword() {
+        return password;
     }
 
-    public void setPasswordHash(String passwordHash) {
-        this.passwordHash = passwordHash;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public String getStatus() {

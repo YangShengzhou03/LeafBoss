@@ -10,7 +10,7 @@
       <div class="product-spec-content">
         <div class="search-bar">
           <el-row :gutter="20">
-            <el-col :span="6">
+            <el-col :xs="24" :sm="8" :md="6" class="mb-10">
               <el-input v-model="searchQuery" placeholder="搜索商品名称或规格名称" clearable @clear="handleSearch"
                 @keyup.enter="handleSearch">
                 <template #append>
@@ -22,16 +22,17 @@
                 </template>
               </el-input>
             </el-col>
-            <el-col :span="4">
-              <el-select v-model="productFilter" placeholder="商品筛选" clearable @change="handleSearch">
+            <el-col :xs="24" :sm="6" :md="4" class="mb-10">
+              <el-select v-model="productFilter" placeholder="商品筛选" clearable @change="handleSearch"
+                style="width: 100%">
                 <el-option label="全部" value="" />
                 <el-option v-for="product in products" :key="product.id" :label="product.name" :value="product.id" />
               </el-select>
             </el-col>
-            <el-col :span="14" class="button-group">
+            <el-col :xs="24" :sm="10" :md="14" class="button-group">
               <el-button type="primary" @click="handleSearch">查询</el-button>
               <el-button @click="resetFilters">重置</el-button>
-              <div style="flex: 1;"></div>
+              <div class="flex-grow" v-if="!isMobile"></div>
               <el-button type="primary" @click="showAddDialog = true">添加规格</el-button>
             </el-col>
           </el-row>
@@ -137,12 +138,17 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, computed } from 'vue'
+import { ref, reactive, onMounted, onUnmounted, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Search } from '@element-plus/icons-vue'
 import api from '../../services/api'
 
 const loading = ref(false)
+const isMobile = ref(false)
+
+const checkIfMobile = () => {
+  isMobile.value = window.innerWidth <= 768
+}
 
 const specs = ref([])
 
@@ -433,8 +439,14 @@ const resetForm = () => {
 }
 
 onMounted(async () => {
+  checkIfMobile()
+  window.addEventListener('resize', checkIfMobile)
   await loadProducts()
   await loadSpecs()
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', checkIfMobile)
 })
 </script>
 
@@ -452,6 +464,19 @@ onMounted(async () => {
   display: flex;
   justify-content: flex-end;
   gap: 8px;
+  flex-wrap: wrap;
+}
+
+.mb-10 {
+  margin-bottom: 10px;
+}
+
+.mt-10 {
+  margin-top: 10px;
+}
+
+.flex-grow {
+  flex-grow: 1;
 }
 
 .id-display {
@@ -473,5 +498,11 @@ onMounted(async () => {
 .low-usage {
   color: #67c23a;
   font-weight: bold;
+}
+.pagination-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 12px;
+  padding: 16px;
 }
 </style>

@@ -31,152 +31,142 @@ public class DashboardController {
         try {
             Map<String, Object> stats = new HashMap<>();
 
-            List<CardKey> todayActivatedCards = getTodayActivatedCardKeys();
+            // 当日销量和营收
+            LocalDate today = LocalDate.now();
+            LocalDateTime startOfDay = today.atStartOfDay();
+            LocalDateTime endOfDay = today.plusDays(1).atStartOfDay();
+            
+            int dailySales = getActivatedCount(startOfDay, endOfDay);
+            double dailyRevenue = getActivatedRevenue(startOfDay, endOfDay);
 
-            int dailySales = todayActivatedCards.size();
-
-            double dailyRevenue = calculateTodayRevenue(todayActivatedCards);
-
-            Map<String, Object> yesterdayStats = getYesterdayStats();
-            int yesterdaySales = (int) yesterdayStats.get("sales");
-            double yesterdayRevenue = (double) yesterdayStats.get("revenue");
+            // 昨日销量和营收
+            LocalDate yesterday = today.minusDays(1);
+            LocalDateTime startOfYesterday = yesterday.atStartOfDay();
+            LocalDateTime endOfYesterday = today.atStartOfDay();
+            
+            int yesterdaySales = getActivatedCount(startOfYesterday, endOfYesterday);
+            double yesterdayRevenue = getActivatedRevenue(startOfYesterday, endOfYesterday);
 
             stats.put("dailySales", dailySales);
             stats.put("dailyRevenue", Math.round(dailyRevenue * 100.0) / 100.0);
             stats.put("yesterdaySales", yesterdaySales);
             stats.put("yesterdayRevenue", Math.round(yesterdayRevenue * 100.0) / 100.0);
 
-            List<CardKey> allCardKeys = cardKeyService.list();
-            List<Specification> allSpecifications = specificationService.list();
+            // 总体统计
+            long totalOrders = cardKeyService.count();
+            double totalRevenue = getActivatedRevenue(null, null);
 
-            double monthlyRevenue = calculateMonthlyRevenue();
+            // 月度营收
+            LocalDateTime startOfMonth = today.withDayOfMonth(1).atStartOfDay();
+            LocalDateTime endOfMonth = today.plusMonths(1).withDayOfMonth(1).atStartOfDay();
+            double monthlyRevenue = getActivatedRevenue(startOfMonth, endOfMonth);
 
-            double lastMonthRevenue = calculateLastMonthRevenue();
+            // 上月营收
+            LocalDateTime startOfLastMonth = today.minusMonths(1).withDayOfMonth(1).atStartOfDay();
+            LocalDateTime endOfLastMonth = today.withDayOfMonth(1).atStartOfDay();
+            double lastMonthRevenue = getActivatedRevenue(startOfLastMonth, endOfLastMonth);
 
-            stats.put("totalOrders", allCardKeys.size());
-            stats.put("totalRevenue", Math.round(calculateTotalRevenue(allCardKeys) * 100.0) / 100.0);
+            stats.put("totalOrders", (int)totalOrders);
+            stats.put("totalRevenue", Math.round(totalRevenue * 100.0) / 100.0);
             stats.put("monthlyRevenue", Math.round(monthlyRevenue * 100.0) / 100.0);
             stats.put("lastMonthRevenue", Math.round(lastMonthRevenue * 100.0) / 100.0);
             stats.put("conversionRate", 0.0);
 
             return Result.success(stats);
         } catch (Exception e) {
+            e.printStackTrace();
             return Result.error("获取仪表盘数据失败");
         }
     }
 
-    private List<CardKey> getTodayActivatedCardKeys() {
-        LocalDate today = LocalDate.now();
-        LocalDateTime startOfDay = today.atStartOfDay();
-        LocalDateTime endOfDay = today.plusDays(1).atStartOfDay();
-
-        List<CardKey> allCards = cardKeyService.list();
-        return allCards.stream()
-                .filter(card -> card.getActivateTime() != null &&
-                               card.getActivateTime().isAfter(startOfDay) &&
-                               card.getActivateTime().isBefore(endOfDay))
-                .collect(java.util.stream.Collectors.toList());
+    private int getActivatedCount(LocalDateTime start, LocalDateTime end) {
+        com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<CardKey> queryWrapper = new com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<>();
+        if (start != null) queryWrapper.ge("activate_time", start);
+        if (end != null) queryWrapper.lt("activate_time", end);
+        return (int) cardKeyService.count(queryWrapper);
     }
 
-    private double calculateTodayRevenue(List<CardKey> todayActivatedCards) {
-        double totalRevenue = 0.0;
+    private double getActivatedRevenue(LocalDateTime start, LocalDateTime end) {
+        com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<CardKey> queryWrapper = new com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<>();
+        if (start != null) queryWrapper.ge("activate_time", start);
+        if (end != null) queryWrapper.lt("activate_time", end);
+        queryWrapper.isNotNull("specification_id");
+        
+        List<CardKey> activatedCards = cardKeyService.list(queryWrapper);
+        if (activatedCards.isEmpty()) return 0.0;
 
-        for (CardKey card : todayActivatedCards) {
-            if (card.getSpecificationId() != null) {
-                Specification spec = specificationService.getById(card.getSpecificationId());
-                if (spec != null && spec.getPrice() != null) {
-                    totalRevenue += spec.getPrice();
-                }
+        List<Integer> specIds = activatedCards.stream()
+                .map(CardKey::getSpecificationId)
+                .distinct()
+                .collect(java.util.stream.Collectors.toList());
+        
+        Map<Integer, Specification> specMap = specificationService.listByIds(specIds).stream()
+                .collect(java.util.stream.Collectors.toMap(Specification::getId, spec -> spec));
+
+        double revenue = 0.0;
+        for (CardKey card : activatedCards) {
+            Specification spec = specMap.get(card.getSpecificationId());
+            if (spec != null && spec.getPrice() != null) {
+                revenue += spec.getPrice();
             }
         }
+        return revenue;
+    }
 
-        return totalRevenue;
+    @GetMapping("/today-sales-distribution")
+    public Result<List<Map<String, Object>>> getTodaySalesDistribution() {
+        try {
+            LocalDate today = LocalDate.now();
+            LocalDateTime startOfDay = today.atStartOfDay();
+            LocalDateTime endOfDay = today.plusDays(1).atStartOfDay();
+
+            com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<CardKey> queryWrapper = new com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<>();
+            queryWrapper.ge("activate_time", startOfDay);
+            queryWrapper.lt("activate_time", endOfDay);
+            queryWrapper.isNotNull("specification_id");
+            
+            List<CardKey> todayActivatedCards = cardKeyService.list(queryWrapper);
+            if (todayActivatedCards.isEmpty()) return Result.success(new java.util.ArrayList<>());
+
+            Map<Integer, Integer> specCountMap = new HashMap<>();
+            for (CardKey card : todayActivatedCards) {
+                specCountMap.put(card.getSpecificationId(), specCountMap.getOrDefault(card.getSpecificationId(), 0) + 1);
+            }
+            
+            List<Integer> specIds = new java.util.ArrayList<>(specCountMap.keySet());
+            List<Specification> specs = specificationService.listByIds(specIds);
+            
+            List<Map<String, Object>> distribution = new java.util.ArrayList<>();
+            for (Specification spec : specs) {
+                Map<String, Object> item = new HashMap<>();
+                item.put("name", spec.getName());
+                item.put("count", specCountMap.get(spec.getId()));
+                distribution.add(item);
+            }
+            
+            return Result.success(distribution);
+        } catch (Exception e) {
+            return Result.error("获取当日售出分布失败");
+        }
     }
 
     private Map<String, Object> getYesterdayStats() {
-        LocalDate yesterday = LocalDate.now().minusDays(1);
-        LocalDateTime startOfYesterday = yesterday.atStartOfDay();
-        LocalDateTime endOfYesterday = yesterday.plusDays(1).atStartOfDay();
+        return null; // Not used anymore as logic moved to getDashboardStats
+    }
 
-        List<CardKey> allCards = cardKeyService.list();
-        List<CardKey> yesterdayActivatedCards = allCards.stream()
-                .filter(card -> card.getActivateTime() != null &&
-                               card.getActivateTime().isAfter(startOfYesterday) &&
-                               card.getActivateTime().isBefore(endOfYesterday))
-                .collect(java.util.stream.Collectors.toList());
-
-        int yesterdaySales = yesterdayActivatedCards.size();
-        double yesterdayRevenue = calculateTodayRevenue(yesterdayActivatedCards);
-
-        Map<String, Object> stats = new HashMap<>();
-        stats.put("sales", yesterdaySales);
-        stats.put("revenue", yesterdayRevenue);
-
-        return stats;
+    private double calculateTodayRevenue(List<CardKey> todayActivatedCards) {
+        return 0.0; // Not used anymore
     }
 
     private double calculateTotalRevenue(List<CardKey> allCardKeys) {
-        double totalRevenue = 0.0;
-
-        for (CardKey card : allCardKeys) {
-            if (card.getActivateTime() != null && card.getSpecificationId() != null) {
-                Specification spec = specificationService.getById(card.getSpecificationId());
-                if (spec != null && spec.getPrice() != null) {
-                    totalRevenue += spec.getPrice();
-                }
-            }
-        }
-
-        return totalRevenue;
+        return 0.0; // Not used anymore
     }
 
     private double calculateMonthlyRevenue() {
-        LocalDate now = LocalDate.now();
-        LocalDateTime startOfMonth = now.withDayOfMonth(1).atStartOfDay();
-        LocalDateTime endOfMonth = now.plusMonths(1).withDayOfMonth(1).atStartOfDay();
-
-        List<CardKey> allCards = cardKeyService.list();
-        List<CardKey> monthlyActivatedCards = allCards.stream()
-                .filter(card -> card.getActivateTime() != null &&
-                               card.getActivateTime().isAfter(startOfMonth) &&
-                               card.getActivateTime().isBefore(endOfMonth))
-                .collect(java.util.stream.Collectors.toList());
-
-        double monthlyRevenue = 0.0;
-        for (CardKey card : monthlyActivatedCards) {
-            if (card.getSpecificationId() != null) {
-                Specification spec = specificationService.getById(card.getSpecificationId());
-                if (spec != null && spec.getPrice() != null) {
-                    monthlyRevenue += spec.getPrice();
-                }
-            }
-        }
-
-        return monthlyRevenue;
+        return 0.0; // Not used anymore
     }
 
     private double calculateLastMonthRevenue() {
-        LocalDate now = LocalDate.now();
-        LocalDateTime startOfLastMonth = now.minusMonths(1).withDayOfMonth(1).atStartOfDay();
-        LocalDateTime endOfLastMonth = now.withDayOfMonth(1).atStartOfDay();
-
-        List<CardKey> allCards = cardKeyService.list();
-        List<CardKey> lastMonthActivatedCards = allCards.stream()
-                .filter(card -> card.getActivateTime() != null &&
-                               card.getActivateTime().isAfter(startOfLastMonth) &&
-                               card.getActivateTime().isBefore(endOfLastMonth))
-                .collect(java.util.stream.Collectors.toList());
-
-        double lastMonthRevenue = 0.0;
-        for (CardKey card : lastMonthActivatedCards) {
-            if (card.getSpecificationId() != null) {
-                Specification spec = specificationService.getById(card.getSpecificationId());
-                if (spec != null && spec.getPrice() != null) {
-                    lastMonthRevenue += spec.getPrice();
-                }
-            }
-        }
-
-        return lastMonthRevenue;
+        return 0.0; // Not used anymore
     }
 }

@@ -74,6 +74,15 @@ public class SpecificationServiceImpl extends ServiceImpl<SpecificationMapper, S
     @Override
     public List<SpecificationDTO> getSpecificationDTOs() {
         List<Specification> specifications = this.list();
+        if (specifications.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        List<Integer> specificationIds = specifications.stream()
+                .map(Specification::getId)
+                .collect(Collectors.toList());
+
+        Map<Integer, CardKeyStatistics> statisticsMap = getCardKeyStatisticsBySpecificationIds(specificationIds);
 
         return specifications.stream().map(spec -> {
             SpecificationDTO dto = new SpecificationDTO();
@@ -89,20 +98,18 @@ public class SpecificationServiceImpl extends ServiceImpl<SpecificationMapper, S
             dto.setCreatedAt(spec.getCreatedAt());
             dto.setUpdatedAt(spec.getUpdatedAt());
 
-            QueryWrapper<CardKey> cardKeyQuery = new QueryWrapper<>();
-            cardKeyQuery.eq("specification_id", spec.getId());
-
-            List<CardKey> cardKeys = cardKeyService.list(cardKeyQuery);
-
-            int totalKeys = cardKeys.size();
-            int usedKeys = (int) cardKeys.stream().filter(card -> "已使用".equals(card.getStatus())).count();
-            int unusedKeys = (int) cardKeys.stream().filter(card -> "未使用".equals(card.getStatus())).count();
-            int disabledKeys = (int) cardKeys.stream().filter(card -> "已禁用".equals(card.getStatus())).count();
-
-            dto.setTotalKeys(totalKeys);
-            dto.setUsedKeys(usedKeys);
-            dto.setUnusedKeys(unusedKeys);
-            dto.setDisabledKeys(disabledKeys);
+            CardKeyStatistics stats = statisticsMap.get(spec.getId());
+            if (stats != null) {
+                dto.setTotalKeys(stats.getTotalKeys());
+                dto.setUsedKeys(stats.getUsedKeys());
+                dto.setUnusedKeys(stats.getUnusedKeys());
+                dto.setDisabledKeys(stats.getDisabledKeys());
+            } else {
+                dto.setTotalKeys(0);
+                dto.setUsedKeys(0);
+                dto.setUnusedKeys(0);
+                dto.setDisabledKeys(0);
+            }
 
             return dto;
         }).collect(Collectors.toList());

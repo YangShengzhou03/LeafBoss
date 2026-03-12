@@ -4,9 +4,11 @@ import com.leafboss.common.Result;
 import com.leafboss.entity.Admin;
 import com.leafboss.service.AdminService;
 import com.leafboss.utils.JwtUtil;
+import com.leafboss.utils.LogUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.Map;
 
@@ -20,8 +22,11 @@ public class AuthController {
     @Autowired
     private JwtUtil jwtUtil;
 
+    @Autowired
+    private LogUtil logUtil;
+
     @PostMapping("/login")
-    public Result<Map<String, Object>> login(@RequestBody Map<String, String> loginRequest) {
+    public Result<Map<String, Object>> login(@RequestBody Map<String, String> loginRequest, HttpServletRequest request) {
         String email = loginRequest.get("email");
         String password = loginRequest.get("password");
 
@@ -35,14 +40,17 @@ public class AuthController {
         Admin admin = adminService.findByEmail(email);
         if (admin != null) {
             if ("inactive".equals(admin.getStatus())) {
+                logUtil.logLogin(false, "管理员登录失败 - 邮箱: " + email + " (账号已被禁用)", request);
                 return Result.error("账号已被禁用，请联系管理员");
             }
 
-            if (password.equals(admin.getPasswordHash())) {
+            if (password.equals(admin.getPassword())) {
                 admin.setLastLoginTime(LocalDateTime.now());
                 adminService.updateById(admin);
 
                 String token = jwtUtil.generateToken(admin.getId(), admin.getEmail());
+
+                logUtil.logLogin(true, "管理员登录成功 - 邮箱: " + email, request);
 
                 Map<String, Object> response = Map.of(
                     "token", token,
@@ -52,6 +60,7 @@ public class AuthController {
             }
         }
 
+        logUtil.logLogin(false, "管理员登录失败 - 邮箱: " + email + " (密码错误或用户不存在)", request);
         return Result.error("邮箱或密码错误");
     }
 
@@ -93,6 +102,63 @@ public class AuthController {
                 return Result.success("用户信息更新成功", true);
             } else {
                 return Result.error("用户信息更新失败");
+            }
+        } catch (Exception e) {
+            return Result.error("Token无效或已过期");
+        }
+    }
+
+    @PutMapping("/password")
+    public Result<Boolean> changePassword(@RequestHeader("Authorization") String authorization,
+                                          @RequestBody Map<String, String> passwordData) {
+        if (authorization == null || !authorization.startsWith("Bearer ")) {
+            return Result.error("未授权访问");
+        }
+
+        String token = authorization.substring(7);
+        try {
+            String userId = jwtUtil.getUserIdFromToken(token);
+            String newPassword = passwordData.get("newPassword");
+
+            Admin admin = adminService.getById(userId);
+            if (admin == null) {
+                return Result.error("用户不存在");
+            }
+
+            admin.setPassword(newPassword);
+            boolean updated = adminService.updateById(admin);
+
+            if (updated) {
+                return Result.success("密码修改成功", true);
+            } else {
+                return Result.error("密码修改失败");
+            }
+        } catch (Exception e) {
+            return Result.error("Token无效或已过期");
+        }
+    }
+
+    @GetMapping("/storage")
+    public Result<Map<String, Object>> getStorageInfo(@RequestHeader("Authorization") String authorization) {
+        if (authorization == null || !authorization.startsWith("Bearer ")) {
+            return Result.error("未授权访问");
+        }
+
+        String token = authorization.substring(7);
+        try {
+            String userId = jwtUtil.getUserIdFromToken(token);
+            Admin admin = adminService.getById(userId);
+
+            if (admin != null) {
+                Map<String, Object> storageInfo = Map.of(
+                    "storageQuota", 1073741824L,
+                    "usedStorage", 104857600L,
+                    "availableStorage", 1073741824L - 104857600L,
+                    "usagePercentage", 10
+                );
+                return Result.success(storageInfo);
+            } else {
+                return Result.error("用户不存在");
             }
         } catch (Exception e) {
             return Result.error("Token无效或已过期");

@@ -28,7 +28,7 @@
               <template #dropdown>
                 <el-dropdown-menu role="menu">
                   <el-dropdown-item command="dashboard" role="menuitem">
-                    进入管理后台
+                    进入后台
                   </el-dropdown-item>
                   <el-dropdown-item divided command="logout" role="menuitem">
                     退出登录
@@ -51,8 +51,8 @@
             </p>
             <div class="cta-buttons" role="group" aria-label="主要操作">
               <el-button type="primary" size="large" class="start-btn" @click="handleStart"
-                :aria-label="isAuthenticated ? '进入管理后台' : '登录系统'">
-                {{ isAuthenticated ? '进入管理后台' : '登录系统' }}
+                :aria-label="isAuthenticated ? '进入后台' : '登录系统'">
+                {{ isAuthenticated ? '进入后台' : '登录系统' }}
               </el-button>
             </div>
           </div>
@@ -429,8 +429,7 @@ onUnmounted(() => {
   justify-content: center;
 }
 
-.start-btn,
-.down-btn {
+.start-btn {
   padding: 14px 32px;
   font-size: 16px;
   font-weight: 500;
@@ -438,9 +437,7 @@ onUnmounted(() => {
   transition: all 0.2s ease;
 }
 
-.start-btn:hover,
-.down-btn:hover {
-  transform: translateY(-1px);
+.start-btn:hover {
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
 }
 
@@ -474,7 +471,6 @@ onUnmounted(() => {
 }
 
 .feature-card:hover {
-  transform: translateY(-4px);
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
   border-color: #e5e7eb;
 }

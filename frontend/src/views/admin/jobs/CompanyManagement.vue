@@ -9,7 +9,7 @@
 
       <div class="search-bar">
         <el-row :gutter="20">
-          <el-col :span="6">
+          <el-col :xs="24" :sm="8" :md="6" class="mb-10">
             <el-input v-model="searchQuery" placeholder="公司名称" clearable @clear="handleSearch()"
               @keyup.enter="handleSearch()">
               <template #append>
@@ -21,19 +21,23 @@
               </template>
             </el-input>
           </el-col>
-          <el-col :span="18" class="button-group">
+          <el-col :xs="24" :sm="16" :md="18" class="button-group">
             <el-button type="primary" @click="handleSearch()">查询</el-button>
             <el-button @click="resetFilters()">重置</el-button>
-            <div style="flex: 1;"></div>
+            <div class="flex-grow" v-if="!isMobile"></div>
             <el-button type="primary" @click="handleAddCompany">新增公司</el-button>
           </el-col>
         </el-row>
       </div>
 
       <div class="table-container">
-        <el-table :data="filteredCompanies" v-loading="loading" stripe style="width: 100%" :key="tableKey"
+        <el-table :data="filteredCompanies" v-loading="loading" style="width: 100%" :key="tableKey"
           :reserve-selection="false" :row-key="row => row.id || Math.random()">
-          <el-table-column prop="id" label="ID" width="80" align="center" show-overflow-tooltip />
+          <el-table-column prop="id" label="ID" width="100" align="center">
+            <template #default="scope">
+              <span class="id-display">{{ formatId(scope.row.id) }}</span>
+            </template>
+          </el-table-column>
           <el-table-column prop="name" label="公司名称" min-width="200" align="left" :show-overflow-tooltip="true" />
           <el-table-column prop="commentCount" label="评论数" width="100" align="center" :show-overflow-tooltip="true">
             <template #default="scope">
@@ -67,8 +71,8 @@
       </div>
     </el-card>
 
-    <el-dialog v-model="showAddDialog" :title="editingCompany ? '编辑公司' : '添加公司'" width="500px">
-      <el-form :model="companyForm" :rules="companyRules" ref="companyFormRef" label-width="80px">
+    <el-dialog v-model="showAddDialog" :title="editingCompany ? '编辑公司' : '添加公司'" :width="isMobile ? '90%' : '500px'">
+      <el-form :model="companyForm" :rules="companyRules" ref="companyFormRef" :label-width="isMobile ? '60px' : '80px'">
         <el-form-item label="公司名称" prop="name">
           <el-input v-model="companyForm.name" placeholder="请输入公司名称" />
         </el-form-item>
@@ -84,12 +88,27 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, reactive } from 'vue'
+import { ref, onMounted, onUnmounted, computed, reactive } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Search } from '@element-plus/icons-vue'
 import api from '../../../services/api'
 
 const loading = ref(false)
+const isMobile = ref(false)
+
+const checkIfMobile = () => {
+  isMobile.value = window.innerWidth <= 768
+}
+
+onMounted(() => {
+  checkIfMobile()
+  window.addEventListener('resize', checkIfMobile)
+  loadCompanies()
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', checkIfMobile)
+})
 
 const companies = ref([])
 
@@ -107,6 +126,15 @@ const editingCompany = ref(null)
 const companyForm = reactive({
   name: ''
 })
+
+const formatId = (id) => {
+  if (!id) return ''
+  const idStr = id.toString()
+  if (idStr.length > 8) {
+    return `${idStr.substring(0, 8)}...`
+  }
+  return idStr
+}
 
 const companyRules = {
   name: [{ required: true, message: '请输入公司名称', trigger: 'blur' }]
@@ -251,9 +279,6 @@ const handleCurrentChange = (page) => {
   loadCompanies()
 }
 
-onMounted(() => {
-  loadCompanies()
-})
 </script>
 
 <style scoped>
@@ -261,39 +286,34 @@ onMounted(() => {
   padding: 0;
 }
 
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-weight: 600;
-  font-size: 16px;
-  color: #303133;
-}
-
 .search-bar {
   margin-bottom: 16px;
   padding: 20px;
 }
 
-.search-bar :deep(.el-col) {
-  display: flex;
-  align-items: center;
-}
-
-.search-bar :deep(.el-input) {
-  flex: 1;
-}
-
 .search-bar :deep(.button-group) {
+  display: flex;
   justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
-.search-bar :deep(.button-group .el-button) {
-  margin-left: 8px;
+.mb-10 {
+  margin-bottom: 10px;
 }
 
-.table-container {
-  width: 100%;
+.mt-10 {
+  margin-top: 10px;
+}
+
+.flex-grow {
+  flex-grow: 1;
+}
+
+.id-display {
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  color: #666;
 }
 
 .pagination-container {
@@ -301,9 +321,5 @@ onMounted(() => {
   justify-content: flex-end;
   margin-top: 12px;
   padding: 16px;
-}
-
-.empty-container {
-  padding: 40px 0;
 }
 </style>
