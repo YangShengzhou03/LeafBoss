@@ -86,9 +86,7 @@ public class CardKeyController {
             response.put("specificationId", card.getSpecificationId());
             response.put("status", card.getStatus());
             response.put("userEmail", card.getUserEmail());
-            response.put("userId", card.getUserId());
             response.put("activateTime", card.getActivateTime());
-            response.put("expireTime", card.getExpireTime());
             response.put("createdAt", card.getCreatedAt());
             response.put("updatedAt", card.getUpdatedAt());
 
@@ -97,7 +95,6 @@ public class CardKeyController {
                 if (spec != null) {
                     response.put("specificationName", spec.getName());
                     response.put("price", spec.getPrice());
-                    response.put("durationDays", spec.getDurationDays());
 
                     Product product = productService.getById(spec.getProductId());
                     if (product != null) {

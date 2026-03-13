@@ -22,14 +22,8 @@ public class CardKey {
     @TableField("user_email")
     private String userEmail;
 
-    @TableField("user_id")
-    private String userId;
-
     @TableField("activate_time")
     private LocalDateTime activateTime;
-
-    @TableField("expire_time")
-    private LocalDateTime expireTime;
 
     @TableField("created_at")
     private LocalDateTime createdAt;
@@ -77,28 +71,12 @@ public class CardKey {
         this.userEmail = userEmail;
     }
 
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
     public LocalDateTime getActivateTime() {
         return activateTime;
     }
 
     public void setActivateTime(LocalDateTime activateTime) {
         this.activateTime = activateTime;
-    }
-
-    public LocalDateTime getExpireTime() {
-        return expireTime;
-    }
-
-    public void setExpireTime(LocalDateTime expireTime) {
-        this.expireTime = expireTime;
     }
 
     public LocalDateTime getCreatedAt() {

@@ -35,8 +35,6 @@ CREATE TABLE specifications (
     id INT PRIMARY KEY AUTO_INCREMENT COMMENT '规格唯一标识符',
     product_id INT NOT NULL COMMENT '所属产品ID',
     name VARCHAR(100) NOT NULL COMMENT '规格名称',
-    description TEXT COMMENT '规格描述',
-    duration_days INT DEFAULT 0 COMMENT '有效期（天）',
     price DECIMAL(10,2) DEFAULT 0.00 COMMENT '价格',
     stock_quantity INT DEFAULT 0 COMMENT '当前库存数量',
     status VARCHAR(20) DEFAULT 'active' NOT NULL COMMENT '状态',
@@ -55,9 +53,7 @@ CREATE TABLE card_keys (
     specification_id INT NOT NULL COMMENT '所属规格ID',
     status VARCHAR(20) DEFAULT '未使用' NOT NULL COMMENT '卡密当前状态',
     user_email VARCHAR(100) COMMENT '激活用户的邮箱',
-    user_id VARCHAR(100) COMMENT '激活用户的ID',
     activate_time DATETIME COMMENT '卡密激活时间',
-    expire_time DATETIME COMMENT '卡密过期时间',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '创建时间',
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL COMMENT '最后更新时间',
     FOREIGN KEY (specification_id) REFERENCES specifications(id) ON DELETE CASCADE,
@@ -118,6 +114,6 @@ CREATE TABLE boss_reviews (
 
 -- 初始化默认管理员账号 (密码: 123456)
 INSERT INTO admins (id, username, email, password, status) VALUES
-('00000000-0000-0000-0000-000000000001', 'admin', 'admin@qq.com', '123456', 'active');
+('550e8400-e29b-41d4-a716-446655440000', 'admin', 'admin@qq.com', '123456', 'active');
 
 COMMIT;

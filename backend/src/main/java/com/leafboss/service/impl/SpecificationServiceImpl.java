@@ -90,8 +90,6 @@ public class SpecificationServiceImpl extends ServiceImpl<SpecificationMapper, S
             dto.setProductId(spec.getProductId());
             dto.setProductName("");
             dto.setName(spec.getName());
-            dto.setDescription(spec.getDescription());
-            dto.setDurationDays(spec.getDurationDays());
             dto.setPrice(spec.getPrice());
             dto.setStockQuantity(spec.getStockQuantity());
             dto.setStatus(spec.getStatus());
@@ -147,8 +145,6 @@ public class SpecificationServiceImpl extends ServiceImpl<SpecificationMapper, S
             dto.setProductId(spec.getProductId());
             dto.setProductName("");
             dto.setName(spec.getName());
-            dto.setDescription(spec.getDescription());
-            dto.setDurationDays(spec.getDurationDays());
             dto.setPrice(spec.getPrice());
             dto.setStockQuantity(spec.getStockQuantity());
             dto.setStatus(spec.getStatus());
