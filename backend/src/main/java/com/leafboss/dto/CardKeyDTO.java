@@ -12,9 +12,7 @@ public class CardKeyDTO {
     private String productName;
     private String status;
     private String userEmail;
-    private String userId;
     private LocalDateTime activateTime;
-    private LocalDateTime expireTime;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -23,8 +21,7 @@ public class CardKeyDTO {
 
     public CardKeyDTO(Integer id, String cardKey, Integer specificationId, String specificationName, 
                      Integer productId, String productName, String status, String userEmail, 
-                     String userId, LocalDateTime activateTime, LocalDateTime expireTime, 
-                     LocalDateTime createdAt, LocalDateTime updatedAt) {
+                     LocalDateTime activateTime, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.cardKey = cardKey;
         this.specificationId = specificationId;
@@ -33,9 +30,7 @@ public class CardKeyDTO {
         this.productName = productName;
         this.status = status;
         this.userEmail = userEmail;
-        this.userId = userId;
         this.activateTime = activateTime;
-        this.expireTime = expireTime;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -104,28 +99,12 @@ public class CardKeyDTO {
         this.userEmail = userEmail;
     }
 
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
     public LocalDateTime getActivateTime() {
         return activateTime;
     }
 
     public void setActivateTime(LocalDateTime activateTime) {
         this.activateTime = activateTime;
-    }
-
-    public LocalDateTime getExpireTime() {
-        return expireTime;
-    }
-
-    public void setExpireTime(LocalDateTime expireTime) {
-        this.expireTime = expireTime;
     }
 
     public LocalDateTime getCreatedAt() {

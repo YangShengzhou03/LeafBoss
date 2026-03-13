@@ -109,9 +109,7 @@ public class CardKeyServiceImpl extends ServiceImpl<CardKeyMapper, CardKey> impl
             dto.setSpecificationId(cardKey.getSpecificationId());
             dto.setStatus(cardKey.getStatus());
             dto.setUserEmail(cardKey.getUserEmail());
-            dto.setUserId(cardKey.getUserId());
             dto.setActivateTime(cardKey.getActivateTime());
-            dto.setExpireTime(cardKey.getExpireTime());
             dto.setCreatedAt(cardKey.getCreatedAt());
             dto.setUpdatedAt(cardKey.getUpdatedAt());
 
@@ -140,18 +138,15 @@ public class CardKeyServiceImpl extends ServiceImpl<CardKeyMapper, CardKey> impl
     }
 
     @Override
-    public boolean activateCard(String cardKey, String userId, String userEmail) {
+    public boolean activateCard(String cardKey, String userEmail) {
         CardKey card = findByCardKey(cardKey);
         if (card == null || !"未使用".equals(card.getStatus())) {
             return false;
         }
 
         card.setStatus("已使用");
-        card.setUserId(userId);
         card.setUserEmail(userEmail);
         card.setActivateTime(LocalDateTime.now());
-
-        card.setExpireTime(LocalDateTime.now().plusDays(30));
 
         return updateById(card);
     }
@@ -205,10 +200,8 @@ public class CardKeyServiceImpl extends ServiceImpl<CardKeyMapper, CardKey> impl
                 cardKey.setCardKey(cardKeyStr);
                 cardKey.setSpecificationId(specificationId);
                 cardKey.setStatus("未使用");
-                cardKey.setUserId(null);
                 cardKey.setUserEmail(null);
                 cardKey.setActivateTime(null);
-                cardKey.setExpireTime(null);
                 cardKey.setCreatedAt(now);
                 cardKey.setUpdatedAt(now);
 

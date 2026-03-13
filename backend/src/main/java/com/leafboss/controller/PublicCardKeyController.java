@@ -42,7 +42,7 @@ public class PublicCardKeyController {
 
             switch (status) {
                 case "未使用":
-                    boolean activated = cardKeyService.activateCard(cardKey, "system", "system@leafboss.com");
+                    boolean activated = cardKeyService.activateCard(cardKey, "system@leafboss.com");
                     if (!activated) {
                         operationLogService.logOperation("CARD_KEY", "验证安装卡密失败 - 激活失败: " + cardKey, getClientIpAddress(request));
                         return Result.error(500, "卡密验证成功但使用失败，请联系开发者处理");

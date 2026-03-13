@@ -8,8 +8,6 @@ public class SpecificationDTO {
     private Integer productId;
     private String productName;
     private String name;
-    private String description;
-    private Integer durationDays;
     private Double price;
     private Integer stockQuantity;
     private String status;
@@ -54,22 +52,6 @@ public class SpecificationDTO {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Integer getDurationDays() {
-        return durationDays;
-    }
-
-    public void setDurationDays(Integer durationDays) {
-        this.durationDays = durationDays;
     }
 
     public Double getPrice() {

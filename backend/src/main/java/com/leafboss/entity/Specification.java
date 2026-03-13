@@ -16,12 +16,6 @@ public class Specification {
     @TableField("name")
     private String name;
 
-    @TableField("description")
-    private String description;
-
-    @TableField("duration_days")
-    private Integer durationDays;
-
     @TableField("price")
     private Double price;
 
@@ -59,22 +53,6 @@ public class Specification {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Integer getDurationDays() {
-        return durationDays;
-    }
-
-    public void setDurationDays(Integer durationDays) {
-        this.durationDays = durationDays;
     }
 
     public Double getPrice() {

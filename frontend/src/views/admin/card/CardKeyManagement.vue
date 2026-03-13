@@ -186,7 +186,6 @@ const loadCardKeys = async () => {
           ? `${cardKey.productName} - ${cardKey.specificationName}`
           : '未设置',
         userEmail: cardKey.userEmail || '',
-        userId: cardKey.userId || '',
         activateTime: cardKey.activateTime ? formatDateTime(cardKey.activateTime) : '',
         createTime: cardKey.createdAt ? formatDateTime(cardKey.createdAt) : '',
         updatedAt: cardKey.updatedAt ? formatDateTime(cardKey.updatedAt) : ''

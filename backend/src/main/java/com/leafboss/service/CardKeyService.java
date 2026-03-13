@@ -17,7 +17,7 @@ public interface CardKeyService extends IService<CardKey> {
 
     IPage<CardKeyDTO> getCardKeyListWithDetails(Page<CardKey> pageParam, String keyword, Long specificationId, String status);
 
-    boolean activateCard(String cardKey, String userId, String userEmail);
+    boolean activateCard(String cardKey, String userEmail);
 
     boolean disableCard(String cardKey);
 

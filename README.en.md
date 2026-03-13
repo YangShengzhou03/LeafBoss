@@ -26,23 +26,7 @@ Data statistics provide visualized reports for real-time monitoring of system us
 
 ## Quick Start
 
-### System Requirements
-
-Before using LeafBoss, ensure your development environment meets these requirements. For development: Node.js 16.0+ for frontend development, Java 17.0+ for backend development, MySQL 8.0+ for database, and Maven 3.6+ for backend building. For production: Linux server with recommended 2GB or more memory and at least 1GB of available storage space. Once these requirements are met, you can proceed with installing and deploying the LeafBoss system.
-
-### Installation & Deployment
-
-Installing and deploying the LeafBoss system requires the following steps. First, clone the project locally using `git clone https://github.com/YangShengzhou03/LeafBoss.git`, then navigate to the project directory. For backend deployment, first configure the database by creating a database named leaf_boss with character set utf8mb4, then execute the initialization script data.sql. Next, configure the application by editing backend/src/main/resources/application.yml to set database connection information, JWT key and expiration time, and server port parameters. Finally, start the backend service by entering the backend directory, running mvn clean package to compile the project, and then using java -jar target/leaf-boss-backend.jar to run the application.
-
-Frontend deployment is relatively simple. First, enter the frontend directory and run npm install to install project dependencies. Then configure environment variables by editing frontend/.env.development to set API base address and application title parameters. Finally, start the frontend service by running npm run serve in development mode to start the development server, or npm run build for production environment to build the production version. After completing these steps, the system can run normally.
-
-### Quick Usage
-
-After system deployment, you can access the frontend at http://localhost:8080 through your browser, and the backend API address is http://localhost:8081/api. The system provides a default admin account with email admin@qq.com and password 123456. Using this account, you can log in to the system and access all management functions. After successful login, administrators can access various system modules including card key management (generation and distribution), product management (products and specifications), company management, review management, personnel management, user management, operation log auditing, and visual dashboard.
-
-The card key management module supports batch generation of card key codes based on specifications, real-time verification of card key status, management of card key lifecycle (enable/disable), and exporting generated card keys as TXT files. The product management module provides complete maintenance of product lines, supporting configuration of multiple authorization specifications (price, duration, stock) for each product, and one-click toggle of online/offline status. The company management module provides company information maintenance and automatic statistics of associated reviews. The review management module supports auditing and cleaning of business reviews posted by users.
-
-The personnel management module supports CRUD operations for system backend administrators, status locking, and password reset. The user management module supports maintenance of basic information for frontend registered users. The operation log module automatically records all sensitive operations in the system (such as login, deletion, status changes), supporting multi-dimensional traceability auditing by time, type, and IP. The data statistics dashboard provides real-time overview of core business metrics, including remaining inventory distribution, daily sales statistics, and monthly revenue trend analysis.
+The system provides a default admin account with email admin@qq.com and password 123456. Use this account to log in to the system and access all management functions.
 
 ![LEAF-BOSS Admin Dashboard](https://gitee.com/Yangshengzhou/leaf-boss/raw/master/assets/LEAF-BOSS-Dashboard.png)
 
@@ -104,10 +88,13 @@ Production environment deployment is divided into three parts: frontend deployme
 The system supports containerized deployment using Docker, which can simplify the deployment process and improve deployment efficiency. The frontend Dockerfile uses nginx:alpine as the base image, copying the built dist directory to nginx's html directory to provide static file services. The backend Dockerfile uses openjdk:17-alpine as the base image, copying the packaged jar file into the container and setting the startup command to run the application. Using Docker for deployment ensures environment consistency and facilitates system migration and scaling across different environments.
 
 #### Deploying with Docker Hub Images (Including HTTPS Configuration)
+
 LeafBoss has published pre-built images on Docker Hub that can be pulled directly. Image repository address: `yangshengzhou/leafboss`, including frontend, backend, and HTTPS proxy images.
 
 ### 1. Environment Preparation
+
 #### 1.1 Pull Core Business Images
+
 ```bash
 docker pull yangshengzhou/leafboss:frontend-v1
 docker pull yangshengzhou/leafboss:backend-v1
@@ -115,14 +102,19 @@ docker pull yangshengzhou/leafboss:https-nginx-v1
 ```
 
 #### 1.2 Create Dedicated Docker Network
+
 Provide an isolated environment for inter-container communication, avoiding port conflicts:
+
 ```bash
 docker network create leafboss-network
 ```
 
 ### 2. Deploy Core Services
+
 #### 2.1 Deploy MySQL Database
+
 First navigate to the directory containing the `data.sql` initialization script, then start the container:
+
 ```bash
 cd ~/leaf-boss
 docker run -d \
@@ -134,12 +126,15 @@ docker run -d \
   -p 3306:3306 \
   mysql:8.0
 ```
+
 Wait 30-60 seconds (for MySQL startup to complete), then execute database initialization:
+
 ```bash
 docker exec -i leafboss-mysql mysql -uroot -p123456 < data.sql
 ```
 
 #### 2.2 Start Backend Service
+
 ```bash
 docker run -d \
   --name leafboss-backend \
@@ -149,8 +144,10 @@ docker run -d \
   yangshengzhou/leafboss:backend-v1
 ```
 
-#### 2.3 Start Frontend Service (Key: Do Not Map Host Port 80)
+#### 2.3 Start Frontend Service
+
 Frontend port 80 only works within the container network, while host ports 80/443 are exclusively used by the HTTPS proxy container:
+
 ```bash
 docker run -d \
   --name leafboss-frontend \
@@ -160,17 +157,24 @@ docker run -d \
 ```
 
 #### 2.4 Deploy HTTPS Proxy Service (Core for Full-Site Encryption)
+
+Prepare SSL certificate files. Copy the certificate file (jasun.xyz_certificate.pem) and private key file (jasun.xyz_private.key) to the server's ~/ssl directory, then execute the following command:
+
 ```bash
+cd ~/ssl
 docker run -d \
   --name leafboss-https-nginx \
   --network leafboss-network \
   --restart always \
   -p 80:80 \
   -p 443:443 \
+  -v $(pwd)/jasun.xyz_certificate.pem:/etc/nginx/ssl/jasun.xyz_certificate.pem \
+  -v $(pwd)/jasun.xyz_private.key:/etc/nginx/ssl/jasun.xyz_private.key \
   yangshengzhou/leafboss:https-nginx-v1
 ```
 
 ### 3. Verify Deployment Results
+
 - Access method: Only supports `https://your-domain` (e.g., `https://jasun.xyz`), `http://server-IP` will automatically redirect to HTTPS;
 - Default account: Email `admin@qq.com`, Password `123456`;
 - Check container status (all containers should be in `Up` status):
@@ -187,12 +191,15 @@ docker run -d \
   ```
 
 ### 4. Common Operations Commands
+
 #### 4.1 View Container Network Configuration
+
 ```bash
 docker network inspect leafboss-network
 ```
 
 #### 4.2 Stop/Remove All Containers
+
 ```bash
 # Stop containers (including HTTPS proxy container)
 docker stop leafboss-https-nginx leafboss-frontend leafboss-backend leafboss-mysql
@@ -201,11 +208,13 @@ docker rm leafboss-https-nginx leafboss-frontend leafboss-backend leafboss-mysql
 ```
 
 #### 4.3 Remove Docker Network
+
 ```bash
 docker network rm leafboss-network
 ```
 
 ### 5. Deployment Notes
+
 1. If HTTPS access shows certificate errors, check if SSL certificate file paths match Nginx configuration;
 2. Server must open ports 80/443 (firewall/security group), otherwise HTTPS service cannot be accessed.
 
@@ -227,6 +236,7 @@ The backend service supports the following environment variable configurations:
 **MySQL Connection Failed**
 
 Check if MySQL container is running normally:
+
 ```bash
 docker logs leafboss-mysql
 ```
@@ -234,6 +244,7 @@ docker logs leafboss-mysql
 **Backend Startup Failed**
 
 Check backend container logs:
+
 ```bash
 docker logs leafboss-backend
 ```
@@ -241,6 +252,7 @@ docker logs leafboss-backend
 **Frontend Cannot Access Backend**
 
 Confirm all containers are in the same network:
+
 ```bash
 docker network inspect leafboss-network
 ```
@@ -251,18 +263,46 @@ Ensure data.sql file is in the correct location and MySQL container has permissi
 
 ### Contributing
 
-We welcome contributions in any form, including code contributions, documentation improvements, and issue feedback. The contribution process includes: First, fork this repository to your own GitHub account, then create a new feature branch using git checkout -b feature/AmazingFeature command. Develop on the branch, and after completion, use git commit -m 'Add some AmazingFeature' to commit the code - the commit message should clearly describe the changes made. Then use git push origin feature/AmazingFeature to push the branch to your repository, and finally create a Pull Request on GitHub, waiting for project maintainers to review and merge the code. When contributing code, you should follow the project's code standards, write clear commit messages, add appropriate test cases, and update relevant documentation.
+We welcome contributions in any form, including code contributions, documentation improvements, and issue feedback. The contribution process includes: first Fork this repository to your own GitHub account, then create a new feature branch using git checkout -b feature/AmazingFeature command. Develop on the branch, and after completion use git commit -m 'Add some AmazingFeature' to commit the code. The commit message should clearly describe the changes made. Then use git push origin feature/AmazingFeature to push the branch to your repository, and finally create a Pull Request on GitHub, waiting for the project maintainers to review and merge the code. When contributing code, you should follow the project's code standards, write clear commit messages, add appropriate test cases, and update relevant documentation.
 
 ## Version History
 
 ### Release Overview
 
-The LeafBoss project has undergone multiple version iterations, continuously improving and optimizing system functionality. Version v2.0.0 was released on 2026-01-18, with the main feature being upgrading LeafCard to LeafBoss Business Operation Support System, refactoring the system architecture, and expanding it into a comprehensive business operation support system. Version v1.0.0 was released on 2024-10-27, marking the official launch of LeafCard Business Operation Support System, providing basic user authentication, card key management, and data statistics functions.
+The LeafBoss project has undergone multiple version iterations, continuously improving and optimizing system functionality. Version v2.0.0 was released on 2026-01-18, with the main feature being upgrading LeafCard to LeafBoss Business Operation Support System, refactoring the system architecture, and expanding it into a comprehensive business operation support system. Version v1.0.0 was released on 2024-10-27, marking the official launch of the LeafCard Business Operation Support System, providing basic user authentication, card key management, and data statistics functions.
 
-### Detailed Change Log
+### Detailed Changelog
 
-Version v2.0.0 (2026-01-18) is a major upgrade of the system. The system was upgraded from LeafCard to LeafBoss Business Operation Support System, the system architecture was refactored, and it was expanded into a comprehensive business operation support system. All documentation and configuration files were updated, UI design was optimized to improve user experience. Security verification mechanisms were enhanced, personnel management module was added supporting administrator and regular user management, and product specification management functionality was optimized, making the system more complete and easy to use.
+Version v2.0.0 (2026-01-18) is a major system upgrade. The system was upgraded from LeafCard to LeafBoss Business Operation Support System, the system architecture was refactored, and it was expanded into a comprehensive business operation support system. All documentation and configuration files were updated, UI design was optimized, and user experience was improved. Security verification mechanisms were enhanced, a personnel management module was added supporting administrator and regular user management, and product specification management functionality was optimized, making the system more complete and easy to use.
 
-Version v1.0.0 (2024-10-27) was the first official release of the system. LeafCard Business Operation Support System was officially launched, providing a complete user authentication system, basic card key management functionality, and basic data statistics functionality, providing users with basic business operation support capabilities.
+Version v1.0.0 (2024-10-27) was the first official release of the system. The LeafCard Business Operation Support System was officially launched, providing complete user authentication system, basic card key management functionality, and basic data statistics functions, providing users with basic business operation support capabilities.
 
 ### Development History
+
+The development history of the LeafBoss project can be traced back to January 2024, when based on the analysis of existing business operation support systems, the concept of developing a lightweight, easy-to-use business operation support system was conceived. In February 2024, technology selection was conducted, determining the use of Vue 3 + Spring Boot 3 technology stack, and system architecture design began. From March to July 2024, core development was carried out, completing frontend and backend core function development, including key management, user management, access control, and other functions. On October 27, 2024, the LeafCard Business Operation Support System was officially launched and began providing services to users. On January 18, 2026, the system was upgraded to LeafBoss Business Operation Support System, supporting comprehensive business operation needs.
+
+## License
+
+This project adopts the MIT License, which is a permissive open source license that allows users to freely use, modify, and distribute the code, whether for commercial or non-commercial purposes. View the LICENSE file to understand the detailed terms and conditions of the license. The MIT License encourages code sharing and reuse, promoting the development and innovation of the open source community.
+
+## Contact
+
+If you encounter any problems during using LeafBoss, or have any suggestions and opinions, you are welcome to contact us through the following ways. The GitHub repository address is https://github.com/YangShengzhou03/LeafBoss, where you can view source code, submit issues, or participate in contributions. Issue feedback can be done through GitHub Issues, and we will reply and handle your problems in a timely manner. The email address is YangSZ03@foxmail.com, and you can contact us via email. The project homepage is also https://github.com/YangShengzhou03/LeafBoss, welcome to visit to learn more information.
+
+## Project Statistics
+
+![GitHub Last Commit](https://img.shields.io/github/last-commit/YangShengzhou03/LeafBoss?style=flat-square)
+![GitHub Contributors](https://img.shields.io/github/contributors/YangShengzhou03/LeafBoss?style=flat-square)
+![GitHub Repo Size](https://img.shields.io/github/repo-size/YangShengzhou03/LeafBoss?style=flat-square)
+
+---
+
+**Thank you for using LeafBoss!**
+
+<div align="center">
+
+If this project helps you, please give it a Star to support us!
+
+[![Star History Chart](https://api.star-history.com/svg?repos=YangShengzhou03/LeafBoss&type=Date)](https://star-history.com/#YangShengzhou03/LeafBoss&Date)
+
+</div>
