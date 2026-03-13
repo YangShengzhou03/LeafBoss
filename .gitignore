@@ -73,3 +73,10 @@ logs/
 *.rar
 *.tar
 *.zip
+
+# SSL/TLS certificates and keys
+*.key
+*.pem
+*.crt
+*.csr
+https-nginx/*.key
