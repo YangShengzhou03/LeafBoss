@@ -31,7 +31,6 @@ public class DashboardController {
         try {
             Map<String, Object> stats = new HashMap<>();
 
-            // 当日销量和营收
             LocalDate today = LocalDate.now();
             LocalDateTime startOfDay = today.atStartOfDay();
             LocalDateTime endOfDay = today.plusDays(1).atStartOfDay();
@@ -39,7 +38,6 @@ public class DashboardController {
             int dailySales = getActivatedCount(startOfDay, endOfDay);
             double dailyRevenue = getActivatedRevenue(startOfDay, endOfDay);
 
-            // 昨日销量和营收
             LocalDate yesterday = today.minusDays(1);
             LocalDateTime startOfYesterday = yesterday.atStartOfDay();
             LocalDateTime endOfYesterday = today.atStartOfDay();
@@ -52,16 +50,13 @@ public class DashboardController {
             stats.put("yesterdaySales", yesterdaySales);
             stats.put("yesterdayRevenue", Math.round(yesterdayRevenue * 100.0) / 100.0);
 
-            // 总体统计
             long totalOrders = cardKeyService.count();
             double totalRevenue = getActivatedRevenue(null, null);
 
-            // 月度营收
             LocalDateTime startOfMonth = today.withDayOfMonth(1).atStartOfDay();
             LocalDateTime endOfMonth = today.plusMonths(1).withDayOfMonth(1).atStartOfDay();
             double monthlyRevenue = getActivatedRevenue(startOfMonth, endOfMonth);
 
-            // 上月营收
             LocalDateTime startOfLastMonth = today.minusMonths(1).withDayOfMonth(1).atStartOfDay();
             LocalDateTime endOfLastMonth = today.withDayOfMonth(1).atStartOfDay();
             double lastMonthRevenue = getActivatedRevenue(startOfLastMonth, endOfLastMonth);
@@ -148,25 +143,5 @@ public class DashboardController {
         } catch (Exception e) {
             return Result.error("获取当日售出分布失败");
         }
-    }
-
-    private Map<String, Object> getYesterdayStats() {
-        return null; // Not used anymore as logic moved to getDashboardStats
-    }
-
-    private double calculateTodayRevenue(List<CardKey> todayActivatedCards) {
-        return 0.0; // Not used anymore
-    }
-
-    private double calculateTotalRevenue(List<CardKey> allCardKeys) {
-        return 0.0; // Not used anymore
-    }
-
-    private double calculateMonthlyRevenue() {
-        return 0.0; // Not used anymore
-    }
-
-    private double calculateLastMonthRevenue() {
-        return 0.0; // Not used anymore
     }
 }

@@ -1,8 +1,8 @@
 import Server from '../utils/Server'
 
 const AdminService = {
-  login(data) {
-    return Server.post('/api/auth/login', data)
+  login(data, autoLogin = false) {
+    return Server.post('/api/auth/login', data, { autoLogin })
   },
 
   getDashboardStats() {
@@ -188,8 +188,8 @@ const AdminService = {
 }
 
 const UserService = {
-  login(data) {
-    return Server.post('/api/auth/login', data)
+  login(data, autoLogin = false) {
+    return Server.post('/api/auth/login', data, { autoLogin })
   },
 
   logout() {

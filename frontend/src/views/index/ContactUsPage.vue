@@ -47,7 +47,6 @@ export default {
   name: 'ContactUsPage',
   setup() {
     onMounted(() => {
-      // 页面加载完成后的逻辑
     });
   }
 }

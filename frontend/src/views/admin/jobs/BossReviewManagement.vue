@@ -39,11 +39,7 @@
       <div class="table-container">
         <el-table :data="filteredReviews" v-loading="loading" style="width: 100%" :key="tableKey"
           :reserve-selection="false" :row-key="row => row.id || Math.random()">
-          <el-table-column prop="id" label="ID" width="100" align="center">
-            <template #default="scope">
-              <span class="id-display">{{ formatId(scope.row.id) }}</span>
-            </template>
-          </el-table-column>
+
           <el-table-column prop="cardKey" label="卡密" width="200" align="center" :show-overflow-tooltip="true" />
           <el-table-column prop="companyName" label="公司" min-width="150" align="left" :show-overflow-tooltip="true" />
           <el-table-column prop="content" label="评论内容" min-width="250" align="left" :show-overflow-tooltip="true" />
@@ -141,14 +137,7 @@ const reviewForm = reactive({
   content: ''
 })
 
-const formatId = (id) => {
-  if (!id) return ''
-  const idStr = id.toString()
-  if (idStr.length > 8) {
-    return `${idStr.substring(0, 8)}...`
-  }
-  return idStr
-}
+
 
 const reviewRules = {
   cardKey: [{ required: true, message: '请输入卡密', trigger: 'blur' }],

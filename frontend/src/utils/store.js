@@ -44,10 +44,10 @@ const store = {
     }
   },
 
-  async login(credentials) {
+  async login(credentials, silent = false) {
     state.loading = true
     try {
-      const response = await api.user.login(credentials)
+      const response = await api.user.login(credentials, silent)
 
       if (response && response.code === 200 && response.data) {
         const { token, user } = response.data
@@ -57,6 +57,10 @@ const store = {
         }
 
         if (user) {
+          if (user.status === 'inactive') {
+            this.clearUser()
+            return { success: false, message: '账号已被禁用，请联系管理员' }
+          }
           this.setUser(user)
         } else {
           await this.fetchCurrentUser()
@@ -67,7 +71,8 @@ const store = {
 
       return { success: false, message: response?.message || '登录失败' }
     } catch (error) {
-      return { success: false, message: '登录失败，请检查网络连接' }
+      const errorMessage = error.message || '登录失败，请检查网络连接'
+      return { success: false, message: errorMessage }
     } finally {
       state.loading = false
     }
@@ -78,11 +83,21 @@ const store = {
     try {
       const response = await api.user.register(userData)
       if (response && response.code === 200) {
-        // 注册成功后自动登录
-        return await this.login({
-          email: userData.email,
-          password: userData.password
-        })
+        try {
+          const loginResult = await this.login({
+            email: userData.email,
+            password: userData.password
+          }, true)
+          if (loginResult.success) {
+            return loginResult
+          } else {
+            this.clearUser()
+            return { success: false, message: '注册成功但账号被禁用，请联系管理员' }
+          }
+        } catch (loginError) {
+          this.clearUser()
+          return { success: false, message: '注册成功但自动登录失败，请手动登录' }
+        }
       }
       return { success: false, message: response?.message || '注册失败' }
     } catch (error) {
@@ -143,6 +158,10 @@ const store = {
       const response = await api.user.getCurrentUser()
 
       if (response && response.code === 200 && response.data) {
+        if (response.data.status === 'inactive') {
+          this.clearUser()
+          return
+        }
         this.setUser(response.data)
 
         if (response.data.storageInfo) {

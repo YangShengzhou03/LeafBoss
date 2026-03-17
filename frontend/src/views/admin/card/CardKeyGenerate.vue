@@ -394,11 +394,6 @@ const handleProductChange = (productId) => {
   loadSpecsByProduct(productId)
 }
 
-onMounted(() => {
-  loadProducts()
-  loadAllSpecs()
-})
-
 const exportCardKeys = () => {
   if (generatedKeys.value.length === 0) {
     ElMessage.warning('没有可导出的卡密')
@@ -450,8 +445,8 @@ const copyCardKeys = async () => {
     textArea.select()
     document.execCommand('copy')
     document.body.removeChild(textArea)
+    ElMessage.success(`已复制 ${generatedKeys.value.length} 个卡密到剪贴板`)
   }
-  ElMessage.success(`已复制 ${generatedKeys.value.length} 个卡密到剪贴板`)
 }
 </script>
 

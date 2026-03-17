@@ -135,7 +135,6 @@ const editProfile = () => {
   profileDialogVisible.value = true
 }
 
-// 保存个人资料
 const saveProfile = async () => {
   if (!profileFormRef.value) return
 
@@ -143,22 +142,18 @@ const saveProfile = async () => {
     await profileFormRef.value.validate()
     saving.value = true
 
-    // 准备提交的数据
     const submitData = {
       username: profileForm.nickname,
       email: profileForm.email
     }
 
-    // 如果有新密码，添加到提交数据
     if (profileForm.password) {
       submitData.password = profileForm.password
     }
 
-    // 调用API保存个人资料
     const response = await api.user.updateUserInfo(submitData)
 
     if (response && response.code === 200) {
-      // 更新用户信息
       userInfo.value = { ...userInfo.value, ...profileForm }
       profileDialogVisible.value = false
       ElMessage.success('个人资料保存成功')

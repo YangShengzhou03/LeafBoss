@@ -14,6 +14,12 @@ Server.interceptors.request.use(config => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
   }
+  if (config.url === '/api/auth/login' && config.autoLogin) {
+    config._autoLogin = true
+  }
+  if (config.silent) {
+    config._silent = true
+  }
   return config
 })
 
@@ -33,12 +39,16 @@ Server.interceptors.response.use(
       } else {
         if (response.data.message && (response.data.message.includes('Token无效') ||
           response.data.message.includes('Token过期') ||
-          response.data.message.includes('未授权访问'))) {
-          handleTokenExpiration()
-          return Promise.reject(new Error('登录已过期，请重新登录'))
+          response.data.message.includes('未授权访问') ||
+          response.data.message.includes('账号已被禁用') ||
+          response.data.message.includes('账号已被禁用或不存在'))) {
+          const isLoginPage = router.currentRoute.value.path === '/login'
+          if (!response.config._autoLogin && !response.config.url.includes('/api/auth/login') && !isLoginPage) {
+            handleTokenExpiration(true, response.data.message)
+          }
+          return Promise.reject(new Error(response.data.message || '登录已过期，请重新登录'))
         }
 
-        ElMessage.error(response.data.message || '请求失败')
         return Promise.reject(new Error(response.data.message || '请求失败'))
       }
     }
@@ -46,44 +56,46 @@ Server.interceptors.response.use(
   },
   error => {
     if (!error.response) {
-      ElMessage.error('网络连接失败，请检查网络连接')
-      return Promise.reject(error)
+      return Promise.reject(new Error('网络连接失败，请检查网络连接'))
     }
 
     const status = error.response.status
     const url = error.config?.url || ''
 
     switch (status) {
-      case 401:
-        handleTokenExpiration()
-        break
+      case 401: {
+        const errorMessage = error.response.data?.message || '登录已过期，请重新登录'
+        const isLoginPage = router.currentRoute.value.path === '/login'
+        if (!error.config._autoLogin && !error.config.url.includes('/api/auth/login') && !isLoginPage) {
+          handleTokenExpiration(true, errorMessage)
+        }
+        return Promise.reject(new Error(errorMessage))
+      }
       case 403:
-        ElMessage.error('权限不足，无法访问该资源')
-        break
+        return Promise.reject(new Error('权限不足，无法访问该资源'))
       case 404:
         if (url.includes('/api/card-keys/')) {
-          ElMessage.error('卡密不存在或参数错误')
+          return Promise.reject(new Error('卡密不存在或参数错误'))
         }
-        break
+        return Promise.reject(new Error('请求的资源不存在'))
       case 500:
-        ElMessage.error('服务器内部错误，请联系管理员')
-        break
+        return Promise.reject(new Error('服务器内部错误，请联系管理员'))
       default:
-        ElMessage.error('请求失败，请稍后重试')
+        return Promise.reject(new Error('请求失败，请稍后重试'))
     }
-
-    return Promise.reject(error)
   }
 )
 
-function handleTokenExpiration() {
+function handleTokenExpiration(showMessage = true, message = '登录已过期，请重新登录') {
   removeToken()
 
   if (store && store.clearUser) {
     store.clearUser()
   }
 
-  ElMessage.error('登录已过期，请重新登录')
+  if (showMessage) {
+    ElMessage.error(message)
+  }
 
   const currentPath = router.currentRoute.value.path
   if (currentPath !== '/login' && !currentPath.includes('/login')) {
@@ -93,8 +105,8 @@ function handleTokenExpiration() {
 
 const http = {
   get: (url, params = {}) => Server.get(url, { params }),
-  post: (url, data = {}) => Server.post(url, data),
-  put: (url, data = {}) => Server.put(url, data),
+  post: (url, data = {}, config = {}) => Server.post(url, data, config),
+  put: (url, data = {}, config = {}) => Server.put(url, data, config),
   delete: (url, params = {}) => Server.delete(url, { params }),
   upload: (url, formData, onUploadProgress) => {
     return Server.post(url, formData, {

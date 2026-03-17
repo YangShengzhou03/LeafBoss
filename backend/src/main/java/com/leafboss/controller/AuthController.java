@@ -177,7 +177,7 @@ public class AuthController {
         }
 
         if (admin.getStatus() == null || admin.getStatus().trim().isEmpty()) {
-            admin.setStatus("active");
+            admin.setStatus("inactive");
         }
 
         admin.setCreatedAt(LocalDateTime.now());

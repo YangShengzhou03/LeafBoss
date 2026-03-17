@@ -314,7 +314,6 @@ const checkPasswordStrength = () => {
   }
 }
 
-// 显示用户协议
 const showUserAgreement = () => {
   ElMessageBox.alert(
     '管理员用户协议内容...',
@@ -326,7 +325,6 @@ const showUserAgreement = () => {
   )
 }
 
-// 显示隐私政策
 const showPrivacyPolicy = () => {
   router.push('/privacy-policy')
 }
@@ -341,7 +339,7 @@ const handleLogin = async () => {
       ElMessage.error(response.message || '登录失败');
     }
   } catch (error) {
-    ElMessage.error('登录失败，请检查网络连接');
+    ElMessage.error(error.message || '登录失败，请检查网络连接');
   }
 };
 
@@ -378,7 +376,6 @@ const handleForgotPassword = async () => {
   }
 };
 
-// 在模板挂载后设置组件引用为markRaw
 onMounted(() => {
   if (loginFormRef.value) {
     loginFormRef.value = markRaw(loginFormRef.value)
